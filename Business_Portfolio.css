@@ -1113,7 +1113,7 @@ section::before {
     }
     
     .logo-image {
-        height: 45px;
+        height: 30px;
     }
     
     .logo {
@@ -1136,7 +1136,8 @@ section::before {
     }
 
     .logo-image-right {
-        display: none;
+        display: block;
+        height: 30px;
     }
 
     .logo-text-main {
