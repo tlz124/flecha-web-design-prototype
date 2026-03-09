@@ -149,10 +149,8 @@ header {
     gap: 0.75rem;
     text-decoration: none;
     transition: all 0.3s ease;
-    border: 1px solid var(--border-gray);
     padding: 0.5rem 1rem;
     border-radius: 4px;
-    background: var(--black);
 }
 
 .logo-image {
@@ -1137,6 +1135,24 @@ section::before {
         letter-spacing: 1.5px;
     }
 
+    .logo-image-right {
+        display: none;
+    }
+
+    .logo-text-main {
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+    }
+
+    .logo-text-sub {
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+    }
+
+    .nav-container {
+        gap: 0.5rem;
+    }
+
     .section-title {
         font-size: 2.5rem;
     }
@@ -1354,7 +1370,27 @@ section::before {
 }
 
 
+/* ===== Social Media Icons ===== */
+.social-icons {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    justify-content: center;
+    margin: 1rem 0;
+}
 
+.social-icon {
+    color: var(--text-gray);
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.social-icon:hover {
+    color: var(--purple-accent);
+    transform: translateY(-3px);
+    filter: drop-shadow(0 0 8px rgba(212, 165, 255, 0.5));
+}
 
 
 
