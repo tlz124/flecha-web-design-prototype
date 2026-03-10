@@ -1113,7 +1113,7 @@ section::before {
     }
     
     .logo-image {
-        height: 20px;
+        height: 15px;
     }
     
     .logo {
@@ -1126,18 +1126,20 @@ section::before {
     }
     
     .logo-text-main {
-        font-size: 1rem;
-        letter-spacing: 1.5px;
-    }
-    
-    .logo-text-sub {
-        font-size: 1rem;
-        letter-spacing: 1.5px;
+        font-size: 0.55rem;
+        letter-spacing: 0.25px;
+        white-space: nowrap;
     }
 
+    .logo-text-sub {
+        font-size: 0.55rem;
+        letter-spacing: 0.25px;
+        white-space: nowrap;
+    }
+    
     .logo-image-right {
         display: block;
-        height: 20px;
+        height: 15px;
     }
 
     .logo-text-main {
