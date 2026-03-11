@@ -1113,7 +1113,7 @@ section::before {
     }
     
     .logo-image {
-        height: 10px !important;
+        height: 20px !important;
         width: auto !important;
         margin: 0 !important;
     }
@@ -1141,7 +1141,7 @@ section::before {
     
     .logo-image-right {
         display: block !important;
-        height: 15px !important;
+        height: 20px !important;
         width: auto !important;
         margin: 0 !important;
     }
