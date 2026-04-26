@@ -335,14 +335,7 @@ document.querySelectorAll('.tier-card').forEach(card => {
         // Set demo link
         const demoLink = document.getElementById('tierModalDemoLink');
         demoLink.href = tier.link;
-        demoLink.onclick = function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            if (tier.link && tier.link !== '#') {
-                window.open(tier.link, '_blank', 'noopener,noreferrer');
-            }
-            return false;
-        };
+        demoLink.onclick = null;
 
         // Show modal
         tierModal.style.display = 'block';
@@ -451,7 +444,7 @@ document.addEventListener('keydown', (e) => {
 const consultationForm = document.getElementById('consultationForm');
 
 // ===== Smooth Scroll for Navigation Links =====
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+document.querySelectorAll('a[href^="#"]:not([id="tierModalDemoLink"])').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         const href = this.getAttribute('href');
 
