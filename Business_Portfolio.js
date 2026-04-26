@@ -6,9 +6,50 @@ const projects = [
         category: "Small Business",
         description: "Modern florist website with online ordering and delivery",
         fullDescription: "A beautiful, user-friendly website for a local flower shop featuring an elegant gallery of floral arrangements, easy online ordering with customization options, and delivery scheduling. The site includes information about special occasion packages for weddings, funerals, and events. The design captures elegance and warmth while making it simple for customers to browse and order flowers for any occasion.",
-        image: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600&h=400&fit=crop",
+        image: "floral_shop.jpg",
         technologies: ["HTML5", "CSS3", "JavaScript", "Online Ordering", "Local SEO"],
-        liveLink: "https://tlz124.github.io/Watsons-Flowers/"
+        liveLink: "https://tlz124.github.io/Watsons-Flowers/",
+        tiers: [
+            {
+                label: "Essential",
+                price: "$1,000",
+                description: "A clean, professional online presence for your flower shop — everything you need to get discovered and make a great first impression.",
+                features: [
+                    "Mobile Responsive Design",
+                    "Photo Gallery",
+                    "Contact Form",
+                    "Business Hours, Location & Google Maps",
+                    "Social Media Links"
+                ],
+                link: "https://tlz124.github.io/floral-shop-essential/"
+            },
+            {
+                label: "Essential Plus",
+                price: "$3,000",
+                description: "Everything in Essential, plus expanded features to showcase your products and build customer trust.",
+                features: [
+                    "Everything in Essential",
+                    "Product Catalog with Pricing",
+                    "Delivery Area Section",
+                    "Testimonials Section",
+                    "Expanded Navigation"
+                ],
+                link: "#"
+            },
+            {
+                label: "Custom",
+                price: "$5,000+",
+                description: "A fully custom build tailored to your exact vision — complex functionality, unique design, and priority support.",
+                features: [
+                    "Everything in Essential Plus",
+                    "Complex Custom Functionality",
+                    "Custom Quote Based on Scope",
+                    "Priority Support",
+                    "Extended Launch Support"
+                ],
+                link: "#"
+            }
+        ]
     },
     {
         id: 1,
@@ -33,7 +74,7 @@ const projects = [
     {
         id: 3,
         title: "Modern Dental Office",
-        category: "Small Business",
+        category: "Healthcare",
         description: "Contemporary dental practice with patient portal and services",
         fullDescription: "A professional website for a modern dental office featuring comprehensive service descriptions, dentist profiles, patient portal access, and online appointment scheduling. The site includes educational resources about dental health, insurance information, and virtual office tours. The clean, trustworthy design helps patients feel comfortable while emphasizing the practice's expertise and modern technology.",
         image: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=600&h=400&fit=crop",
@@ -132,7 +173,6 @@ const managePreferencesBtn = document.getElementById('managePreferences');
 function checkCookieConsent() {
     const cookieChoice = localStorage.getItem('cookieConsent');
     if (!cookieChoice) {
-        // Show cookie banner after a short delay
         setTimeout(() => {
             cookieConsent.classList.remove('hidden');
         }, 1000);
@@ -150,7 +190,6 @@ rejectAllBtn.addEventListener('click', () => {
 });
 
 managePreferencesBtn.addEventListener('click', () => {
-    // For now, just open accept dialog - could be expanded to show preferences modal
     alert('Cookie preferences: You can customize your cookie settings here. For this demo, we only use essential cookies for site functionality.');
     localStorage.setItem('cookieConsent', 'managed');
     cookieConsent.classList.add('hidden');
@@ -210,7 +249,7 @@ viewDetailsButtons.forEach(button => {
         document.getElementById('modalTitle').textContent = project.title;
         document.getElementById('modalDescription').textContent = project.description;
         document.getElementById('modalFullDescription').textContent = project.fullDescription;
-        
+
         // Add technologies
         const techContainer = document.getElementById('modalTechnologies');
         techContainer.innerHTML = '';
@@ -221,7 +260,29 @@ viewDetailsButtons.forEach(button => {
             techContainer.appendChild(techTag);
         });
 
-        // Update live link - use onclick to force it to work
+        // Render tier buttons if available
+        const tiersContainer = document.getElementById('modalTiers');
+        tiersContainer.innerHTML = '';
+        if (project.tiers && project.tiers.length > 0) {
+            document.getElementById('modalTiersSection').style.display = 'block';
+            project.tiers.forEach((tier, index) => {
+                const tierBtn = document.createElement('a');
+                tierBtn.href = tier.link;
+                tierBtn.className = 'tier-btn tier-btn--' + (index + 1);
+                tierBtn.target = '_blank';
+                tierBtn.rel = 'noopener noreferrer';
+                tierBtn.innerHTML = `
+                    <span class="tier-btn__icon">${'◆'.repeat(index + 1)}</span>
+                    <span class="tier-btn__label">${tier.label}</span>
+                    <span class="arrow-icon">→</span>
+                `;
+                tiersContainer.appendChild(tierBtn);
+            });
+        } else {
+            document.getElementById('modalTiersSection').style.display = 'none';
+        }
+
+        // Update live link
         const liveLink = document.getElementById('modalLiveLink');
         if (liveLink) {
             liveLink.href = project.liveLink;
@@ -237,6 +298,76 @@ viewDetailsButtons.forEach(button => {
         projectModal.style.display = 'block';
         document.body.style.overflow = 'hidden';
     });
+});
+
+// ===== Tier Card Click Handlers =====
+const tierModal = document.getElementById('tierModal');
+
+document.querySelectorAll('.tier-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const projectId = parseInt(card.getAttribute('data-project'));
+        const tierIndex = parseInt(card.getAttribute('data-tier'));
+        const project = projects[projectId];
+        const tier = project.tiers[tierIndex];
+        if (!tier) return;
+
+        // Set tier number class for styling (1, 2, or 3)
+        const tierContent = document.getElementById('tierModalContent');
+        tierContent.className = 'tier-modal-content tier-modal-content--' + (tierIndex + 1);
+
+        // Populate modal
+        document.getElementById('tierModalName').textContent = tier.label;
+        document.getElementById('tierModalDiamonds').textContent = '◆'.repeat(tierIndex + 1);
+        document.getElementById('tierModalPrice').textContent = tier.price;
+        document.getElementById('tierModalDescription').textContent = tier.description;
+
+        // Populate features
+        const featuresList = document.getElementById('tierModalFeatures');
+        featuresList.innerHTML = '';
+        tier.features.forEach(feature => {
+            const li = document.createElement('li');
+            li.textContent = feature;
+            featuresList.appendChild(li);
+        });
+
+        // Set demo link
+        const demoLink = document.getElementById('tierModalDemoLink');
+        demoLink.href = tier.link;
+        demoLink.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (tier.link && tier.link !== '#') {
+                window.open(tier.link, '_blank', 'noopener,noreferrer');
+            }
+            return false;
+        };
+
+        // Show modal
+        tierModal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    });
+});
+
+// Close tier modal
+document.getElementById('closeTierModal').addEventListener('click', () => {
+    tierModal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+});
+
+window.addEventListener('click', (e) => {
+    if (e.target === tierModal) {
+        tierModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && tierModal && tierModal.style.display === 'block') {
+        tierModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
 });
 
 // ===== Legal Modals Functionality =====
@@ -268,20 +399,18 @@ closeModalButtons.forEach(button => {
         if (modalId) {
             document.getElementById(modalId).style.display = 'none';
         } else {
-            // Close project modal if no data-modal attribute
             projectModal.style.display = 'none';
         }
         document.body.style.overflow = 'auto';
     });
 });
 
-// Close modal when clicking outside (but not on links or content)
+// Close modal when clicking outside
 window.addEventListener('click', (e) => {
-    // Don't close if clicking on a link inside the modal
     if (e.target.tagName === 'A' || e.target.closest('a')) {
         return;
     }
-    
+
     if (e.target === projectModal) {
         projectModal.style.display = 'none';
         document.body.style.overflow = 'auto';
@@ -321,19 +450,16 @@ document.addEventListener('keydown', (e) => {
 // ===== Consultation Form Handling =====
 const consultationForm = document.getElementById('consultationForm');
 
-
-
-
 // ===== Smooth Scroll for Navigation Links =====
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         const href = this.getAttribute('href');
-        
+
         // Don't prevent default for modal links
         if (href === '#privacyModal' || href === '#accessibilityModal') {
             return;
         }
-        
+
         e.preventDefault();
         const target = document.querySelector(href);
         if (target) {
@@ -404,20 +530,16 @@ const allProjectCards = document.querySelectorAll('.project-card');
 
 filterButtons.forEach(button => {
     button.addEventListener('click', () => {
-        // Remove active class from all buttons
         filterButtons.forEach(btn => btn.classList.remove('active'));
-        
-        // Add active class to clicked button
         button.classList.add('active');
-        
+
         const filterValue = button.getAttribute('data-filter');
-        
+
         allProjectCards.forEach(card => {
             const category = card.querySelector('.project-category').textContent;
-            
+
             if (filterValue === 'all' || category === filterValue) {
                 card.classList.remove('hidden');
-                // Re-trigger animation
                 card.style.animation = 'none';
                 setTimeout(() => {
                     card.style.animation = 'fadeInUp 0.6s ease forwards';
@@ -434,74 +556,65 @@ filterButtons.forEach(button => {
 (function() {
     const heroCanvas = document.getElementById('heroCanvas');
     if (!heroCanvas) return;
-    
+
     const ctx = heroCanvas.getContext('2d');
     let particles = [];
     let mouse = { x: null, y: null, radius: 150 };
     let animationFrameId = null;
-    
+
     function resizeCanvas() {
         heroCanvas.width = heroCanvas.offsetWidth;
         heroCanvas.height = heroCanvas.offsetHeight;
         initParticles();
     }
-    
+
     function initParticles() {
         const width = heroCanvas.width;
         const height = heroCanvas.height;
         const isMobile = width <= 768;
         const isPortrait = width < height;
-        
-        // Adjust particle count based on screen size and orientation
+
         let particleCount;
         if (isMobile) {
-            particleCount = isPortrait ? 30 : 40; // Fewer in portrait mode
+            particleCount = isPortrait ? 30 : 40;
         } else {
             particleCount = 80;
         }
-        
-        // Calculate connection distance based on screen size
+
         const connectionDistance = isMobile ? 100 : 150;
-        
         particles = Array.from({ length: particleCount }, () => new Particle(connectionDistance));
     }
-    
+
     class Particle {
         constructor(connectionDistance) {
             this.connectionDistance = connectionDistance;
             this.x = Math.random() * heroCanvas.width;
             this.y = Math.random() * heroCanvas.height;
-            
-            // Slower movement on mobile for smoother performance
+
             const speedMultiplier = window.innerWidth <= 768 ? 0.3 : 0.5;
             this.vx = (Math.random() - 0.5) * speedMultiplier;
             this.vy = (Math.random() - 0.5) * speedMultiplier;
-            
-            // Slightly larger nodes on mobile for better visibility
+
             this.radius = window.innerWidth <= 768 ? 2.5 : 2;
             this.baseRadius = this.radius;
         }
-        
+
         update() {
             this.x += this.vx;
             this.y += this.vy;
-            
-            // Bounce off edges
+
             if (this.x < 0 || this.x > heroCanvas.width) this.vx *= -1;
             if (this.y < 0 || this.y > heroCanvas.height) this.vy *= -1;
-            
-            // Clamp position within bounds
+
             this.x = Math.max(0, Math.min(heroCanvas.width, this.x));
             this.y = Math.max(0, Math.min(heroCanvas.height, this.y));
-            
-            // Mouse interaction (desktop only for performance)
+
             if (mouse.x !== null && window.innerWidth > 768) {
                 const dx = mouse.x - this.x;
                 const dy = mouse.y - this.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
-                
+
                 if (distance < mouse.radius) {
-                    // Repel from mouse
                     const angle = Math.atan2(dy, dx);
                     const force = (mouse.radius - distance) / mouse.radius;
                     this.x -= Math.cos(angle) * force * 2;
@@ -514,9 +627,8 @@ filterButtons.forEach(button => {
                 this.radius = this.baseRadius;
             }
         }
-        
+
         draw() {
-            // Glowing node effect
             ctx.shadowBlur = 10;
             ctx.shadowColor = 'rgba(102, 126, 234, 0.8)';
             ctx.fillStyle = 'rgba(102, 126, 234, 0.9)';
@@ -525,22 +637,20 @@ filterButtons.forEach(button => {
             ctx.fill();
             ctx.shadowBlur = 0;
         }
-        
+
         connect(otherParticle) {
             const dx = otherParticle.x - this.x;
             const dy = otherParticle.y - this.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
-            
+
             if (distance < this.connectionDistance) {
-                // Fade connection based on distance
                 const opacity = (1 - distance / this.connectionDistance) * 0.5;
-                
-                // Gradient line for better visual effect
+
                 const gradient = ctx.createLinearGradient(this.x, this.y, otherParticle.x, otherParticle.y);
                 gradient.addColorStop(0, `rgba(102, 126, 234, ${opacity})`);
                 gradient.addColorStop(0.5, `rgba(118, 75, 162, ${opacity})`);
                 gradient.addColorStop(1, `rgba(102, 126, 234, ${opacity})`);
-                
+
                 ctx.strokeStyle = gradient;
                 ctx.lineWidth = 1.5;
                 ctx.beginPath();
@@ -550,28 +660,26 @@ filterButtons.forEach(button => {
             }
         }
     }
-    
-    // Mouse/Touch tracking
+
     heroCanvas.addEventListener('mousemove', (e) => {
         const rect = heroCanvas.getBoundingClientRect();
         mouse.x = e.clientX - rect.left;
         mouse.y = e.clientY - rect.top;
     });
-    
+
     heroCanvas.addEventListener('mouseleave', () => {
         mouse.x = null;
         mouse.y = null;
     });
-    
-    // Touch support (simplified for mobile)
+
     heroCanvas.addEventListener('touchstart', (e) => {
-        if (window.innerWidth <= 768) return; // Disable on mobile for performance
+        if (window.innerWidth <= 768) return;
         const rect = heroCanvas.getBoundingClientRect();
         const touch = e.touches[0];
         mouse.x = touch.clientX - rect.left;
         mouse.y = touch.clientY - rect.top;
     });
-    
+
     heroCanvas.addEventListener('touchmove', (e) => {
         if (window.innerWidth <= 768) return;
         e.preventDefault();
@@ -580,54 +688,48 @@ filterButtons.forEach(button => {
         mouse.x = touch.clientX - rect.left;
         mouse.y = touch.clientY - rect.top;
     });
-    
+
     heroCanvas.addEventListener('touchend', () => {
         mouse.x = null;
         mouse.y = null;
     });
-    
+
     resizeCanvas();
-    
-    // Debounced resize handler
+
     let resizeTimeout;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(resizeCanvas, 250);
     });
-    
-    // Animation loop with performance optimization
+
     let lastFrameTime = 0;
-    const targetFPS = window.innerWidth <= 768 ? 30 : 60; // Lower FPS on mobile
+    const targetFPS = window.innerWidth <= 768 ? 30 : 60;
     const frameInterval = 1000 / targetFPS;
-    
+
     function animateParticles(currentTime) {
         animationFrameId = requestAnimationFrame(animateParticles);
-        
+
         const deltaTime = currentTime - lastFrameTime;
-        
+
         if (deltaTime < frameInterval) return;
-        
+
         lastFrameTime = currentTime - (deltaTime % frameInterval);
-        
-        // Clear with slight trail effect
+
         ctx.fillStyle = 'rgba(26, 35, 62, 0.05)';
         ctx.fillRect(0, 0, heroCanvas.width, heroCanvas.height);
-        
-        // Update and draw particles
+
         particles.forEach((particle, i) => {
             particle.update();
             particle.draw();
-            
-            // Connect to nearby particles
+
             for (let j = i + 1; j < particles.length; j++) {
                 particle.connect(particles[j]);
             }
         });
     }
-    
+
     animateParticles(0);
-    
-    // Pause animation when tab is not visible (performance optimization)
+
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
             if (animationFrameId) {
@@ -651,5 +753,3 @@ dateInput.addEventListener('blur', function() {
         this.type = 'text';
     }
 });
-
-

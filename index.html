@@ -7,6 +7,7 @@
     <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
     <title>Flecha Web Design - Web Design for Education & Small Business</title>
+    <link rel="icon" type="image/png" href="flecha-web-design-logo.png">
     <link rel="stylesheet" href="Business_Portfolio.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -22,10 +23,6 @@
             </div>
         </div>
     </div>
-
-
-
-
 
     <!-- Header/Navigation -->
     <header>
@@ -172,17 +169,35 @@
             
             <div class="projects-grid">
                 <!-- Small Business Projects -->
-                <div class="project-card">
+                <div class="project-card project-card--tiered">
                     <div class="project-image">
-                        <img src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600&h=400&fit=crop" alt="Local Flower Shop">
-                        <div class="project-overlay">
-                            <button class="view-details" data-project="0">View Details <span class="arrow-icon">→</span></button>
-                        </div>
+                        <img src="floral_shop.jpg" alt="Local Flower Shop">
+                        <div class="project-tier-badge">3 Demo Tiers</div>
                     </div>
                     <div class="project-info">
                         <span class="project-category">Small Business</span>
                         <h3 class="project-title">Local Flower Shop</h3>
                         <p class="project-description">Modern florist website with online ordering and delivery</p>
+                    </div>
+                    <div class="project-tiers">
+                        <p class="project-tiers__label">Choose a tier to view the demo</p>
+                        <div class="project-tiers__buttons">
+                            <a href="#" class="tier-card tier-card--1" data-project="0" data-tier="0">
+                                <span class="tier-card__diamonds">◆</span>
+                                <span class="tier-card__name">Essential</span>
+                                <span class="tier-card__arrow">→</span>
+                            </a>
+                            <a href="#" class="tier-card tier-card--2" data-project="0" data-tier="1">
+                                <span class="tier-card__diamonds">◆◆</span>
+                                <span class="tier-card__name">Essential Plus</span>
+                                <span class="tier-card__arrow">→</span>
+                            </a>
+                            <a href="#" class="tier-card tier-card--3" data-project="0" data-tier="2">
+                                <span class="tier-card__diamonds">◆◆◆</span>
+                                <span class="tier-card__name">Custom</span>
+                                <span class="tier-card__arrow">→</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
@@ -222,7 +237,7 @@
                         </div>
                     </div>
                     <div class="project-info">
-                        <span class="project-category">Small Business</span>
+                        <span class="project-category">Healthcare</span>
                         <h3 class="project-title">Modern Dental Office</h3>
                         <p class="project-description">Contemporary dental practice with patient portal and services</p>
                     </div>
@@ -356,93 +371,93 @@
     </section>
 
     <!-- Pricing & Payment Section -->
-<section id="pricing" class="pricing-section">
-    <div class="container">
-        <h2 class="section-title">Investment</h2>
-        <p class="section-subtitle">Simple, transparent pricing — no surprises</p>
+    <section id="pricing" class="pricing-section">
+        <div class="container">
+            <h2 class="section-title">Investment</h2>
+            <p class="section-subtitle">Simple, transparent pricing — no surprises</p>
 
-        <div class="pricing-grid">
+            <div class="pricing-grid">
 
-            <!-- Tier 1: Essential -->
-            <div class="pricing-card">
-                <div class="pricing-header">
-                    <h3 class="pricing-name">Essential</h3>
-                    <div class="pricing-amount">
-                        <span class="pricing-total">$1,000</span>
-                        <span class="pricing-label">Total Project Price</span>
+                <!-- Tier 1: Essential -->
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3 class="pricing-name">Essential</h3>
+                        <div class="pricing-amount">
+                            <span class="pricing-total">$1,000</span>
+                            <span class="pricing-label">Total Project Price</span>
+                        </div>
+                    </div>
+                    <div class="pricing-body">
+                        <ul class="pricing-features">
+                            <li>✓ Mobile Responsive Design</li>
+                            <li>✓ Photo Gallery</li>
+                            <li>✓ Contact Form</li>
+                            <li>✓ Business Hours, Location & Google Maps</li>
+                            <li>✓ Social Media Links</li>
+                        </ul>
+                        <a href="#contact" class="pricing-cta">
+                            Request Consultation <span class="arrow-icon">→</span>
+                        </a>
                     </div>
                 </div>
-                <div class="pricing-body">
-                    <ul class="pricing-features">
-                        <li>✓ Mobile Responsive Design</li>
-                        <li>✓ Photo Gallery</li>
-                        <li>✓ Contact Form</li>
-                        <li>✓ Business Hours, Location & Google Maps</li>
-                        <li>✓ Social Media Links</li>
-                    </ul>
-                    <a href="#contact" class="pricing-cta">
-                        Request Consultation <span class="arrow-icon">→</span>
-                    </a>
-                </div>
-            </div>
 
-            <!-- Tier 2: Name TBD -->
-            <div class="pricing-card pricing-card-featured">
-                <div class="pricing-featured-label">Most Popular</div>
-                <div class="pricing-header">
-                    <h3 class="pricing-name">Coming Soon</h3>
-                    <div class="pricing-amount">
-                        <span class="pricing-total">$3,000</span>
-                        <span class="pricing-label">Total Project Price</span>
+                <!-- Tier 2: Essential Plus -->
+                <div class="pricing-card pricing-card-featured">
+                    <div class="pricing-featured-label">Most Popular</div>
+                    <div class="pricing-header">
+                        <h3 class="pricing-name">Coming Soon</h3>
+                        <div class="pricing-amount">
+                            <span class="pricing-total">$3,000</span>
+                            <span class="pricing-label">Total Project Price</span>
+                        </div>
+                    </div>
+                    <div class="pricing-body">
+                        <ul class="pricing-features">
+                            <li>✓ Everything in Essential</li>
+                            <li>✓ Product Catalog with Pricing</li>
+                            <li>✓ Delivery Area Section</li>
+                            <li>✓ Testimonials Section</li>
+                            <li>✓ Expanded Navigation</li>
+                        </ul>
+                        <a href="#contact" class="pricing-cta">
+                            Request Consultation <span class="arrow-icon">→</span>
+                        </a>
                     </div>
                 </div>
-                <div class="pricing-body">
-                    <ul class="pricing-features">
-                        <li>✓ Everything in Essential</li>
-                        <li>✓ Product Catalog with Pricing</li>
-                        <li>✓ Delivery Area Section</li>
-                        <li>✓ Testimonials Section</li>
-                        <li>✓ Expanded Navigation</li>
-                    </ul>
-                    <a href="#contact" class="pricing-cta">
-                        Request Consultation <span class="arrow-icon">→</span>
-                    </a>
-                </div>
-            </div>
 
-            <!-- Tier 3: Custom -->
-            <div class="pricing-card">
-                <div class="pricing-header">
-                    <h3 class="pricing-name">Custom</h3>
-                    <div class="pricing-amount">
-                        <span class="pricing-total">$5,000+</span>
-                        <span class="pricing-label">Starting Price</span>
+                <!-- Tier 3: Custom -->
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3 class="pricing-name">Custom</h3>
+                        <div class="pricing-amount">
+                            <span class="pricing-total">$5,000+</span>
+                            <span class="pricing-label">Starting Price</span>
+                        </div>
+                    </div>
+                    <div class="pricing-body">
+                        <ul class="pricing-features">
+                            <li>✓ Everything in Tier 2</li>
+                            <li>✓ Complex Functionality</li>
+                            <li>✓ Custom Quote Based on Scope</li>
+                            <li>✓ Priority Support</li>
+                            <li>✓ Extended Launch Support</li>
+                        </ul>
+                        <a href="#contact" class="pricing-cta">
+                            Request Consultation <span class="arrow-icon">→</span>
+                        </a>
                     </div>
                 </div>
-                <div class="pricing-body">
-                    <ul class="pricing-features">
-                        <li>✓ Everything in Tier 2</li>
-                        <li>✓ Complex Functionality</li>
-                        <li>✓ Custom Quote Based on Scope</li>
-                        <li>✓ Priority Support</li>
-                        <li>✓ Extended Launch Support</li>
-                    </ul>
-                    <a href="#contact" class="pricing-cta">
-                        Request Consultation <span class="arrow-icon">→</span>
-                    </a>
-                </div>
+
             </div>
+
+            <p class="pricing-note">
+                All tiers include a 50% deposit at project start with the
+                remaining balance due on delivery. Optional maintenance &amp;
+                support plans available for all tiers.
+            </p>
 
         </div>
-
-        <p class="pricing-note">
-            All tiers include a 50% deposit at project start with the
-            remaining balance due on delivery. Optional maintenance &amp;
-            support plans available for all tiers.
-        </p>
-
-    </div>
-</section>
+    </section>
 
     <!-- Contact Section -->
     <section id="contact" class="contact">
@@ -455,7 +470,7 @@
                     <div class="contact-details">
                         <div class="contact-item">
                             <strong>Email:</strong>
-                            <a href="/cdn-cgi/l/email-protection#eb9c9c9cc5ad878e88838ac6bc8e89af8e98828c85c5888486">www.Flecha-WebDesign.com</a>
+                            <a href="mailto:www.Flecha-WebDesign.com">www.Flecha-WebDesign.com</a>
                         </div>
                         <div class="contact-item">
                             <strong>Phone:</strong>
@@ -466,7 +481,7 @@
 
                 <div class="consultation-form">
                     <h3>Request a Consultation</h3>
-                    <form action="https://formspree.io/f/xreavegv" method="POST">
+                    <form id="consultationForm" action="https://formspree.io/f/xreavegv" method="POST">
                         <div class="form-group">
                             <input type="text" name="name" placeholder="Your Name" required pattern="[A-Za-z\s\-']{2,50}" title="Please enter a valid name (letters only, 2-50 characters)">
                         </div>
@@ -476,14 +491,9 @@
                         <div class="form-group">
                             <input type="tel" name="phone" placeholder="Your Phone Number" required pattern="[\d\s\-\+\(\)]{7,15}" title="Please enter a valid phone number">
                         </div>
-                        
-                        
-                        
                         <div class="form-group">
                             <input type="text" id="preferred_date" name="preferred_date" placeholder="Preferred Date" required>
                         </div>
-
-
                         <div class="form-group">
                             <select name="preferred_time" required>
                                 <option value="" disabled selected>Select a Preferred Time</option>
@@ -499,11 +509,6 @@
                             </select>
                         </div>
 
-
-
-
-
-
                         <!-- FormSubmit Configuration -->
                         <input type="hidden" name="_subject" value="New Consultation Request - Flecha Web Design">
                         <input type="hidden" name="_captcha" value="true">
@@ -517,29 +522,30 @@
     </section>
 
     <!-- Footer -->
-<footer class="footer">
-    <div class="container">
-        <p>&copy; 2026 Flecha Web Design. All rights reserved.</p>
-        <div class="social-icons">
-            <a href="YOUR_FACEBOOK_URL" class="social-icon" target="_blank" aria-label="Facebook">
-                <i class="fa-brands fa-facebook"></i>
-            </a>
-            <a href="YOUR_LINKEDIN_URL" class="social-icon" target="_blank" aria-label="LinkedIn">
-                <i class="fa-brands fa-linkedin"></i>
-            </a>
-            <a href="YOUR_X_URL" class="social-icon" target="_blank" aria-label="X">
-                <i class="fa-brands fa-x-twitter"></i>
-            </a>
-            <a href="YOUR_INSTAGRAM_URL" class="social-icon" target="_blank" aria-label="Instagram">
-                <i class="fa-brands fa-instagram"></i>
-            </a>
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Flecha Web Design. All rights reserved.</p>
+            <div class="social-icons">
+                <a href="YOUR_FACEBOOK_URL" class="social-icon" target="_blank" aria-label="Facebook">
+                    <i class="fa-brands fa-facebook"></i>
+                </a>
+                <a href="YOUR_LINKEDIN_URL" class="social-icon" target="_blank" aria-label="LinkedIn">
+                    <i class="fa-brands fa-linkedin"></i>
+                </a>
+                <a href="YOUR_X_URL" class="social-icon" target="_blank" aria-label="X">
+                    <i class="fa-brands fa-x-twitter"></i>
+                </a>
+                <a href="YOUR_INSTAGRAM_URL" class="social-icon" target="_blank" aria-label="Instagram">
+                    <i class="fa-brands fa-instagram"></i>
+                </a>
+            </div>
+            <div class="footer-links">
+                <a href="#privacyModal" class="footer-link" id="privacyLink">Privacy Policy</a>
+                <a href="#accessibilityModal" class="footer-link" id="accessibilityLink">Accessibility Statement</a>
+            </div>
         </div>
-        <div class="footer-links">
-            <a href="#privacyModal" class="footer-link" id="privacyLink">Privacy Policy</a>
-            <a href="#accessibilityModal" class="footer-link" id="accessibilityLink">Accessibility Statement</a>
-        </div>
-    </div>
-</footer>
+    </footer>
+
     <!-- Privacy Policy Modal -->
     <div id="privacyModal" class="modal">
         <div class="modal-content legal-modal">
@@ -555,7 +561,7 @@
                 <p>We never share your data.</p>
                 
                 <h3>User Rights</h3>
-                <p>You have the right to delete your information at any time. Simply email us at <a href="/cdn-cgi/l/email-protection#51173d343239307c06343315342238363f11173d343239307c06343315342238363f7f323e3c"><span class="__cf_email__" data-cfemail="591f353c3a3138740e3c3b1d3c2a303e37191f353c3a3138740e3c3b1d3c2a303e37773a3634">[email&#160;protected]</span></a>.</p>
+                <p>You have the right to delete your information at any time. Simply email us at <a href="mailto:www.Flecha-WebDesign.com">www.Flecha-WebDesign.com</a>.</p>
                 
                 <h2>Terms of Service</h2>
                 <p>By using our site, you agree to use it for lawful purposes and respect our intellectual property. While we strive for 100% uptime, we cannot guarantee the site will always be error-free.</p>
@@ -589,7 +595,7 @@
                 
                 <h3>Feedback and Contact</h3>
                 <p>We welcome your feedback on the accessibility of Flecha Web Design. Please let us know if you encounter accessibility barriers on our site.</p>
-                <p><strong>Email:</strong> <a href="/cdn-cgi/l/email-protection#b3c4c4c49df5dfd6d0dbd29ee4d6d1f7d6c0dad4dd9dd0dcde">www.Flecha-WebDesign.com</a></p>
+                <p><strong>Email:</strong> <a href="mailto:www.Flecha-WebDesign.com">www.Flecha-WebDesign.com</a></p>
                 <p><strong>Phone:</strong> (480) 995-7487</p>
                 <p><strong>Response Time:</strong> We aim to respond to accessibility inquiries within 2 business days.</p>
                 
@@ -603,6 +609,7 @@
             </div>
         </div>
     </div>
+
     <!-- Project Detail Modal -->
     <div id="projectModal" class="modal">
         <div class="modal-content">
@@ -618,6 +625,16 @@
                         <p id="modalFullDescription"></p>
                         <h4>Technologies Used</h4>
                         <div id="modalTechnologies" class="tech-tags"></div>
+
+                        <!-- Tier Demo Buttons (shown only when tiers exist) -->
+                        <div id="modalTiersSection" class="modal-tiers-section" style="display:none;">
+                            <h4 class="modal-tiers-heading">
+                                <span class="modal-tiers-heading__icon">⬡</span>
+                                View Demo By Tier
+                            </h4>
+                            <div id="modalTiers" class="modal-tiers"></div>
+                        </div>
+
                         <div class="modal-links">
                             <a href="#" id="modalLiveLink" class="modal-link" target="_blank" rel="noopener noreferrer">View Live Site <span class="arrow-icon">→</span></a>
                         </div>
@@ -627,17 +644,33 @@
         </div>
     </div>
 
-
+    <!-- Tier Detail Modal -->
+    <div id="tierModal" class="modal">
+        <div id="tierModalContent" class="tier-modal-content">
+            <button id="closeTierModal" class="close-modal">&times;</button>
+            <div class="tier-modal-header">
+                <span id="tierModalDiamonds" class="tier-modal-diamonds"></span>
+                <h2 id="tierModalName" class="tier-modal-name"></h2>
+                <span id="tierModalPrice" class="tier-modal-price"></span>
+            </div>
+            <div class="tier-modal-body">
+                <p id="tierModalDescription" class="tier-modal-description"></p>
+                <h4 class="tier-modal-features-heading">What's Included</h4>
+                <ul id="tierModalFeatures" class="tier-modal-features"></ul>
+            </div>
+            <div class="tier-modal-footer">
+                <a href="#" id="tierModalDemoLink" class="tier-modal-demo-btn" target="_blank" rel="noopener noreferrer">
+                    View Live Demo <span class="arrow-icon">→</span>
+                </a>
+            </div>
+        </div>
+    </div>
 
     <!-- Floating CTA Button -->
     <a href="#contact" class="floating-cta">
         Request Consultation <span class="arrow-icon">→</span>
     </a>
 
-    <script data-cfasync="false" src="Business_Portfolio.js"></script>
+    <script src="Business_Portfolio.js"></script>
 </body>
-</html>    
-    
-    
-    
-    
+</html>
