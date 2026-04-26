@@ -34,7 +34,7 @@ const projects = [
                     "Testimonials Section",
                     "Expanded Navigation"
                 ],
-                link: "#"
+                link: "https://tlz124.github.io/floral-shop-essential-plus/"
             },
             {
                 label: "Custom",
