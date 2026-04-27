@@ -47,12 +47,7 @@ const projects = [
                     "Priority Support",
                     "Extended Launch Support"
                 ],
-                link: "#"
-            }
-        ]
-    },
-    {
-        id: 1,
+                link: "https://tlz124.github.io/floral-shop-custom/"
         title: "Mexican Restaurant",
         category: "Small Business",
         description: "Authentic Mexican restaurant with menu and reservation system",
