@@ -48,6 +48,11 @@ const projects = [
                     "Extended Launch Support"
                 ],
                 link: "https://tlz124.github.io/floral-shop-custom/"
+            }
+        ]
+    },
+    {
+        id: 1,
         title: "Mexican Restaurant",
         category: "Small Business",
         description: "Authentic Mexican restaurant with menu and reservation system",
@@ -164,7 +169,6 @@ const acceptAllBtn = document.getElementById('acceptAll');
 const rejectAllBtn = document.getElementById('rejectAll');
 const managePreferencesBtn = document.getElementById('managePreferences');
 
-// Check if user has already made a cookie choice
 function checkCookieConsent() {
     const cookieChoice = localStorage.getItem('cookieConsent');
     if (!cookieChoice) {
@@ -190,7 +194,6 @@ managePreferencesBtn.addEventListener('click', () => {
     cookieConsent.classList.add('hidden');
 });
 
-// Initialize cookie consent check
 checkCookieConsent();
 
 // ===== Hamburger Menu Functionality =====
@@ -199,19 +202,16 @@ const menuOverlay = document.getElementById('menuOverlay');
 const closeMenuBtn = document.getElementById('closeMenu');
 const menuLinks = document.querySelectorAll('.menu-link');
 
-// Open menu
 hamburgerBtn.addEventListener('click', () => {
     menuOverlay.classList.add('active');
     document.body.style.overflow = 'hidden';
 });
 
-// Close menu
 closeMenuBtn.addEventListener('click', () => {
     menuOverlay.classList.remove('active');
     document.body.style.overflow = 'auto';
 });
 
-// Close menu when clicking a link
 menuLinks.forEach(link => {
     link.addEventListener('click', () => {
         menuOverlay.classList.remove('active');
@@ -219,7 +219,6 @@ menuLinks.forEach(link => {
     });
 });
 
-// Close menu when clicking outside
 menuOverlay.addEventListener('click', (e) => {
     if (e.target === menuOverlay) {
         menuOverlay.classList.remove('active');
@@ -231,21 +230,18 @@ menuOverlay.addEventListener('click', (e) => {
 const projectModal = document.getElementById('projectModal');
 const viewDetailsButtons = document.querySelectorAll('.view-details');
 
-// Open project modal with details
 viewDetailsButtons.forEach(button => {
     button.addEventListener('click', (e) => {
         e.stopPropagation();
         const projectId = parseInt(button.getAttribute('data-project'));
         const project = projects[projectId];
 
-        // Populate modal with project data
         document.getElementById('modalImage').src = project.image;
         document.getElementById('modalCategory').textContent = project.category;
         document.getElementById('modalTitle').textContent = project.title;
         document.getElementById('modalDescription').textContent = project.description;
         document.getElementById('modalFullDescription').textContent = project.fullDescription;
 
-        // Add technologies
         const techContainer = document.getElementById('modalTechnologies');
         techContainer.innerHTML = '';
         project.technologies.forEach(tech => {
@@ -255,29 +251,6 @@ viewDetailsButtons.forEach(button => {
             techContainer.appendChild(techTag);
         });
 
-        // Render tier buttons if available
-        const tiersContainer = document.getElementById('modalTiers');
-        tiersContainer.innerHTML = '';
-        if (project.tiers && project.tiers.length > 0) {
-            document.getElementById('modalTiersSection').style.display = 'block';
-            project.tiers.forEach((tier, index) => {
-                const tierBtn = document.createElement('a');
-                tierBtn.href = tier.link;
-                tierBtn.className = 'tier-btn tier-btn--' + (index + 1);
-                tierBtn.target = '_blank';
-                tierBtn.rel = 'noopener noreferrer';
-                tierBtn.innerHTML = `
-                    <span class="tier-btn__icon">${'◆'.repeat(index + 1)}</span>
-                    <span class="tier-btn__label">${tier.label}</span>
-                    <span class="arrow-icon">→</span>
-                `;
-                tiersContainer.appendChild(tierBtn);
-            });
-        } else {
-            document.getElementById('modalTiersSection').style.display = 'none';
-        }
-
-        // Update live link
         const liveLink = document.getElementById('modalLiveLink');
         if (liveLink) {
             liveLink.href = project.liveLink;
@@ -289,7 +262,6 @@ viewDetailsButtons.forEach(button => {
             };
         }
 
-        // Show modal
         projectModal.style.display = 'block';
         document.body.style.overflow = 'hidden';
     });
@@ -302,13 +274,14 @@ document.querySelectorAll('.tier-card').forEach(card => {
     card.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
+
         const projectId = parseInt(card.getAttribute('data-project'));
         const tierIndex = parseInt(card.getAttribute('data-tier'));
         const project = projects[projectId];
         const tier = project.tiers[tierIndex];
         if (!tier) return;
 
-        // Set tier number class for styling (1, 2, or 3)
+        // Apply tier-specific styling
         const tierContent = document.getElementById('tierModalContent');
         tierContent.className = 'tier-modal-content tier-modal-content--' + (tierIndex + 1);
 
@@ -318,7 +291,6 @@ document.querySelectorAll('.tier-card').forEach(card => {
         document.getElementById('tierModalPrice').textContent = tier.price;
         document.getElementById('tierModalDescription').textContent = tier.description;
 
-        // Populate features
         const featuresList = document.getElementById('tierModalFeatures');
         featuresList.innerHTML = '';
         tier.features.forEach(feature => {
@@ -327,12 +299,14 @@ document.querySelectorAll('.tier-card').forEach(card => {
             featuresList.appendChild(li);
         });
 
-        // Set demo link
-        const demoLink = document.getElementById('tierModalDemoLink');
-        demoLink.href = tier.link;
-        demoLink.onclick = null;
+        // Wire up demo button — it's a <button> so no anchor/scroll conflicts
+        const demoBtn = document.getElementById('tierModalDemoLink');
+        const newDemoBtn = demoBtn.cloneNode(true);
+        demoBtn.parentNode.replaceChild(newDemoBtn, demoBtn);
+        newDemoBtn.addEventListener('click', () => {
+            window.open(tier.link, '_blank', 'noopener,noreferrer');
+        });
 
-        // Show modal
         tierModal.style.display = 'block';
         document.body.style.overflow = 'hidden';
     });
@@ -344,43 +318,26 @@ document.getElementById('closeTierModal').addEventListener('click', () => {
     document.body.style.overflow = 'auto';
 });
 
-window.addEventListener('click', (e) => {
-    if (e.target === tierModal) {
-        tierModal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
-});
-
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && tierModal && tierModal.style.display === 'block') {
-        tierModal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
-});
-
-// ===== Legal Modals Functionality =====
+// ===== Legal Modals =====
 const privacyModal = document.getElementById('privacyModal');
 const accessibilityModal = document.getElementById('accessibilityModal');
 const privacyLink = document.getElementById('privacyLink');
 const accessibilityLink = document.getElementById('accessibilityLink');
 
-// Open privacy modal
 privacyLink.addEventListener('click', (e) => {
     e.preventDefault();
     privacyModal.style.display = 'block';
     document.body.style.overflow = 'hidden';
 });
 
-// Open accessibility modal
 accessibilityLink.addEventListener('click', (e) => {
     e.preventDefault();
     accessibilityModal.style.display = 'block';
     document.body.style.overflow = 'hidden';
 });
 
-// Close modal functionality
+// Close modal buttons (X)
 const closeModalButtons = document.querySelectorAll('.close-modal');
-
 closeModalButtons.forEach(button => {
     button.addEventListener('click', () => {
         const modalId = button.getAttribute('data-modal');
@@ -388,19 +345,20 @@ closeModalButtons.forEach(button => {
             document.getElementById(modalId).style.display = 'none';
         } else {
             projectModal.style.display = 'none';
+            tierModal.style.display = 'none';
         }
         document.body.style.overflow = 'auto';
     });
 });
 
-// Close modal when clicking outside
+// Close modals by clicking outside
 window.addEventListener('click', (e) => {
-    if (e.target.tagName === 'A' || e.target.closest('a')) {
-        return;
-    }
-
     if (e.target === projectModal) {
         projectModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    if (e.target === tierModal) {
+        tierModal.style.display = 'none';
         document.body.style.overflow = 'auto';
     }
     if (e.target === privacyModal) {
@@ -413,21 +371,15 @@ window.addEventListener('click', (e) => {
     }
 });
 
-// Close modal with Escape key
+// Close modals with Escape key
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-        if (projectModal.style.display === 'block') {
-            projectModal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-        if (privacyModal.style.display === 'block') {
-            privacyModal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-        if (accessibilityModal.style.display === 'block') {
-            accessibilityModal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
+        [projectModal, tierModal, privacyModal, accessibilityModal].forEach(modal => {
+            if (modal && modal.style.display === 'block') {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
         if (menuOverlay.classList.contains('active')) {
             menuOverlay.classList.remove('active');
             document.body.style.overflow = 'auto';
@@ -435,16 +387,20 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// ===== Consultation Form Handling =====
-const consultationForm = document.getElementById('consultationForm');
-
-// ===== Smooth Scroll for Navigation Links =====
-document.querySelectorAll('a[href^="#"]:not([id="tierModalDemoLink"])').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
+// ===== Smooth Scroll (navigation links only) =====
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
         const href = this.getAttribute('href');
 
-        // Don't prevent default for modal links
-        if (href === '#privacyModal' || href === '#accessibilityModal') {
+        // Skip tier card buttons — they have their own handler
+        if (this.classList.contains('tier-card')) return;
+
+        // Allow footer modal links to work normally
+        if (href === '#privacyModal' || href === '#accessibilityModal') return;
+
+        // Prevent bare # from scrolling to top
+        if (href === '#') {
+            e.preventDefault();
             return;
         }
 
@@ -452,30 +408,20 @@ document.querySelectorAll('a[href^="#"]:not([id="tierModalDemoLink"])').forEach(
         const target = document.querySelector(href);
         if (target) {
             const headerOffset = 80;
-            const elementPosition = target.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth'
-            });
+            const offsetPosition = target.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
         }
     });
 });
 
-// ===== Add Scroll Effect to Navbar =====
+// ===== Navbar Scroll Effect =====
 let lastScroll = 0;
 const navbar = document.querySelector('header');
-
 window.addEventListener('scroll', () => {
     const currentScroll = window.pageYOffset;
-
-    if (currentScroll <= 0) {
-        navbar.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
-    } else {
-        navbar.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)';
-    }
-
+    navbar.style.boxShadow = currentScroll <= 0
+        ? '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+        : '0 10px 15px -3px rgba(0, 0, 0, 0.1)';
     lastScroll = currentScroll;
 });
 
@@ -494,25 +440,21 @@ const observer = new IntersectionObserver((entries) => {
     });
 }, observerOptions);
 
-// Observe project cards
-const projectCards = document.querySelectorAll('.project-card');
-projectCards.forEach(card => {
+document.querySelectorAll('.project-card').forEach(card => {
     card.style.opacity = '0';
     card.style.transform = 'translateY(20px)';
     card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
     observer.observe(card);
 });
 
-// Observe testimonial cards
-const testimonialCards = document.querySelectorAll('.testimonial-card');
-testimonialCards.forEach(card => {
+document.querySelectorAll('.testimonial-card').forEach(card => {
     card.style.opacity = '0';
     card.style.transform = 'translateY(20px)';
     card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
     observer.observe(card);
 });
 
-// ===== Portfolio Filter Functionality =====
+// ===== Portfolio Filter =====
 const filterButtons = document.querySelectorAll('.filter-btn');
 const allProjectCards = document.querySelectorAll('.project-card');
 
@@ -522,10 +464,8 @@ filterButtons.forEach(button => {
         button.classList.add('active');
 
         const filterValue = button.getAttribute('data-filter');
-
         allProjectCards.forEach(card => {
             const category = card.querySelector('.project-category').textContent;
-
             if (filterValue === 'all' || category === filterValue) {
                 card.classList.remove('hidden');
                 card.style.animation = 'none';
@@ -538,7 +478,6 @@ filterButtons.forEach(button => {
         });
     });
 });
-
 
 // ===== Hero Canvas Node Network Effect =====
 (function() {
@@ -553,22 +492,14 @@ filterButtons.forEach(button => {
     function resizeCanvas() {
         heroCanvas.width = heroCanvas.offsetWidth;
         heroCanvas.height = heroCanvas.offsetHeight;
+        ctx.clearRect(0, 0, heroCanvas.width, heroCanvas.height);
         initParticles();
     }
 
     function initParticles() {
-        const width = heroCanvas.width;
-        const height = heroCanvas.height;
-        const isMobile = width <= 768;
-        const isPortrait = width < height;
-
-        let particleCount;
-        if (isMobile) {
-            particleCount = isPortrait ? 30 : 40;
-        } else {
-            particleCount = 80;
-        }
-
+        const isMobile = heroCanvas.width <= 768;
+        const isPortrait = heroCanvas.width < heroCanvas.height;
+        let particleCount = isMobile ? (isPortrait ? 30 : 40) : 80;
         const connectionDistance = isMobile ? 100 : 150;
         particles = Array.from({ length: particleCount }, () => new Particle(connectionDistance));
     }
@@ -578,11 +509,9 @@ filterButtons.forEach(button => {
             this.connectionDistance = connectionDistance;
             this.x = Math.random() * heroCanvas.width;
             this.y = Math.random() * heroCanvas.height;
-
             const speedMultiplier = window.innerWidth <= 768 ? 0.3 : 0.5;
             this.vx = (Math.random() - 0.5) * speedMultiplier;
             this.vy = (Math.random() - 0.5) * speedMultiplier;
-
             this.radius = window.innerWidth <= 768 ? 2.5 : 2;
             this.baseRadius = this.radius;
         }
@@ -590,10 +519,8 @@ filterButtons.forEach(button => {
         update() {
             this.x += this.vx;
             this.y += this.vy;
-
             if (this.x < 0 || this.x > heroCanvas.width) this.vx *= -1;
             if (this.y < 0 || this.y > heroCanvas.height) this.vy *= -1;
-
             this.x = Math.max(0, Math.min(heroCanvas.width, this.x));
             this.y = Math.max(0, Math.min(heroCanvas.height, this.y));
 
@@ -601,7 +528,6 @@ filterButtons.forEach(button => {
                 const dx = mouse.x - this.x;
                 const dy = mouse.y - this.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
-
                 if (distance < mouse.radius) {
                     const angle = Math.atan2(dy, dx);
                     const force = (mouse.radius - distance) / mouse.radius;
@@ -630,15 +556,12 @@ filterButtons.forEach(button => {
             const dx = otherParticle.x - this.x;
             const dy = otherParticle.y - this.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
-
             if (distance < this.connectionDistance) {
                 const opacity = (1 - distance / this.connectionDistance) * 0.5;
-
                 const gradient = ctx.createLinearGradient(this.x, this.y, otherParticle.x, otherParticle.y);
                 gradient.addColorStop(0, `rgba(102, 126, 234, ${opacity})`);
                 gradient.addColorStop(0.5, `rgba(118, 75, 162, ${opacity})`);
                 gradient.addColorStop(1, `rgba(102, 126, 234, ${opacity})`);
-
                 ctx.strokeStyle = gradient;
                 ctx.lineWidth = 1.5;
                 ctx.beginPath();
@@ -654,11 +577,7 @@ filterButtons.forEach(button => {
         mouse.x = e.clientX - rect.left;
         mouse.y = e.clientY - rect.top;
     });
-
-    heroCanvas.addEventListener('mouseleave', () => {
-        mouse.x = null;
-        mouse.y = null;
-    });
+    heroCanvas.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
 
     heroCanvas.addEventListener('touchstart', (e) => {
         if (window.innerWidth <= 768) return;
@@ -667,7 +586,6 @@ filterButtons.forEach(button => {
         mouse.x = touch.clientX - rect.left;
         mouse.y = touch.clientY - rect.top;
     });
-
     heroCanvas.addEventListener('touchmove', (e) => {
         if (window.innerWidth <= 768) return;
         e.preventDefault();
@@ -676,11 +594,7 @@ filterButtons.forEach(button => {
         mouse.x = touch.clientX - rect.left;
         mouse.y = touch.clientY - rect.top;
     });
-
-    heroCanvas.addEventListener('touchend', () => {
-        mouse.x = null;
-        mouse.y = null;
-    });
+    heroCanvas.addEventListener('touchend', () => { mouse.x = null; mouse.y = null; });
 
     resizeCanvas();
 
@@ -696,11 +610,8 @@ filterButtons.forEach(button => {
 
     function animateParticles(currentTime) {
         animationFrameId = requestAnimationFrame(animateParticles);
-
         const deltaTime = currentTime - lastFrameTime;
-
         if (deltaTime < frameInterval) return;
-
         lastFrameTime = currentTime - (deltaTime % frameInterval);
 
         ctx.fillStyle = 'rgba(26, 35, 62, 0.05)';
@@ -709,7 +620,6 @@ filterButtons.forEach(button => {
         particles.forEach((particle, i) => {
             particle.update();
             particle.draw();
-
             for (let j = i + 1; j < particles.length; j++) {
                 particle.connect(particles[j]);
             }
@@ -720,24 +630,14 @@ filterButtons.forEach(button => {
 
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
-            if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
-                animationFrameId = null;
-            }
+            if (animationFrameId) { cancelAnimationFrame(animationFrameId); animationFrameId = null; }
         } else {
-            if (!animationFrameId) {
-                animateParticles(0);
-            }
+            if (!animationFrameId) animateParticles(0);
         }
     });
 })();
 
+// ===== Date Input =====
 const dateInput = document.getElementById('preferred_date');
-dateInput.addEventListener('focus', function() {
-    this.type = 'date';
-});
-dateInput.addEventListener('blur', function() {
-    if (!this.value) {
-        this.type = 'text';
-    }
-});
+dateInput.addEventListener('focus', function() { this.type = 'date'; });
+dateInput.addEventListener('blur', function() { if (!this.value) this.type = 'text'; });
