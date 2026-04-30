@@ -59,7 +59,48 @@ const projects = [
         fullDescription: "A vibrant website for a Mexican restaurant featuring an interactive menu with high-quality food photography, online reservation system, and information about catering services. The design reflects the restaurant's authentic atmosphere with warm colors and engaging visuals. Includes hours of operation, location details, and special events calendar.",
         image: "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=600&h=400&fit=crop",
         technologies: ["HTML5", "CSS3", "JavaScript", "Reservation System", "Menu Display"],
-        liveLink: "https://tlz124.github.io/restaurant/"
+        liveLink: "https://tlz124.github.io/restaurant/",
+        tiers: [
+            {
+                label: "Essential",
+                price: "$1,000",
+                description: "A clean, professional online presence for your restaurant — everything you need to showcase your menu and get more diners through the door.",
+                features: [
+                    "Mobile Responsive Design",
+                    "Menu Display with Photos",
+                    "Contact Form & Reservations",
+                    "Business Hours, Location & Google Maps",
+                    "Social Media Links"
+                ],
+                link: "https://tlz124.github.io/restaurant-essential/"
+            },
+            {
+                label: "Essential Plus",
+                price: "$3,000",
+                description: "Everything in Essential, plus expanded features to highlight your food and build a loyal customer base.",
+                features: [
+                    "Everything in Essential",
+                    "Full Menu Catalog with Pricing",
+                    "Online Reservation System",
+                    "Customer Testimonials Section",
+                    "Expanded Navigation & About Page"
+                ],
+                link: "https://tlz124.github.io/restaurant-essential-plus/"
+            },
+            {
+                label: "Custom",
+                price: "$5,000+",
+                description: "A fully custom build tailored to your restaurant's unique identity — advanced features, custom design, and priority support.",
+                features: [
+                    "Everything in Essential Plus",
+                    "Online Ordering Integration",
+                    "Custom Quote Based on Scope",
+                    "Priority Support",
+                    "Extended Launch Support"
+                ],
+                link: "https://tlz124.github.io/restaurant-custom/"
+            }
+        ]
     },
     {
         id: 2,
