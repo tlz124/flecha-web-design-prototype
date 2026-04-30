@@ -180,7 +180,48 @@ const projects = [
         fullDescription: "A sophisticated website for Lumière Beauty Supply featuring curated beauty essentials from top brands. Includes product showcases, shopping categories, bestseller highlights, and a clean, elegant design that emphasizes luxury and quality.",
         image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=600&h=400&fit=crop",
         technologies: ["HTML5", "CSS3", "JavaScript", "Product Catalog", "E-commerce Ready"],
-        liveLink: "https://tlz124.github.io/Beauty"
+        liveLink: "https://tlz124.github.io/Beauty",
+        tiers: [
+            {
+                label: "Essential",
+                price: "$1,000",
+                description: "A clean, elegant online presence for your beauty supply store — everything you need to showcase your brand and attract customers.",
+                features: [
+                    "Mobile Responsive Design",
+                    "Featured Product Showcase",
+                    "Contact Form",
+                    "Business Hours, Location & Google Maps",
+                    "Social Media Links"
+                ],
+                link: "https://tlz124.github.io/beauty-supply-essential/"
+            },
+            {
+                label: "Essential Plus",
+                price: "$3,000",
+                description: "Everything in Essential, plus a full product catalog to display your inventory and drive more sales.",
+                features: [
+                    "Everything in Essential",
+                    "Full Product Catalog with Pricing",
+                    "Product Categories & Filtering",
+                    "Customer Testimonials Section",
+                    "Expanded Navigation & About Page"
+                ],
+                link: "https://tlz124.github.io/beauty-supply-essential-plus/"
+            },
+            {
+                label: "Custom",
+                price: "$5,000+",
+                description: "A fully custom e-commerce build tailored to your store — advanced shopping features, custom design, and priority support.",
+                features: [
+                    "Everything in Essential Plus",
+                    "Full E-commerce Shopping Cart",
+                    "Custom Quote Based on Scope",
+                    "Priority Support",
+                    "Extended Launch Support"
+                ],
+                link: "https://tlz124.github.io/beauty-supply-custom/"
+            }
+        ]
     },
     {
         id: 10,
