@@ -344,7 +344,8 @@ document.querySelectorAll('.tier-card').forEach(card => {
         const demoBtn = document.getElementById('tierModalDemoLink');
         const newDemoBtn = demoBtn.cloneNode(true);
         demoBtn.parentNode.replaceChild(newDemoBtn, demoBtn);
-        newDemoBtn.addEventListener('click', () => {
+        newDemoBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             window.open(tier.link, '_blank', 'noopener,noreferrer');
         });
 
