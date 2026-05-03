@@ -501,6 +501,39 @@ section::before {
     font-weight: 600;
 }
 
+.step-questionnaire-btns {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 0.25rem;
+}
+
+.step-q-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1.25rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.2s;
+}
+.step-q-btn:hover { opacity: 0.82; transform: translateY(-1px); }
+
+.step-q-btn--download {
+    background: rgba(212, 165, 255, 0.12);
+    border: 1px solid var(--purple-accent);
+    color: var(--purple-accent);
+}
+
+.step-q-btn--online {
+    background: var(--purple-accent);
+    border: 1px solid var(--purple-accent);
+    color: var(--black);
+}
+
 .process-arrow {
     display: none;
 }
