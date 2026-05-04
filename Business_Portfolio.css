@@ -2135,3 +2135,21 @@ section::before {
 
 .tier-modal-demo-btn .arrow-icon { transition: transform 0.3s ease; }
 .tier-modal-demo-btn:hover .arrow-icon { transform: translateX(5px); }
+
+
+
+
+@media (max-width: 768px) {
+    .floating-cta {
+        width: 30px;
+        height: 30px;
+    }
+
+    .floating-cta svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+
+
