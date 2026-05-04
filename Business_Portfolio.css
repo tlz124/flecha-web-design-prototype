@@ -1070,8 +1070,8 @@ section::before {
 .floating-cta {
     background: #000000;
     color: var(--black);
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     border: 2px solid var(--purple-accent);
     text-decoration: none;
