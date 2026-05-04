@@ -1068,14 +1068,10 @@ section::before {
 
 /* ===== Floating CTA Button ===== */
 .floating-cta {
-    position: fixed;
-    bottom: 9.5rem;
-    right: 2rem;
-    z-index: 999;
     background: #000000;
     color: var(--black);
-    width: 60px;
-    height: 60px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     border: 2px solid var(--purple-accent);
     text-decoration: none;
@@ -1084,14 +1080,20 @@ section::before {
     justify-content: center;
     opacity: 1;
     transition: box-shadow 0.3s ease, transform 0.3s ease;
-    box-shadow: 0 0 16px rgba(212, 165, 255, 0.35);
+    box-shadow: 0 0 12px rgba(212, 165, 255, 0.35);
+    flex-shrink: 0;
 }
 
 .floating-cta svg {
-    width: 26px;
-    height: 26px;
+    width: 20px;
+    height: 20px;
     color: #ead6ff;
     display: block;
+}
+
+.floating-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 22px rgba(212, 165, 255, 0.6);
 }
 
 .floating-cta:hover {
@@ -1294,12 +1296,6 @@ section::before {
         width: 100%;
     }
     
-    .floating-cta {
-        bottom: 1.5rem;
-        right: 1rem;
-        width: 52px;
-        height: 52px;
-    }
 }
 
 /* ===== Pricing & Payment Section ===== */
