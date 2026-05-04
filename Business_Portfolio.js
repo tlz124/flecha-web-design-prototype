@@ -720,48 +720,7 @@ filterButtons.forEach(button => {
     });
 })();
 
-// ===== Floating CTA Scroll-Driven Opacity & Color =====
-(function() {
-    const floatingCta = document.querySelector('.floating-cta');
-    if (!floatingCta) return;
 
-    // Purple accent: #d4a5ff  →  Orange/yellow: #f5a623
-    const fromR = 212, fromG = 165, fromB = 255;
-    const toR   = 245, toG   = 166, toB   =  35;
-
-    // Color transition fires in the last 8% of scroll
-    const colorThreshold = 0.92;
-
-    function lerp(a, b, t) {
-        return Math.round(a + (b - a) * t);
-    }
-
-    function updateCta() {
-        const scrollTop = window.scrollY;
-        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-        const progress  = docHeight > 0 ? Math.min(Math.max(scrollTop / docHeight, 0), 1) : 0;
-
-        // Opacity: 0.08 at top → 1 at bottom
-        const opacity = 0.08 + progress * 0.92;
-
-        // Color stays purple until the last 8%, then transitions to orange/yellow
-        const colorProgress = progress < colorThreshold
-            ? 0
-            : (progress - colorThreshold) / (1 - colorThreshold);
-
-        const r = lerp(fromR, toR, colorProgress);
-        const g = lerp(fromG, toG, colorProgress);
-        const b = lerp(fromB, toB, colorProgress);
-        const color = `rgb(${r}, ${g}, ${b})`;
-
-        floatingCta.style.opacity     = opacity;
-        floatingCta.style.background  = color;
-        floatingCta.style.borderColor = color;
-    }
-
-    window.addEventListener('scroll', updateCta, { passive: true });
-    updateCta(); // set initial state on load
-})();
 
 // ===== Date Input =====
 const dateInput = document.getElementById('preferred_date');
