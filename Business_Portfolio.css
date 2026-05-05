@@ -1067,34 +1067,6 @@ section::before {
 }
 
 /* ===== Floating CTA Button ===== */
-.floating-cta {
-    background: #000000;
-    color: var(--black);
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    border: 2px solid var(--purple-accent);
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 1;
-    transition: box-shadow 0.3s ease, transform 0.3s ease;
-    box-shadow: 0 0 12px rgba(212, 165, 255, 0.35);
-    flex-shrink: 0;
-}
-
-.floating-cta svg {
-    width: 20px;
-    height: 20px;
-    color: #ead6ff;
-    display: block;
-}
-
-.floating-cta:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 22px rgba(212, 165, 255, 0.6);
-}
 
 .floating-cta:hover {
     transform: translateY(-4px);
@@ -2135,21 +2107,3 @@ section::before {
 
 .tier-modal-demo-btn .arrow-icon { transition: transform 0.3s ease; }
 .tier-modal-demo-btn:hover .arrow-icon { transform: translateX(5px); }
-
-
-
-
-@media (max-width: 768px) {
-    .floating-cta {
-        width: 30px;
-        height: 30px;
-    }
-
-    .floating-cta svg {
-        width: 16px;
-        height: 16px;
-    }
-}
-
-
-
