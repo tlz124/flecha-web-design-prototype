@@ -306,6 +306,19 @@ header {
     border-bottom: 1px solid var(--border-gray);
 }
 
+.page-hero {
+    margin-top: 130px;
+    background: linear-gradient(135deg, #0f0f0f 0%, #1a0a2e 50%, #0f0f0f 100%);
+    border-bottom: 1px solid var(--border-gray);
+    padding: 5rem 2rem 4rem;
+    text-align: center;
+}
+
+.active-link {
+    color: var(--purple-accent) !important;
+}
+
+
 .hero-canvas {
     position: absolute;
     top: 0;
@@ -444,6 +457,11 @@ section::before {
     align-items: stretch;
 }
 
+.process-step--questionnaire {
+    grid-column: 1 / -1;
+    min-height: unset;
+}
+
 .process-step {
     background: var(--medium-gray);
     border: 1px solid var(--border-gray);
@@ -477,9 +495,59 @@ section::before {
 .step-title {
     font-size: 1.5rem;
     color: var(--text-white);
-    margin-bottom: 1rem;
+    margin-bottom: 0;
     text-transform: uppercase;
     letter-spacing: 2px;
+}
+
+.step-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    cursor: pointer;
+}
+
+.step-toggle {
+    background: none;
+    border: 1px solid var(--purple-accent);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s ease, transform 0.3s ease;
+    padding: 0;
+}
+
+.step-toggle svg {
+    width: 16px;
+    height: 16px;
+    color: var(--purple-accent);
+    transition: transform 0.3s ease;
+}
+
+.step-toggle:hover {
+    background: rgba(212, 165, 255, 0.1);
+}
+
+.step-toggle.open svg {
+    transform: rotate(180deg);
+}
+
+.step-body {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.35s ease, margin-top 0.35s ease;
+    margin-top: 0;
+}
+
+.step-body.open {
+    max-height: 400px;
+    margin-top: 1rem;
 }
 
 .step-description {

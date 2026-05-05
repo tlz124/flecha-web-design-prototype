@@ -722,6 +722,16 @@ filterButtons.forEach(button => {
 
 
 
+// ===== Process Step Collapsible Toggle =====
+document.querySelectorAll('.process-step:not(.process-step--questionnaire) .step-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const body = btn.closest('.step-content').querySelector('.step-body');
+        const isOpen = body.classList.contains('open');
+        body.classList.toggle('open', !isOpen);
+        btn.classList.toggle('open', !isOpen);
+    });
+});
+
 // ===== Date Input =====
 const dateInput = document.getElementById('preferred_date');
 dateInput.addEventListener('focus', function() { this.type = 'date'; });

@@ -50,8 +50,9 @@
         <button class="close-menu" id="closeMenu" aria-label="Close menu">&times;</button>
         <nav class="menu-nav">
             <ul>
-                <li><a href="#home" class="menu-link">Home</a></li>
-                <li><a href="#about" class="menu-link">About</a></li>
+                <li><a href="index.html" class="menu-link">Home</a></li>
+                <li><a href="about.html" class="menu-link">About</a></li>
+                <li><a href="what_we_do.html" class="menu-link">What We Do</a></li>
                 <li><a href="#our-process" class="menu-link">Our Process</a></li>
                 <li><a href="#portfolio" class="menu-link">View Our Work</a></li>
                 <li><a href="#pricing" class="menu-link">Pricing</a></li>
@@ -77,42 +78,40 @@
         </div>
     </section>
 
-    <!-- What We Do Section -->
-    <section class="what-we-do">
-        <div class="container">
-            <h2 class="section-title">What We Do</h2>
-            <p class="what-we-do-text">Every project begins with understanding your unique goals and audience. We don't believe in one-size-fits-all templates. Instead, we take time to learn about your vision, your values, and what sets you apart. Our design strategy focuses on three core principles: clarity, functionality, and purpose. Whether you're an educational platform helping students achieve their dreams or a local business serving your community, we craft websites that are intuitive, professional, and designed to grow with you. We combine clean aesthetics with practical features to ensure your site doesn't just look good—it works hard for you.</p>
-        </div>
-    </section>
 
     <!-- Our Process Section -->
     <section id="our-process" class="our-process">
         <div class="container">
             <h2 class="section-title">Our Process</h2>
             <p class="section-subtitle">Simple steps, no tech knowledge required</p>
-					<div class="process-step">
-			<div class="step-content">
-				<h3 class="step-title">Client Questionnaire</h3>
-				<p class="step-description">Before we meet, we ask you to complete a short questionnaire about your business, goals, and vision. This helps us make the most of our time together and come prepared with the right questions and ideas.</p>
-				<div class="step-questionnaire-btns">
-					<a href="flecha-client-questionnaire.pdf" download class="step-q-btn step-q-btn--download">
-						<span>⬇</span> Download PDF
-					</a>
-					<a href="questionnaire.html" target="_blank" class="step-q-btn step-q-btn--online">
-						<span>✏</span> Fill Out Online
-					</a>
-				</div>
-			</div>
-		</div>
-
-		<div class="process-arrow">→</div>
             <div class="process-timeline">
+
+                <!-- Client Questionnaire -->
+                <div class="process-step process-step--questionnaire">
+                    <div class="step-content">
+                        <h3 class="step-title">Client Questionnaire</h3>
+                        <div class="step-body open">
+                            <p class="step-description">Before we meet, we ask you to complete a short questionnaire about your business, goals, and vision. This helps us make the most of our time together and come prepared with the right questions and ideas.</p>
+                            <div class="step-questionnaire-btns">
+                                <a href="flecha-client-questionnaire.pdf" download class="step-q-btn step-q-btn--download"><span>⬇</span> Download PDF</a>
+                                <a href="questionnaire.html" target="_blank" class="step-q-btn step-q-btn--online"><span>✏</span> Fill Out Online</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="process-step">
                     <div class="step-number">1</div>
                     <div class="step-content">
-                        <h3 class="step-title">Free Consultation</h3>
-                        <p class="step-description">We start with a friendly conversation about your vision, goals, and what success looks like for you. No pressure, no jargon—just getting to know your business.</p>
-                        <span class="step-time">30 minutes</span>
+                        <div class="step-header">
+                        	<h3 class="step-title">Free Consultation</h3>
+                        	<button class="step-toggle" aria-label="Toggle details">
+                        		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        	</button>
+                        </div>
+                        <div class="step-body">
+                            <p class="step-description">We start with a friendly conversation about your vision, goals, and what success looks like for you. No pressure, no jargon—just getting to know your business.</p>
+                            <span class="step-time">30 minutes</span>
+                        </div>
                     </div>
                 </div>
 
@@ -121,9 +120,16 @@
                 <div class="process-step">
                     <div class="step-number">2</div>
                     <div class="step-content">
-                        <h3 class="step-title">Custom Proposal</h3>
-                        <p class="step-description">You'll receive a clear proposal with timeline, deliverables, and pricing. No surprises, no hidden fees. You approve before we begin any work.</p>
-                        <span class="step-time">2-3 business days</span>
+                        <div class="step-header">
+                        	<h3 class="step-title">Custom Proposal</h3>
+                        	<button class="step-toggle" aria-label="Toggle details">
+                        		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        	</button>
+                        </div>
+                        <div class="step-body">
+                            <p class="step-description">You'll receive a clear proposal with timeline, deliverables, and pricing. No surprises, no hidden fees. You approve before we begin any work.</p>
+                            <span class="step-time">2-3 business days</span>
+                        </div>
                     </div>
                 </div>
 
@@ -132,9 +138,16 @@
                 <div class="process-step">
                     <div class="step-number">3</div>
                     <div class="step-content">
-                        <h3 class="step-title">Design & Build</h3>
-                        <p class="step-description">We handle all the technical stuff while keeping you in the loop. You'll see progress updates and give feedback in plain language—we translate it into code.</p>
-                        <span class="step-time">2-4 weeks</span>
+                        <div class="step-header">
+                        	<h3 class="step-title">Design & Build</h3>
+                        	<button class="step-toggle" aria-label="Toggle details">
+                        		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        	</button>
+                        </div>
+                        <div class="step-body">
+                            <p class="step-description">We handle all the technical stuff while keeping you in the loop. You'll see progress updates and give feedback in plain language—we translate it into code.</p>
+                            <span class="step-time">2-4 weeks</span>
+                        </div>
                     </div>
                 </div>
 
@@ -143,9 +156,16 @@
                 <div class="process-step">
                     <div class="step-number">4</div>
                     <div class="step-content">
-                        <h3 class="step-title">Launch & Support</h3>
-                        <p class="step-description">We'll guide you through launch day and show you how to make simple updates. Plus, we're here if you need help down the road.</p>
-                        <span class="step-time">Ongoing</span>
+                        <div class="step-header">
+                        	<h3 class="step-title">Launch & Support</h3>
+                        	<button class="step-toggle" aria-label="Toggle details">
+                        		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        	</button>
+                        </div>
+                        <div class="step-body">
+                            <p class="step-description">We'll guide you through launch day and show you how to make simple updates. Plus, we're here if you need help down the road.</p>
+                            <span class="step-time">Ongoing</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -410,16 +430,6 @@
         </div>
     </section>
 
-    <!-- About Section -->
-    <section id="about" class="about">
-        <div class="container">
-            <h2 class="section-title">About the Name</h2>
-            <div class="about-content">
-                <p>The name "Flecha Web Design" holds special meaning for us. "Flecha" is the Spanish word for "arrow," symbolizing direction, precision, and forward movement. Just as an arrow points toward a target with purpose and clarity, we help businesses and educational institutions navigate the digital landscape with confidence.</p>
-                <p>We chose this name because we believe great web design should do more than look good—it should guide users exactly where they need to go and help organizations move toward their goals. Every arrow has a direction, and we're here to make sure yours is pointed toward success.</p>
-            </div>
-        </div>
-    </section>
 
     <!-- Pricing & Payment Section -->
     <section id="pricing" class="pricing-section">
