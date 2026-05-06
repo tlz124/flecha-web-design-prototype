@@ -154,6 +154,7 @@ header {
 }
 
 .logo-image {
+	filter: brightness(3);
     height: 100px;
     width: auto;
     transition: all 0.3s ease;
