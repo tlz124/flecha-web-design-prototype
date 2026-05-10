@@ -153,16 +153,20 @@ header {
     border-radius: 4px;
 }
 
-.logo-image {
-	filter: brightness(3);
+/* .logo-image {
     height: 100px;
     width: auto;
     transition: all 0.3s ease;
-/* 
-    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.2));
- */
+    filter: brightness(6);
     display: block;
     margin: -0.5rem 0;
+} */
+
+.logo-chevrons {
+    height: 42px;
+    width: auto;
+    display: block;
+    transition: all 0.3s ease;
 }
 
 .logo-text {
@@ -1175,10 +1179,15 @@ section::before {
         font-weight: 500;
     }
     
-    .logo-image {
-        height: 15px !important;
+    /* .logo-image {
+        height: 10px !important;
         width: auto !important;
         margin: 0 !important;
+    } */
+
+    .logo-chevrons {
+        height: 24px !important;
+        width: auto !important;
     }
     
     .logo {
@@ -1202,12 +1211,12 @@ section::before {
         white-space: nowrap;
     }
     
-    .logo-image-right {
+    /* .logo-image-right {
         display: block !important;
-        height: 15px !important;
+        height: 10px !important;
         width: auto !important;
         margin: 0 !important;
-    }
+    } */
 
     .logo-text-main {
         font-size: 0.75rem;
