@@ -178,8 +178,9 @@
      inkscape:groupmode="layer"
      id="layer1"
      style="opacity:1">
+
     <path
-       style="fill:#888888;fill-opacity:1;stroke:#d543ff;stroke-width:3;stroke-opacity:1;opacity:1;stroke-dasharray:none;filter:url(#filter2)"
+       style="fill:#888888;fill-opacity:0.10725552;stroke:#d543ff;stroke-width:3;stroke-opacity:1;opacity:1;stroke-dasharray:none;filter:url(#filter2)"
        d="m 93.938621,47.493563 88.723129,100.514667 -0.0704,0.0541 -88.890876,96.93511 71.354116,0.11268 89.2031,-97.14001 -89.23462,-100.182088 z"
        id="path1"
        sodipodi:nodetypes="cccccccc" />
@@ -201,9 +202,13 @@
        cy="109.20188"
        r="0.076992579" />
     <path
-       style="fill:#888888;fill-opacity:0.10725552;stroke-width:3;stroke:#a511fb;stroke-opacity:1;stroke-dasharray:none;stroke-linecap:square;stroke-linejoin:bevel;filter:url(#filter8)"
+       style="fill:#888888;fill-opacity:1;stroke-width:3;stroke:#a511fb;stroke-opacity:1;stroke-dasharray:none;stroke-linecap:square;stroke-linejoin:bevel;filter:url(#filter8)"
        d="m 281.5785,47.721279 89.02499,100.288291 -0.0704,0.0541 -88.89089,96.93511 71.365,0.0366 89.19223,-97.06391 -89.55811,-100.397759 z"
        id="path1-0"
        sodipodi:nodetypes="cccccccc" />
   </g>
 </svg>
+
+
+
+
