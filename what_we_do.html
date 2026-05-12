@@ -11,7 +11,7 @@
 <body>
 
     <!-- Header/Navigation -->
-    <header>     
+    <header>
         <nav class="navbar">
             <div class="nav-container">
                 <a href="index.html" class="logo">
@@ -48,10 +48,15 @@
     </div>
 
     <!-- Page Hero -->
-    <section class="page-hero">
-        <div class="container">
-            <h1 class="section-title">What We Do</h1>
-            <p class="section-subtitle">Design with direction, purpose, and clarity</p>
+    <section class="page-hero page-hero--3d">
+        <div class="page-hero-content">
+            <div class="page-hero-text">
+                <h1 class="section-title">What We Do</h1>
+                <p class="section-subtitle">Design with direction, purpose, and clarity</p>
+            </div>
+            <div class="page-hero-3d">
+                <canvas id="heroCanvas"></canvas>
+            </div>
         </div>
     </section>
 
@@ -84,5 +89,85 @@
     </footer>
 
     <script src="Business_Portfolio.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+        const canvas = document.getElementById('heroCanvas');
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+        camera.position.set(0, 0.5, 5);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        const dirLight1 = new THREE.DirectionalLight(0xd4a5ff, 2);
+        dirLight1.position.set(5, 5, 5);
+        scene.add(dirLight1);
+
+        const dirLight2 = new THREE.DirectionalLight(0x9b30d4, 1.5);
+        dirLight2.position.set(-5, -2, -3);
+        scene.add(dirLight2);
+
+        const pointLight = new THREE.PointLight(0xffffff, 1, 20);
+        pointLight.position.set(0, 3, 3);
+        scene.add(pointLight);
+
+        // Load model
+        let model;
+        const loader = new GLTFLoader();
+        loader.load('FlechaWebDesign_Logo.glb', (gltf) => {
+            model = gltf.scene;
+
+            // Center the model
+            const box = new THREE.Box3().setFromObject(model);
+            const center = box.getCenter(new THREE.Vector3());
+            model.position.sub(center);
+
+            // Scale to fit nicely
+            const size = box.getSize(new THREE.Vector3());
+            const maxDim = Math.max(size.x, size.y, size.z);
+            const scale = 3 / maxDim;
+            model.scale.setScalar(scale);
+
+            scene.add(model);
+        });
+
+        // Resize handler
+        function resize() {
+            const container = canvas.parentElement;
+            const w = container.clientWidth;
+            const h = container.clientHeight;
+            renderer.setSize(w, h);
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            if (model) {
+                model.rotation.y += 0.008;
+                model.rotation.x = Math.sin(Date.now() * 0.0005) * 0.15;
+            }
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
 </body>
 </html>
