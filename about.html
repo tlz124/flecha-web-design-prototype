@@ -111,7 +111,7 @@
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-        camera.position.set(0, 0, 6);
+        camera.position.set(0, 0.5, 5);
 
         // Lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
@@ -139,12 +139,11 @@
             const box = new THREE.Box3().setFromObject(model);
             const center = box.getCenter(new THREE.Vector3());
             model.position.sub(center);
-            model.position.y = 0; 
 
             // Scale to fit nicely
             const size = box.getSize(new THREE.Vector3());
             const maxDim = Math.max(size.x, size.y, size.z);
-            const scale = 5 / maxDim;
+            const scale = 3 / maxDim;
             model.scale.setScalar(scale);
 
             scene.add(model);
