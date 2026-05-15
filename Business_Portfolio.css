@@ -313,8 +313,8 @@ header {
 
 .page-hero {
     margin-top: 130px;
-    background: linear-gradient(135deg, #0f0f0f 0%, #1a0a2e 50%, #0f0f0f 100%);
-    border-bottom: 1px solid var(--border-gray);
+    background: radial-gradient(circle at 50% 50%, #2a0a5e 0%, #0f0520 25%, #000000 50%);
+    border-bottom: none;
     padding: 5rem 2rem 4rem;
     text-align: center;
 }
