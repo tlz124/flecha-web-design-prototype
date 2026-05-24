@@ -167,6 +167,7 @@ header {
     width: auto;
     display: block;
     transition: all 0.3s ease;
+    transform: translateZ(0);
 }
 
 .logo-text {
