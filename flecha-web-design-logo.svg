@@ -54,125 +54,7 @@
        gridanglez="30"
        visible="false" />
   </sodipodi:namedview>
-  <defs
-     id="defs1">
-    <linearGradient
-       id="swatch11"
-       inkscape:swatch="solid">
-      <stop
-         style="stop-color:#000000;stop-opacity:1;"
-         offset="0"
-         id="stop11" />
-    </linearGradient>
-    <filter
-       y="-0.068384129"
-       height="1.1367035"
-       inkscape:menu-tooltip="Darkens the edge with an inner blur and adds a flexible glow"
-       inkscape:menu="Shadows and Glows"
-       inkscape:label="Dark and Glow"
-       style="color-interpolation-filters:sRGB;"
-       id="filter2"
-       x="-0.095952062"
-       width="1.183288">
-      <feGaussianBlur
-         stdDeviation="5"
-         result="result6"
-         id="feGaussianBlur1" />
-      <feComposite
-         result="result8"
-         operator="atop"
-         in2="result6"
-         id="feComposite1"
-         in="SourceGraphic" />
-      <feComposite
-         result="result9"
-         operator="over"
-         in2="SourceAlpha"
-         in="result8"
-         id="feComposite2" />
-      <feColorMatrix
-         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0 "
-         result="result10"
-         id="feColorMatrix2" />
-      <feBlend
-         in="result10"
-         mode="normal"
-         in2="result6"
-         id="feBlend2" />
-    </filter>
-    <filter
-       y="-0.068348419"
-       height="1.13669"
-       inkscape:menu-tooltip="Darkens the edge with an inner blur and adds a flexible glow"
-       inkscape:menu="Shadows and Glows"
-       inkscape:label="Dark and Glow"
-       style="color-interpolation-filters:sRGB;"
-       id="filter6"
-       x="-0.095669802"
-       width="1.1829753">
-      <feGaussianBlur
-         stdDeviation="5"
-         result="result6"
-         id="feGaussianBlur5" />
-      <feComposite
-         result="result8"
-         in="SourceGraphic"
-         operator="atop"
-         in2="result6"
-         id="feComposite5" />
-      <feComposite
-         result="result9"
-         operator="over"
-         in2="SourceAlpha"
-         in="result8"
-         id="feComposite6" />
-      <feColorMatrix
-         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0 "
-         result="result10"
-         id="feColorMatrix6" />
-      <feBlend
-         in="result10"
-         mode="normal"
-         in2="result6"
-         id="feBlend6" />
-    </filter>
-    <filter
-       y="-0.068367683"
-       height="1.1367354"
-       inkscape:menu-tooltip="Darkens the edge with an inner blur and adds a flexible glow"
-       inkscape:menu="Shadows and Glows"
-       inkscape:label="Dark and Glow"
-       style="color-interpolation-filters:sRGB;"
-       id="filter8"
-       x="-0.081694092"
-       width="1.1633731">
-      <feGaussianBlur
-         stdDeviation="5"
-         result="result6"
-         id="feGaussianBlur6" />
-      <feComposite
-         result="result8"
-         in="SourceGraphic"
-         operator="atop"
-         in2="result6"
-         id="feComposite7" />
-      <feComposite
-         result="result9"
-         operator="over"
-         in2="SourceAlpha"
-         in="result8"
-         id="feComposite8" />
-      <feColorMatrix
-         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0 "
-         result="result10"
-         id="feColorMatrix8" />
-      <feBlend
-         in="result10"
-         mode="normal"
-         in2="result6"
-         id="feBlend8" />
-    </filter>
-  </defs>
+
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
@@ -180,12 +62,12 @@
      style="opacity:1">
 
     <path
-       style="fill:#888888;fill-opacity:0.10725552;stroke:#d543ff;stroke-width:3;stroke-opacity:1;opacity:1;stroke-dasharray:none;filter:url(#filter2)"
+       style="fill:#888888;fill-opacity:0.10725552;stroke:#d543ff;stroke-width:3;stroke-opacity:1;opacity:1;stroke-dasharray:none"
        d="m 93.938621,47.493563 88.723129,100.514667 -0.0704,0.0541 -88.890876,96.93511 71.354116,0.11268 89.2031,-97.14001 -89.23462,-100.182088 z"
        id="path1"
        sodipodi:nodetypes="cccccccc" />
     <path
-       style="fill:#888888;fill-opacity:0.33753943;stroke-width:3;stroke:#a511fb;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter6)"
+       style="fill:#888888;fill-opacity:0.33753943;stroke-width:3;stroke:#a511fb;stroke-opacity:1;stroke-dasharray:none"
        d="m 186.77905,47.579942 89.02499,100.288318 -0.0704,0.0541 -88.91263,97.04382 71.37587,0.004 89.2031,-97.14001 -89.55811,-100.397786 z"
        id="path1-7"
        sodipodi:nodetypes="cccccccc" />
@@ -202,7 +84,7 @@
        cy="109.20188"
        r="0.076992579" />
     <path
-       style="fill:#888888;fill-opacity:1;stroke-width:3;stroke:#a511fb;stroke-opacity:1;stroke-dasharray:none;stroke-linecap:square;stroke-linejoin:bevel;filter:url(#filter8)"
+       style="fill:#888888;fill-opacity:1;stroke-width:3;stroke:#a511fb;stroke-opacity:1;stroke-dasharray:none;stroke-linecap:square;stroke-linejoin:bevel"
        d="m 281.5785,47.721279 89.02499,100.288291 -0.0704,0.0541 -88.89089,96.93511 71.365,0.0366 89.19223,-97.06391 -89.55811,-100.397759 z"
        id="path1-0"
        sodipodi:nodetypes="cccccccc" />
