@@ -2182,3 +2182,12 @@ section::before {
         height: 40px;
     }
 }
+
+
+
+
+.step-q-btn:visited,
+.step-q-btn--download:visited,
+.step-q-btn--online:visited {
+    color: var(--purple-accent) !important;
+}
