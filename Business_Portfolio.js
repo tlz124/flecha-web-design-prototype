@@ -140,7 +140,7 @@ const projects = [
         fullDescription: "A sophisticated website for an architecture firm featuring a stunning portfolio gallery, detailed service descriptions, and project case studies. The site highlights the firm's design philosophy, team expertise, and past projects with high-quality imagery. The clean, modern design reflects architectural precision while making it easy for potential clients to explore work and request consultations.",
         image: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&h=400&fit=crop",
         technologies: ["HTML5", "CSS3", "JavaScript", "Portfolio Gallery", "Project Showcase"],
-        liveLink: "https://tlz124.github.io/architecture/"
+        liveLink: "https://tlz124.github.io/architecture-essential/"
     },
     {
         id: 6,
