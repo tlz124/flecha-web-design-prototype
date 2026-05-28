@@ -40,7 +40,7 @@
                 <li><a href="about.html" class="menu-link active-link">About</a></li>
                 <li><a href="what_we_do.html" class="menu-link">What We Do</a></li>
                 <li><a href="index.html#our-process" class="menu-link">Our Process</a></li>
-                <li><a href="index.html#portfolio" class="menu-link">View Our Work</a></li>
+                <li><a href="portfolio.html" class="menu-link">Portfolio</a></li>
                 <li><a href="index.html#pricing" class="menu-link">Pricing</a></li>
                 <li><a href="index.html#contact" class="menu-link">Contact Us</a></li>
             </ul>
@@ -115,7 +115,7 @@
 
         // Lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 3.0);
-        scene.add(ambientLight);
+        scene.add(ambientLight);   
 
         const dirLight1 = new THREE.DirectionalLight(0xd4a5ff, 4.0);
         dirLight1.position.set(5, 5, 5);
@@ -147,7 +147,7 @@
             const box = new THREE.Box3().setFromObject(model);
             const center = box.getCenter(new THREE.Vector3());
             model.position.sub(center);
-            model.position.y = -6;
+            model.position.y = 0;
 
             // Scale to fit nicely
             const size = box.getSize(new THREE.Vector3());
