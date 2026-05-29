@@ -260,17 +260,17 @@ function checkCookieConsent() {
     }
 }
 
-acceptAllBtn.addEventListener('click', () => {
+if (acceptAllBtn) if (acceptAllBtn) acceptAllBtn.addEventListener('click', () => {
     localStorage.setItem('cookieConsent', 'accepted');
     cookieConsent.classList.add('hidden');
 });
 
-rejectAllBtn.addEventListener('click', () => {
+if (rejectAllBtn) rejectAllBtn.addEventListener('click', () => {
     localStorage.setItem('cookieConsent', 'rejected');
     cookieConsent.classList.add('hidden');
 });
 
-managePreferencesBtn.addEventListener('click', () => {
+if (managePreferencesBtn) managePreferencesBtn.addEventListener('click', () => {
     alert('Cookie preferences: You can customize your cookie settings here. For this demo, we only use essential cookies for site functionality.');
     localStorage.setItem('cookieConsent', 'managed');
     cookieConsent.classList.add('hidden');
@@ -736,3 +736,22 @@ document.querySelectorAll('.process-step:not(.process-step--questionnaire) .step
 const dateInput = document.getElementById('preferred_date');
 dateInput.addEventListener('focus', function() { this.type = 'date'; });
 dateInput.addEventListener('blur', function() { if (!this.value) this.type = 'text'; });
+
+// ===== Back to Top Button =====
+(function() {
+    const btn = document.getElementById('backToTop');
+    if (!btn) return;
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 400) {
+            btn.classList.add('visible');
+        } else {
+            btn.classList.remove('visible');
+        }
+    }, { passive: true });
+
+    btn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (navigator.vibrate) navigator.vibrate(30);
+    });
+})();
