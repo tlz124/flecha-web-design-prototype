@@ -147,7 +147,7 @@
             const box = new THREE.Box3().setFromObject(model);
             const center = box.getCenter(new THREE.Vector3());
             model.position.sub(center);
-            model.position.y = 0;
+            model.position.y = -1;
 
             // Scale to fit nicely
             const size = box.getSize(new THREE.Vector3());
