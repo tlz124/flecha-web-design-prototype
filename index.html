@@ -193,192 +193,22 @@
     <section id="portfolio" class="portfolio">
         <div class="container">
             <h2 class="section-title">View Our Work</h2>
-            <p class="section-subtitle">Recent projects across education and small business</p>
-            
-            <!-- Filter Buttons -->
-            <div class="filter-container">
-                <button class="filter-btn active" data-filter="all">All Projects</button>
-                <button class="filter-btn" data-filter="Small Business">Small Business</button>
-                <button class="filter-btn" data-filter="Healthcare">Healthcare</button>
-                <button class="filter-btn" data-filter="Education">Education</button>
-                <button class="filter-btn" data-filter="Professional Services">Professional Services</button>
+            <p class="section-subtitle">Drag to explore — tap a project to learn more</p>
+
+            <div class="sphere-container">
+                <canvas id="portfolioSphere"></canvas>
             </div>
-            
-            <div class="projects-grid">
-                <!-- Small Business Projects -->
-                <div class="project-card project-card--tiered">
-                    <div class="project-image">
-                        <img src="floral_shop.jpg" alt="Local Flower Shop">
-                        <div class="project-tier-badge">3 Demo Tiers</div>
-                    </div>
-                    <div class="project-info">
-                        <span class="project-category">Small Business</span>
-                        <h3 class="project-title">Local Flower Shop</h3>
-                        <p class="project-description">Modern florist website with online ordering and delivery</p>
-                    </div>
-                    <div class="project-tiers">
-                        <p class="project-tiers__label">Choose a tier to view the demo</p>
-                        <div class="project-tiers__buttons">
-                            <a href="#" class="tier-card tier-card--1" data-project="0" data-tier="0">
-                                <span class="tier-card__diamonds">◆</span>
-                                <span class="tier-card__name">Essential</span>
-                                <span class="tier-card__arrow">→</span>
-                            </a>
-                            <a href="#" class="tier-card tier-card--2" data-project="0" data-tier="1">
-                                <span class="tier-card__diamonds">◆◆</span>
-                                <span class="tier-card__name">Essential Plus</span>
-                                <span class="tier-card__arrow">→</span>
-                            </a>
-                            <a href="#" class="tier-card tier-card--3" data-project="0" data-tier="2">
-                                <span class="tier-card__diamonds">◆◆◆</span>
-                                <span class="tier-card__name">Custom</span>
-                                <span class="tier-card__arrow">→</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="project-card project-card--tiered">
-                    <div class="project-image">
-                        <img src="https://images.unsplash.com/photo-1552566626-52f8b828add9?w=600&h=400&fit=crop" alt="Mexican Restaurant">
-                        <div class="project-tier-badge">3 Demo Tiers</div>
-                    </div>
-                    <div class="project-info">
-                        <span class="project-category">Small Business</span>
-                        <h3 class="project-title">Mexican Restaurant</h3>
-                        <p class="project-description">Authentic Mexican restaurant with menu and reservation system</p>
-                    </div>
-                    <div class="project-tiers">
-                        <p class="project-tiers__label">Choose a tier to view the demo</p>
-                        <div class="project-tiers__buttons">
-                            <a href="#" class="tier-card tier-card--1" data-project="1" data-tier="0">
-                                <span class="tier-card__diamonds">◆</span>
-                                <span class="tier-card__name">Essential</span>
-                                <span class="tier-card__arrow">→</span>
-                            </a>
-                            <a href="#" class="tier-card tier-card--2" data-project="1" data-tier="1">
-                                <span class="tier-card__diamonds">◆◆</span>
-                                <span class="tier-card__name">Essential Plus</span>
-                                <span class="tier-card__arrow">→</span>
-                            </a>
-                            <a href="#" class="tier-card tier-card--3" data-project="1" data-tier="2">
-                                <span class="tier-card__diamonds">◆◆◆</span>
-                                <span class="tier-card__name">Custom</span>
-                                <span class="tier-card__arrow">→</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-
-                <div class="project-card">
-                    <div class="project-image">
-                        <img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=600&h=400&fit=crop" alt="Modern Dental Office">
-                        <div class="project-overlay">
-                            <button class="view-details" data-project="3">View Details <span class="arrow-icon">→</span></button>
-                        </div>
-                    </div>
-                    <div class="project-info">
-                        <span class="project-category">Healthcare</span>
-                        <h3 class="project-title">Modern Dental Office</h3>
-                        <p class="project-description">Contemporary dental practice with patient portal and services</p>
-                    </div>
-                </div>
-
-
-                <div class="project-card">
-                    <div class="project-image">
-                        <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&h=400&fit=crop" alt="Architecture Firm">
-                        <div class="project-overlay">
-                            <button class="view-details" data-project="5">View Details <span class="arrow-icon">→</span></button>
-                        </div>
-                    </div>
-                    <div class="project-info">
-                        <span class="project-category">Small Business</span>
-                        <h3 class="project-title">Architecture Firm</h3>
-                        <p class="project-description">Professional architecture business showcasing portfolio and services</p>
-                    </div>
-                </div>
-
-                <!-- Education Projects -->
-                <div class="project-card">
-                    <div class="project-image">
-                        <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600&h=400&fit=crop" alt="K-12 School Website">
-                        <div class="project-overlay">
-                            <button class="view-details" data-project="6">View Details <span class="arrow-icon">→</span></button>
-                        </div>
-                    </div>
-                    <div class="project-info">
-                        <span class="project-category">Education</span>
-                        <h3 class="project-title">K-12 School Website</h3>
-                        <p class="project-description">Comprehensive school website for middle and high school students</p>
-                    </div>
-                </div>
-
-                <div class="project-card">
-                    <div class="project-image">
-                        <img src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=600&h=400&fit=crop" alt="Nonprofit Organization">
-                        <div class="project-overlay">
-                            <button class="view-details" data-project="7">View Details <span class="arrow-icon">→</span></button>
-                        </div>
-                    </div>
-                    <div class="project-info">
-                        <span class="project-category">Education</span>
-                        <h3 class="project-title">Nonprofit Organization</h3>
-                        <p class="project-description">Versatile nonprofit website template for community organizations</p>
-                    </div>
-                </div>
-
-
-                <div class="project-card project-card--tiered">
-                    <div class="project-image">
-                        <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=600&h=400&fit=crop" alt="Beauty Supply Store">
-                        <div class="project-tier-badge">3 Demo Tiers</div>
-                    </div>
-                    <div class="project-info">
-                        <span class="project-category">Small Business</span>
-                        <h3 class="project-title">Beauty Supply Store</h3>
-                        <p class="project-description">Modern beauty supply website with curated products and elegant design</p>
-                    </div>
-                    <div class="project-tiers">
-                        <p class="project-tiers__label">Choose a tier to view the demo</p>
-                        <div class="project-tiers__buttons">
-                            <a href="#" class="tier-card tier-card--1" data-project="9" data-tier="0">
-                                <span class="tier-card__diamonds">◆</span>
-                                <span class="tier-card__name">Essential</span>
-                                <span class="tier-card__arrow">→</span>
-                            </a>
-                            <a href="#" class="tier-card tier-card--2" data-project="9" data-tier="1">
-                                <span class="tier-card__diamonds">◆◆</span>
-                                <span class="tier-card__name">Essential Plus</span>
-                                <span class="tier-card__arrow">→</span>
-                            </a>
-                            <a href="#" class="tier-card tier-card--3" data-project="9" data-tier="2">
-                                <span class="tier-card__diamonds">◆◆◆</span>
-                                <span class="tier-card__name">Custom</span>
-                                <span class="tier-card__arrow">→</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-
-                <div class="project-card">
-                    <div class="project-image">
-                        <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&h=400&fit=crop" alt="Corporate Law Firm">
-                        <div class="project-overlay">
-                            <button class="view-details" data-project="11">View Details <span class="arrow-icon">→</span></button>
-                        </div>
-                    </div>
-                    <div class="project-info">
-                        <span class="project-category">Professional Services</span>
-                        <h3 class="project-title">Corporate Law Firm</h3>
-                        <p class="project-description">Professional law firm website showcasing expertise and legal services</p>
-                    </div>
+            <!-- Project Modal -->
+            <div class="modal-overlay" id="sphereModalOverlay">
+                <div class="modal-content" id="sphereModalContent">
+                    <button class="modal-close" id="sphereModalClose">&times;</button>
+                    <div class="modal-body" id="sphereModalBody"></div>
                 </div>
             </div>
         </div>
     </section>
+
 
    
     <!-- Pricing & Payment Section -->
@@ -687,5 +517,270 @@
     </button>
 
     <script src="Business_Portfolio.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script>
+    (function() {
+        const sphereProjects = [
+            {
+                id: 0, title: "Local Flower Shop", category: "Small Business",
+                description: "Modern florist website with online ordering and delivery",
+                fullDescription: "A beautiful website for a local florist featuring online ordering, delivery scheduling, and a stunning gallery of arrangements.",
+                image: "floral_shop.jpg",
+                technologies: ["HTML5", "CSS3", "JavaScript", "Online Ordering"],
+                liveLink: "https://tlz124.github.io/Watsons-Flowers/"
+            },
+            {
+                id: 1, title: "Mexican Restaurant", category: "Food & Beverage",
+                description: "Vibrant restaurant with menu and reservations",
+                fullDescription: "A vibrant website for a Mexican restaurant featuring an interactive menu, online reservation system, and catering information.",
+                image: "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=600&h=400&fit=crop",
+                technologies: ["HTML5", "CSS3", "JavaScript", "Reservations"],
+                liveLink: "https://tlz124.github.io/restaurant/"
+            },
+            {
+                id: 2, title: "Modern Dental Office", category: "Healthcare",
+                description: "Professional dental practice with appointment booking",
+                fullDescription: "A clean, professional dental website with appointment scheduling, service descriptions, and patient resources.",
+                image: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=600&h=400&fit=crop",
+                technologies: ["HTML5", "CSS3", "JavaScript", "Appointment Booking"],
+                liveLink: "https://tlz124.github.io/dental-office-website/"
+            },
+            {
+                id: 3, title: "Architecture Firm", category: "Professional Services",
+                description: "Sleek portfolio showcasing architectural projects",
+                fullDescription: "A sophisticated website for an architecture firm featuring portfolio gallery, project case studies, and consultation booking.",
+                image: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&h=400&fit=crop",
+                technologies: ["HTML5", "CSS3", "JavaScript", "Portfolio Gallery"],
+                liveLink: "https://tlz124.github.io/architecture-essential/"
+            },
+            {
+                id: 4, title: "K-12 School", category: "Education",
+                description: "Full-featured school website with student portals",
+                fullDescription: "A comprehensive school website with student portals, parent access, event calendars, staff directories, and club information.",
+                image: "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600&h=400&fit=crop",
+                technologies: ["HTML5", "CSS3", "JavaScript", "Student Portal"],
+                liveLink: "https://tlz124.github.io/school/"
+            },
+            {
+                id: 5, title: "Nonprofit Organization", category: "Nonprofit",
+                description: "Community org with donation integration",
+                fullDescription: "A warm, engaging website for a nonprofit with donation system, volunteer sign-up, event calendar, and impact stories.",
+                image: "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=600&h=400&fit=crop",
+                technologies: ["HTML5", "CSS3", "JavaScript", "Donation System"],
+                liveLink: "https://tlz124.github.io/nonprofit/"
+            },
+            {
+                id: 6, title: "Beauty Supply Store", category: "Retail",
+                description: "Modern beauty store with product catalog",
+                fullDescription: "A stylish beauty supply store with product catalog, brand filtering, and a sleek modern aesthetic.",
+                image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=600&h=400&fit=crop",
+                technologies: ["HTML5", "CSS3", "JavaScript", "Product Catalog"],
+                liveLink: "https://tlz124.github.io/Beauty"
+            },
+            {
+                id: 7, title: "Corporate Law Firm", category: "Professional Services",
+                description: "Professional law firm showcasing expertise",
+                fullDescription: "A sophisticated law firm website with practice area details, attorney profiles, case results, and consultation booking.",
+                image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&h=400&fit=crop",
+                technologies: ["HTML5", "CSS3", "JavaScript", "Consultation Booking"],
+                liveLink: "https://tlz124.github.io/legal"
+            }
+        ];
+
+        const canvas = document.getElementById('portfolioSphere');
+        if (!canvas) return;
+        const cont = canvas.parentElement;
+
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+        camera.position.set(0, 0, 6.5);
+
+        scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+        const dl1 = new THREE.DirectionalLight(0xd4a5ff, 2);
+        dl1.position.set(5, 5, 5);
+        scene.add(dl1);
+        const dl2 = new THREE.DirectionalLight(0xffffff, 1);
+        dl2.position.set(-5, -3, -3);
+        scene.add(dl2);
+
+        const group = new THREE.Group();
+        scene.add(group);
+
+        const faceMeshes = [];
+        const R = 2.2;
+        const rows = 2;
+        const cols = 4;
+        const gap = 0.04;
+        const loader = new THREE.TextureLoader();
+
+        function makeCardTexture(p, img) {
+            const c = document.createElement('canvas');
+            c.width = 256; c.height = 256;
+            const ctx = c.getContext('2d');
+            if (img) {
+                ctx.drawImage(img, 0, 0, 256, 256);
+            } else {
+                ctx.fillStyle = '#1a0a2e';
+                ctx.fillRect(0, 0, 256, 256);
+            }
+            ctx.fillStyle = 'rgba(0,0,0,0.6)';
+            ctx.fillRect(0, 170, 256, 86);
+            ctx.fillStyle = '#d4a5ff';
+            ctx.font = 'bold 11px sans-serif';
+            ctx.fillText(p.category.toUpperCase(), 8, 190);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 16px sans-serif';
+            const words = p.title.split(' ');
+            let line = '', y = 212;
+            words.forEach(w => {
+                const test = line + w + ' ';
+                if (ctx.measureText(test).width > 240 && line) {
+                    ctx.fillText(line.trim(), 8, y); y += 18; line = w + ' ';
+                } else { line = test; }
+            });
+            ctx.fillText(line.trim(), 8, y);
+            return new THREE.CanvasTexture(c);
+        }
+
+        function buildFace(r, c, tex, proj) {
+            const phi1 = (Math.PI / (rows + 1)) * (r + 1);
+            const phi2 = (Math.PI / (rows + 1)) * (r + 2);
+            const theta1 = (2 * Math.PI / cols) * c;
+            const theta2 = (2 * Math.PI / cols) * (c + 1);
+            const phiMid = (phi1 + phi2) / 2;
+            const thetaMid = (theta1 + theta2) / 2;
+            const nx = Math.sin(phiMid) * Math.cos(thetaMid);
+            const ny = Math.cos(phiMid);
+            const nz = Math.sin(phiMid) * Math.sin(thetaMid);
+            const faceW = Math.max(0.1, R * (theta2 - theta1) * Math.sin(phiMid) - gap);
+            const faceH = Math.max(0.1, R * (phi2 - phi1) - gap);
+            const geo = new THREE.PlaneGeometry(faceW, faceH);
+            const mat = new THREE.MeshStandardMaterial({ map: tex, side: THREE.FrontSide, roughness: 0.4, metalness: 0.1 });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(nx * R, ny * R, nz * R);
+            mesh.lookAt(0, 0, 0);
+            mesh.rotateY(Math.PI);
+            mesh.userData.project = proj;
+            return mesh;
+        }
+
+        // Build all 8 faces — one per project
+        sphereProjects.forEach((proj, i) => {
+            const r = Math.floor(i / cols);
+            const c = i % cols;
+            // Start with fallback texture
+            const fallbackTex = makeCardTexture(proj, null);
+            const mesh = buildFace(r, c, fallbackTex, proj);
+            group.add(mesh);
+            faceMeshes.push(mesh);
+            // Load real image
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+                const tex = makeCardTexture(proj, img);
+                mesh.material.map = tex;
+                mesh.material.needsUpdate = true;
+            };
+            img.src = proj.image;
+        });
+
+        // Resize
+        function resize() {
+            const w = cont.clientWidth;
+            const h = cont.clientHeight;
+            renderer.setSize(w, h);
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        // Drag controls
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let dragging = false, px = 0, py = 0, vx = 0, vy = 0;
+
+        function getXY(e) { return e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY }; }
+
+        canvas.addEventListener('mousedown', e => { dragging = true; const p = getXY(e); px = p.x; py = p.y; vx = vy = 0; });
+        canvas.addEventListener('touchstart', e => { dragging = true; const p = getXY(e); px = p.x; py = p.y; vx = vy = 0; }, { passive: true });
+
+        window.addEventListener('mousemove', e => {
+            if (!dragging) return;
+            const p = getXY(e); vx = (p.x - px) * 0.006; vy = (p.y - py) * 0.006;
+            group.rotation.y += vx; group.rotation.x += vy; px = p.x; py = p.y;
+        });
+        window.addEventListener('touchmove', e => {
+            if (!dragging) return;
+            const p = getXY(e); vx = (p.x - px) * 0.006; vy = (p.y - py) * 0.006;
+            group.rotation.y += vx; group.rotation.x += vy; px = p.x; py = p.y;
+        }, { passive: true });
+
+        window.addEventListener('mouseup', e => {
+            if (!dragging) return; dragging = false;
+            if (Math.abs(vx) < 0.004 && Math.abs(vy) < 0.004) {
+                const rect = canvas.getBoundingClientRect();
+                mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+                mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+                doClick();
+            }
+        });
+        window.addEventListener('touchend', e => {
+            if (!dragging) return; dragging = false;
+            if (Math.abs(vx) < 0.004 && Math.abs(vy) < 0.004) {
+                const t = e.changedTouches[0];
+                const rect = canvas.getBoundingClientRect();
+                mouse.x = ((t.clientX - rect.left) / rect.width) * 2 - 1;
+                mouse.y = -((t.clientY - rect.top) / rect.height) * 2 + 1;
+                doClick();
+            }
+        });
+
+        function doClick() {
+            raycaster.setFromCamera(mouse, camera);
+            const hits = raycaster.intersectObjects(faceMeshes);
+            if (hits.length) showModal(hits[0].object.userData.project);
+        }
+
+        // Modal
+        const overlay = document.getElementById('sphereModalOverlay');
+        const body = document.getElementById('sphereModalBody');
+        const closeBtn = document.getElementById('sphereModalClose');
+
+        function showModal(p) {
+            body.innerHTML = `
+                <img src="${p.image}" alt="${p.title}" style="width:100%;border-radius:4px;margin-bottom:1.5rem;object-fit:cover;height:200px;" crossorigin="anonymous">
+                <span class="project-category">${p.category}</span>
+                <h2 style="font-size:1.5rem;font-weight:900;letter-spacing:2px;text-transform:uppercase;margin:0.5rem 0 1rem;color:var(--text-white);">${p.title}</h2>
+                <p style="color:var(--text-gray);line-height:1.8;margin-bottom:1.5rem;">${p.fullDescription}</p>
+                <div style="margin-bottom:1.5rem;">
+                    <h4 style="font-size:0.8rem;letter-spacing:2px;text-transform:uppercase;color:var(--purple-accent);margin-bottom:0.75rem;">Technologies Used</h4>
+                    <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+                        ${p.technologies.map(t => `<span style="background:rgba(212,165,255,0.1);border:1px solid rgba(212,165,255,0.3);border-radius:4px;padding:0.25rem 0.75rem;font-size:0.8rem;color:var(--purple-accent);">${t}</span>`).join('')}
+                    </div>
+                </div>
+                ${p.liveLink ? `<a href="${p.liveLink}" target="_blank" class="submit-btn" style="display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none;">View Live Site <span>→</span></a>` : ''}
+            `;
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        closeBtn.addEventListener('click', closeModal);
+        overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+        function closeModal() { overlay.classList.remove('active'); document.body.style.overflow = ''; }
+
+        // Animate
+        function animate() {
+            requestAnimationFrame(animate);
+            if (!dragging) { vx *= 0.93; vy *= 0.93; group.rotation.y += vx; group.rotation.x += vy; }
+            renderer.render(scene, camera);
+        }
+        animate();
+    })();
+    </script>
 </body>
 </html>
