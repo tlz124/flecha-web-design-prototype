@@ -1489,12 +1489,29 @@ section::before {
 
 @media (max-width: 968px) {
     .pricing-grid {
-        grid-template-columns: 1fr;
-        max-width: 500px;
-        margin: 0 auto 2rem;
+        display: flex;
+        flex-direction: row;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        gap: 1rem;
+        padding: 0 1rem 1rem;
+        margin: 0 -1rem 2rem;
+        grid-template-columns: unset;
+        max-width: unset;
+        scrollbar-width: none;
+    }
+
+    .pricing-grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    .pricing-card {
+        flex: 0 0 80vw;
+        max-width: 320px;
+        scroll-snap-align: center;
     }
 }
-
 
 
 /* ===== Social Media Icons ===== */
