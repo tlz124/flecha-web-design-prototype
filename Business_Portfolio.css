@@ -483,6 +483,7 @@ section::before {
     align-items: center;
     gap: 0.8rem;
     flex-shrink: 0;
+    width: 48px;
 }
 
 /* Right column — title + collapsible body */
