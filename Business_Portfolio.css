@@ -460,16 +460,36 @@ section::before {
     background: var(--medium-gray);
     border: 1px solid var(--border-gray);
     border-radius: 4px;
-    padding: 1.25rem 1.25rem;
+    padding: 1.25rem;
     min-height: unset;
     transition: all 0.3s ease;
     position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1rem;
 }
 
 .process-step:hover {
     border-color: var(--purple-accent);
     box-shadow: var(--glow-purple);
     transform: translateY(-5px);
+}
+
+/* Left column — number badge + toggle */
+.step-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+/* Right column — title + collapsible body */
+.step-content {
+    flex: 1;
+    min-width: 0;
+    padding-top: 0.2rem;
 }
 
 .step-number {
@@ -483,7 +503,8 @@ section::before {
     justify-content: center;
     font-size: 1.5rem;
     font-weight: 900;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0;
+    flex-shrink: 0;
 }
 
 .step-title {
@@ -1258,9 +1279,10 @@ section::before {
 
     .process-step {
         min-height: auto;
-        padding: 2rem 1.5rem;
+        padding: 1rem;
     }
-    
+
+
     .process-reassurance {
         grid-template-columns: 1fr;
         padding: 2rem 1.5rem;
