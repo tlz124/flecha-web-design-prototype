@@ -460,7 +460,7 @@ section::before {
     background: var(--medium-gray);
     border: 1px solid var(--border-gray);
     border-radius: 4px;
-    padding: 1.25rem 1.25rem 2.5rem;
+    padding: 1.25rem;
     min-height: unset;
     transition: all 0.3s ease;
     position: relative;
@@ -476,7 +476,7 @@ section::before {
     transform: translateY(-5px);
 }
 
-/* Left column — number badge only */
+/* Left column — number badge + toggle below */
 .step-left {
     display: flex;
     flex-direction: column;
@@ -519,7 +519,6 @@ section::before {
 .step-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 0.75rem;
     cursor: pointer;
 }
@@ -527,10 +526,6 @@ section::before {
 .step-toggle {
     background: none;
     border: none;
-    position: absolute;
-    bottom: 0.75rem;
-    left: 50%;
-    transform: translateX(-50%);
     width: 28px;
     height: 28px;
     display: flex;
@@ -538,7 +533,7 @@ section::before {
     justify-content: center;
     cursor: pointer;
     padding: 0;
-    transition: transform 0.3s ease;
+    flex-shrink: 0;
 }
 
 .step-toggle svg {
@@ -2421,4 +2416,115 @@ section::before {
         width: 100%;
         height: 200px;
     }
+}
+
+/* ===== Pricing Swipe Hint ===== */
+.pricing-swipe-hint {
+    display: none;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--purple-accent);
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 968px) {
+    .pricing-swipe-hint {
+        display: block;
+    }
+}
+
+/* ===== E-Commerce Toggle Buttons ===== */
+.pricing-toggle-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.pricing-toggle-btn {
+    padding: 0.75rem 2rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: 2px solid var(--purple-accent);
+    background: transparent;
+    color: var(--text-light);
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.pricing-toggle-btn--left {
+    border-radius: 50px 0 0 50px;
+    border-right: 1px solid var(--purple-accent);
+}
+
+.pricing-toggle-btn--right {
+    border-radius: 0 50px 50px 0;
+    border-left: 1px solid var(--purple-accent);
+}
+
+.pricing-toggle-btn.active {
+    background: var(--purple-accent);
+    color: var(--black);
+}
+
+.pricing-toggle-btn:hover:not(.active) {
+    background: rgba(212, 165, 255, 0.1);
+}
+
+/* ===== Nested Pricing Feature Toggle ===== */
+.pricing-feature-expandable {
+    list-style: none;
+}
+
+.pricing-feature-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.pricing-feature-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.pricing-feature-toggle svg {
+    width: 14px;
+    height: 14px;
+    color: var(--purple-accent);
+    transition: transform 0.3s ease;
+}
+
+.pricing-feature-toggle.open svg {
+    transform: rotate(180deg);
+}
+
+.pricing-feature-sub {
+    list-style: none;
+    padding: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, margin-top 0.3s ease;
+    margin-top: 0;
+    padding-left: 0.5rem;
+}
+
+.pricing-feature-sub.open {
+    max-height: 400px;
+    margin-top: 0.5rem;
+}
+
+.pricing-feature-sub li {
+    font-size: 0.85rem;
+    color: var(--text-gray);
+    padding: 0.15rem 0;
 }

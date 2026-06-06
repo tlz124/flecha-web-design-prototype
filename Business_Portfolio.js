@@ -756,3 +756,35 @@ dateInput.addEventListener('blur', function() { if (!this.value) this.type = 'te
         if (navigator.vibrate) navigator.vibrate(30);
     });
 })();
+
+// ===== E-Commerce / Non E-Commerce Pricing Toggle =====
+const ecomBtn = document.getElementById('ecomBtn');
+const nonEcomBtn = document.getElementById('nonEcomBtn');
+const ecomPricing = document.getElementById('ecomPricing');
+const nonEcomPricing = document.getElementById('nonEcomPricing');
+
+if (ecomBtn && nonEcomBtn) {
+    ecomBtn.addEventListener('click', () => {
+        ecomBtn.classList.add('active');
+        nonEcomBtn.classList.remove('active');
+        ecomPricing.style.display = '';
+        nonEcomPricing.style.display = 'none';
+    });
+
+    nonEcomBtn.addEventListener('click', () => {
+        nonEcomBtn.classList.add('active');
+        ecomBtn.classList.remove('active');
+        nonEcomPricing.style.display = '';
+        ecomPricing.style.display = 'none';
+    });
+}
+
+// ===== Nested Pricing Feature Toggles =====
+document.querySelectorAll('.pricing-feature-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const sub = btn.closest('.pricing-feature-expandable').querySelector('.pricing-feature-sub');
+        const isOpen = sub.classList.contains('open');
+        sub.classList.toggle('open', !isOpen);
+        btn.classList.toggle('open', !isOpen);
+    });
+});

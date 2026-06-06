@@ -104,12 +104,14 @@
                 <div class="process-step">
                     <div class="step-left">
                         <div class="step-number">1</div>
-                        <button class="step-toggle" aria-label="Toggle details">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                        </button>
                     </div>
                     <div class="step-content">
-                        <h3 class="step-title">Free Consultation</h3>
+                        <div class="step-header">
+                            <h3 class="step-title">Free Consultation</h3>
+                            <button class="step-toggle" aria-label="Toggle details">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                        </div>
                         <div class="step-body">
                             <p class="step-description">We start with a friendly conversation about your vision, goals, and what success looks like for you. No pressure, no jargon—just getting to know your business.</p>
                             <span class="step-time">30 minutes</span>
@@ -122,12 +124,14 @@
                 <div class="process-step">
                     <div class="step-left">
                         <div class="step-number">2</div>
-                        <button class="step-toggle" aria-label="Toggle details">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                        </button>
                     </div>
                     <div class="step-content">
-                        <h3 class="step-title">Custom Proposal</h3>
+                        <div class="step-header">
+                            <h3 class="step-title">Custom Proposal</h3>
+                            <button class="step-toggle" aria-label="Toggle details">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                        </div>
                         <div class="step-body">
                             <p class="step-description">You'll receive a clear proposal with timeline, deliverables, and pricing. No surprises, no hidden fees. You approve before we begin any work.</p>
                             <span class="step-time">2-3 business days</span>
@@ -140,12 +144,14 @@
                 <div class="process-step">
                     <div class="step-left">
                         <div class="step-number">3</div>
-                        <button class="step-toggle" aria-label="Toggle details">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                        </button>
                     </div>
                     <div class="step-content">
-                        <h3 class="step-title">Design & Build</h3>
+                        <div class="step-header">
+                            <h3 class="step-title">Design & Build</h3>
+                            <button class="step-toggle" aria-label="Toggle details">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                        </div>
                         <div class="step-body">
                             <p class="step-description">We handle all the technical stuff while keeping you in the loop. You'll see progress updates and give feedback in plain language—we translate it into code.</p>
                             <span class="step-time">2-4 weeks</span>
@@ -158,12 +164,14 @@
                 <div class="process-step">
                     <div class="step-left">
                         <div class="step-number">4</div>
-                        <button class="step-toggle" aria-label="Toggle details">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                        </button>
                     </div>
                     <div class="step-content">
-                        <h3 class="step-title">Launch & Support</h3>
+                        <div class="step-header">
+                            <h3 class="step-title">Launch & Support</h3>
+                            <button class="step-toggle" aria-label="Toggle details">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                        </div>
                         <div class="step-body">
                             <p class="step-description">We'll guide you through launch day and show you how to make simple updates. Plus, we're here if you need help down the road.</p>
                             <span class="step-time">Ongoing</span>
@@ -208,8 +216,20 @@
         <div class="container">
             <h2 class="section-title">Investment</h2>
             <p class="section-subtitle">Simple, transparent pricing — no surprises</p>
+            <p class="pricing-swipe-hint">← Swipe to explore plans →</p>
 
-            <div class="pricing-grid">
+            <!-- E-Commerce Toggle -->
+            <div class="pricing-toggle-wrap">
+                <button class="pricing-toggle-btn pricing-toggle-btn--left active" id="nonEcomBtn">
+                    Non E-Commerce
+                </button>
+                <button class="pricing-toggle-btn pricing-toggle-btn--right" id="ecomBtn">
+                    E-Commerce
+                </button>
+            </div>
+
+            <!-- Non E-Commerce Pricing -->
+            <div class="pricing-grid" id="nonEcomPricing">
 
                 <!-- Tier 1: Essential -->
                 <div class="pricing-card">
@@ -246,7 +266,21 @@
                     </div>
                     <div class="pricing-body">
                         <ul class="pricing-features">
-                            <li>✓ Everything in Essential</li>
+                            <li class="pricing-feature-expandable">
+                                <div class="pricing-feature-header">
+                                    <span>✓ Everything in Essential</span>
+                                    <button class="pricing-feature-toggle" aria-label="Show Essential features">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                    </button>
+                                </div>
+                                <ul class="pricing-feature-sub">
+                                    <li>— Mobile Responsive Design</li>
+                                    <li>— Photo Gallery</li>
+                                    <li>— Contact Form</li>
+                                    <li>— Business Hours, Location & Google Maps</li>
+                                    <li>— Social Media Links</li>
+                                </ul>
+                            </li>
                             <li>✓ Product Catalog with Pricing</li>
                             <li>✓ Delivery Area Section</li>
                             <li>✓ Testimonials Section</li>
@@ -269,7 +303,25 @@
                     </div>
                     <div class="pricing-body">
                         <ul class="pricing-features">
-                            <li>✓ Everything in Tier 2</li>
+                            <li class="pricing-feature-expandable">
+                                <div class="pricing-feature-header">
+                                    <span>✓ Everything in Tier 2</span>
+                                    <button class="pricing-feature-toggle" aria-label="Show Tier 2 features">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                    </button>
+                                </div>
+                                <ul class="pricing-feature-sub">
+                                    <li>— Mobile Responsive Design</li>
+                                    <li>— Photo Gallery</li>
+                                    <li>— Contact Form</li>
+                                    <li>— Business Hours, Location & Google Maps</li>
+                                    <li>— Social Media Links</li>
+                                    <li>— Product Catalog with Pricing</li>
+                                    <li>— Delivery Area Section</li>
+                                    <li>— Testimonials Section</li>
+                                    <li>— Expanded Navigation</li>
+                                </ul>
+                            </li>
                             <li>✓ Complex Functionality</li>
                             <li>✓ Custom Quote Based on Scope</li>
                             <li>✓ Priority Support</li>
@@ -282,6 +334,109 @@
                 </div>
 
             </div>
+
+            <!-- E-Commerce Pricing -->
+            <div class="pricing-grid" id="ecomPricing" style="display:none;">
+
+                <!-- E-Com Tier 1 -->
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3 class="pricing-name">E-Com Essential</h3>
+                        <div class="pricing-amount">
+                            <span class="pricing-total">$2,500</span>
+                            <span class="pricing-label">Total Project Price</span>
+                        </div>
+                    </div>
+                    <div class="pricing-body">
+                        <ul class="pricing-features">
+                            <li>✓ Mobile Responsive Design</li>
+                            <li>✓ Online Store Setup</li>
+                            <li>✓ Up to 25 Products</li>
+                            <li>✓ Secure Checkout</li>
+                            <li>✓ Payment Gateway Integration</li>
+                        </ul>
+                        <a href="#contact" class="pricing-cta">
+                            Request Consultation <span class="arrow-icon">→</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- E-Com Tier 2 -->
+                <div class="pricing-card pricing-card-featured">
+                    <div class="pricing-featured-label">Most Popular</div>
+                    <div class="pricing-header">
+                        <h3 class="pricing-name">E-Com Plus</h3>
+                        <div class="pricing-amount">
+                            <span class="pricing-total">$4,500</span>
+                            <span class="pricing-label">Total Project Price</span>
+                        </div>
+                    </div>
+                    <div class="pricing-body">
+                        <ul class="pricing-features">
+                            <li class="pricing-feature-expandable">
+                                <div class="pricing-feature-header">
+                                    <span>✓ Everything in E-Com Essential</span>
+                                    <button class="pricing-feature-toggle" aria-label="Show features">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                    </button>
+                                </div>
+                                <ul class="pricing-feature-sub">
+                                    <li>— Mobile Responsive Design</li>
+                                    <li>— Online Store Setup</li>
+                                    <li>— Up to 25 Products</li>
+                                    <li>— Secure Checkout</li>
+                                    <li>— Payment Gateway Integration</li>
+                                </ul>
+                            </li>
+                            <li>✓ Up to 100 Products</li>
+                            <li>✓ Inventory Management</li>
+                            <li>✓ Discount & Coupon System</li>
+                            <li>✓ Customer Accounts</li>
+                        </ul>
+                        <a href="#contact" class="pricing-cta">
+                            Request Consultation <span class="arrow-icon">→</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- E-Com Tier 3 -->
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3 class="pricing-name">E-Com Custom</h3>
+                        <div class="pricing-amount">
+                            <span class="pricing-total">$7,500+</span>
+                            <span class="pricing-label">Starting Price</span>
+                        </div>
+                    </div>
+                    <div class="pricing-body">
+                        <ul class="pricing-features">
+                            <li class="pricing-feature-expandable">
+                                <div class="pricing-feature-header">
+                                    <span>✓ Everything in E-Com Plus</span>
+                                    <button class="pricing-feature-toggle" aria-label="Show features">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                    </button>
+                                </div>
+                                <ul class="pricing-feature-sub">
+                                    <li>— Mobile Responsive Design</li>
+                                    <li>— Online Store Setup</li>
+                                    <li>— Up to 100 Products</li>
+                                    <li>— Inventory Management</li>
+                                    <li>— Discount & Coupon System</li>
+                                    <li>— Customer Accounts</li>
+                                </ul>
+                            </li>
+                            <li>✓ Unlimited Products</li>
+                            <li>✓ Custom Integrations</li>
+                            <li>✓ Priority Support</li>
+                            <li>✓ Custom Quote Based on Scope</li>
+                        </ul>
+                        <a href="#contact" class="pricing-cta">
+                            Request Consultation <span class="arrow-icon">→</span>
+                        </a>
+                    </div>
+                </div>
+
 
             <p class="pricing-note">
                 All tiers include a 50% deposit at project start with the
@@ -662,7 +817,7 @@
 
         window.addEventListener('mouseup', e => {
             if (!dragging) return; dragging=false; canvas.style.cursor='grab';
-            if (Math.abs(vx) < 0.005) {
+            if (Math.abs(vx) < 0.002) {
                 const rect=canvas.getBoundingClientRect();
                 mouse.x=((e.clientX-rect.left)/rect.width)*2-1;
                 mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
@@ -671,7 +826,7 @@
         });
         window.addEventListener('touchend', e => {
             if (!dragging) return; dragging=false;
-            if (Math.abs(vx) < 0.005) {
+            if (Math.abs(vx) < 0.002) {
                 const t=e.changedTouches[0];
                 const rect=canvas.getBoundingClientRect();
                 mouse.x=((t.clientX-rect.left)/rect.width)*2-1;
