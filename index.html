@@ -52,13 +52,18 @@
         <button class="close-menu" id="closeMenu" aria-label="Close menu">&times;</button>
         <nav class="menu-nav">
             <ul>
-                <li><a href="index.html" class="menu-link">Home</a></li>
+                <li class="menu-item-parent">
+                    <a href="index.html" class="menu-link active-link menu-link--parent">Home</a>
+                    <ul class="menu-submenu">
+                        <li><a href="questionnaire.html" class="menu-sublink">Client Questionnaire</a></li>
+                        <li><a href="#our-process" class="menu-sublink">Our Process</a></li>
+                        <li><a href="#pricing" class="menu-sublink">Pricing</a></li>
+                        <li><a href="#contact" class="menu-sublink">Contact Us</a></li>
+                    </ul>
+                </li>
                 <li><a href="about.html" class="menu-link">About</a></li>
                 <li><a href="what_we_do.html" class="menu-link">What We Do</a></li>
-                <li><a href="#our-process" class="menu-link">Our Process</a></li>
                 <li><a href="portfolio.html" class="menu-link">Portfolio</a></li>
-                <li><a href="#pricing" class="menu-link">Pricing</a></li>
-                <li><a href="#contact" class="menu-link">Contact Us</a></li>
             </ul>
         </nav>
     </div>

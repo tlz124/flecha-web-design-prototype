@@ -297,6 +297,51 @@
         }
         .q-submit-btn:hover { opacity: 0.88; transform: translateY(-1px); }
 
+        /* Save / Resume Controls */
+        .q-save-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .q-save-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.55rem 1.25rem;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.2s;
+            text-decoration: none;
+            border: none;
+            font-family: inherit;
+        }
+        .q-save-btn:hover { opacity: 0.82; transform: translateY(-1px); }
+
+        .q-save-btn--download {
+            background: rgba(212, 165, 255, 0.12);
+            border: 1px solid var(--purple-accent);
+            color: var(--purple-accent);
+        }
+
+        .q-save-btn--upload {
+            background: var(--purple-accent);
+            border: 1px solid var(--purple-accent);
+            color: var(--black);
+        }
+
+        .q-autosave-label {
+            font-size: 0.75rem;
+            color: var(--grey);
+            font-style: italic;
+            margin-left: 0.25rem;
+        }
+
         /* Success message */
         .q-success {
             display: none;
@@ -329,6 +374,39 @@
             .q-hero { padding: 2rem 1rem 1.75rem; }
             .q-container { padding: 1.5rem 1rem 3rem; }
         }
+        /* Back to Top */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 999;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #000000;
+            border: 2px solid #d4a5ff;
+            color: #ead6ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 0 12px rgba(212, 165, 255, 0.3);
+        }
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .back-to-top:hover {
+            box-shadow: 0 0 22px rgba(212, 165, 255, 0.6);
+            transform: translateY(-2px);
+        }
+        .back-to-top svg { width: 20px; height: 20px; }
+
     </style>
 </head>
 <body>
@@ -358,6 +436,18 @@
             <div class="q-progress-bar-fill" id="progressFill"></div>
         </div>
         <div class="q-progress-label" id="progressLabel">0% complete</div>
+    </div>
+
+    <!-- Save / Resume Controls -->
+    <div class="q-save-controls">
+        <label class="q-save-btn q-save-btn--upload" for="resumeFileInput" title="Upload a previously saved progress file">
+            <span>⬆</span> Resume Saved Progress
+        </label>
+        <input type="file" id="resumeFileInput" accept=".json" style="display:none;">
+        <button type="button" class="q-save-btn q-save-btn--download" id="saveProgressBtn" title="Download your answers to continue later">
+            <span>⬇</span> Save Progress
+        </button>
+        <span class="q-autosave-label" id="autosaveLabel"></span>
     </div>
 
     <form id="questionnaireForm">
@@ -729,7 +819,123 @@
 </footer>
 
 <script>
-// Highlight selected options
+const STORAGE_KEY = 'flecha_questionnaire_progress';
+
+// ===== Collect all form answers into an object =====
+function collectAnswers() {
+    const data = {};
+    document.querySelectorAll('#questionnaireForm input, #questionnaireForm textarea').forEach(el => {
+        if (!el.name) return;
+        if (el.type === 'radio') {
+            if (el.checked) data[el.name] = el.value;
+        } else if (el.type === 'checkbox') {
+            if (!data[el.name]) data[el.name] = [];
+            if (el.checked) data[el.name].push(el.value);
+        } else {
+            data[el.name] = el.value;
+        }
+    });
+    return data;
+}
+
+// ===== Restore answers from an object =====
+function restoreAnswers(data) {
+    Object.entries(data).forEach(([name, value]) => {
+        const inputs = document.querySelectorAll(`#questionnaireForm [name="${name}"]`);
+        inputs.forEach(input => {
+            if (input.type === 'radio') {
+                if (input.value === value) {
+                    input.checked = true;
+                    input.closest('.q-option')?.classList.add('selected');
+                }
+            } else if (input.type === 'checkbox') {
+                if (Array.isArray(value) && value.includes(input.value)) {
+                    input.checked = true;
+                    input.closest('.q-option')?.classList.add('selected');
+                }
+            } else {
+                input.value = value;
+            }
+        });
+    });
+
+    // Re-trigger other field visibility
+    otherMap.forEach(({ trigger, triggerValue, inputId }) => {
+        const inputs = document.querySelectorAll(`input[name="${trigger}"]`);
+        inputs.forEach(input => {
+            const otherInput = document.getElementById(inputId);
+            if (!otherInput) return;
+            const shouldShow = input.type === 'checkbox'
+                ? document.querySelector(`input[name="${trigger}"][value="${triggerValue}"]`)?.checked
+                : input.value === triggerValue && input.checked;
+            if (shouldShow) otherInput.classList.add('visible');
+        });
+    });
+
+    updateProgress();
+}
+
+// ===== Auto-save to localStorage =====
+function autoSave() {
+    const data = collectAnswers();
+    data._savedAt = new Date().toISOString();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    const label = document.getElementById('autosaveLabel');
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    label.textContent = `Auto-saved at ${time}`;
+}
+
+// ===== Load from localStorage on page load =====
+function loadFromStorage() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return;
+    try {
+        const data = JSON.parse(saved);
+        delete data._savedAt;
+        restoreAnswers(data);
+        const label = document.getElementById('autosaveLabel');
+        label.textContent = 'Progress restored from last session';
+    } catch(e) {}
+}
+
+// ===== Download progress as JSON file =====
+document.getElementById('saveProgressBtn').addEventListener('click', () => {
+    const data = collectAnswers();
+    data._savedAt = new Date().toISOString();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'flecha-questionnaire-progress.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    const label = document.getElementById('autosaveLabel');
+    label.textContent = 'Progress file downloaded!';
+    if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+});
+
+// ===== Upload and restore from JSON file =====
+document.getElementById('resumeFileInput').addEventListener('change', function() {
+    const file = this.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            delete data._savedAt;
+            restoreAnswers(data);
+            const label = document.getElementById('autosaveLabel');
+            label.textContent = 'Progress restored from file!';
+            if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch(err) {
+            alert('Could not read the file. Please make sure it is a valid Flecha progress file.');
+        }
+    };
+    reader.readAsText(file);
+});
+
+// ===== Highlight selected options =====
 document.querySelectorAll('.q-option input').forEach(input => {
     input.addEventListener('change', () => {
         const name = input.name;
@@ -746,7 +952,7 @@ document.querySelectorAll('.q-option input').forEach(input => {
     });
 });
 
-// "Other" text field reveal logic
+// ===== "Other" text field reveal logic =====
 const otherMap = [
     { trigger: 'industry',     triggerValue: 'other_industry',  inputId: 'industryOther' },
     { trigger: 'primary_goal', triggerValue: 'other_goal',      inputId: 'goalOther' },
@@ -769,10 +975,9 @@ otherMap.forEach(({ trigger, triggerValue, inputId }) => {
     });
 });
 
-// Progress bar
+// ===== Progress bar =====
 function updateProgress() {
     const allInputs = document.querySelectorAll('#questionnaireForm input:not([type="hidden"]):not([type="text"]), #questionnaireForm textarea');
-    let answered = 0;
     const answeredNames = new Set();
 
     allInputs.forEach(input => {
@@ -789,12 +994,13 @@ function updateProgress() {
     document.getElementById('progressLabel').textContent = progress + '% complete';
 }
 
+// Auto-save and progress update on any input change
 document.querySelectorAll('#questionnaireForm input, #questionnaireForm textarea').forEach(el => {
-    el.addEventListener('change', updateProgress);
-    el.addEventListener('input', updateProgress);
+    el.addEventListener('change', () => { updateProgress(); autoSave(); });
+    el.addEventListener('input',  () => { updateProgress(); autoSave(); });
 });
 
-// Form submission — UI/UX review mode (no data sent)
+// ===== Form submission =====
 document.getElementById('questionnaireForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const btn = this.querySelector('.q-submit-btn');
@@ -802,12 +1008,34 @@ document.getElementById('questionnaireForm').addEventListener('submit', function
     btn.disabled = true;
 
     setTimeout(() => {
+        localStorage.removeItem(STORAGE_KEY);
         this.style.display = 'none';
         document.getElementById('successMessage').classList.add('visible');
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
     }, 800);
 });
+
+// ===== Back to Top Button =====
+(function() {
+    const btn = document.getElementById('backToTop');
+    if (!btn) return;
+    window.addEventListener('scroll', () => {
+        btn.classList.toggle('visible', window.scrollY > 400);
+    }, { passive: true });
+    btn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (navigator.vibrate) navigator.vibrate(30);
+    });
+})();
 </script>
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="19" x2="12" y2="5"/>
+            <polyline points="6 11 12 5 18 11"/>
+        </svg>
+    </button>
 
 </body>
 </html>

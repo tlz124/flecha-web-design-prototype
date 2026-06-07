@@ -36,13 +36,18 @@
         <button class="close-menu" id="closeMenu" aria-label="Close menu">&times;</button>
         <nav class="menu-nav">
             <ul>
-                <li><a href="index.html" class="menu-link">Home</a></li>
+                <li class="menu-item-parent">
+                    <a href="index.html" class="menu-link menu-link--parent">Home</a>
+                    <ul class="menu-submenu">
+                        <li><a href="questionnaire.html" class="menu-sublink">Client Questionnaire</a></li>
+                        <li><a href="index.html#our-process" class="menu-sublink">Our Process</a></li>
+                        <li><a href="index.html#pricing" class="menu-sublink">Pricing</a></li>
+                        <li><a href="index.html#contact" class="menu-sublink">Contact Us</a></li>
+                    </ul>
+                </li>
                 <li><a href="about.html" class="menu-link active-link">About</a></li>
                 <li><a href="what_we_do.html" class="menu-link">What We Do</a></li>
-                <li><a href="index.html#our-process" class="menu-link">Our Process</a></li>
                 <li><a href="portfolio.html" class="menu-link">Portfolio</a></li>
-                <li><a href="index.html#pricing" class="menu-link">Pricing</a></li>
-                <li><a href="index.html#contact" class="menu-link">Contact Us</a></li>
             </ul>
         </nav>
     </div>
@@ -98,7 +103,7 @@
                 "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
                 "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
             }
-        }
+        }  
     </script>
     <script type="module">
         import * as THREE from 'three';
@@ -111,7 +116,7 @@
 
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
-        camera.position.set(0, 0, 8);
+        camera.position.set(0, 0, 7);
 
         // Lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 3.0);

@@ -306,6 +306,54 @@ header {
     transform: translateX(10px);
 }
 
+/* ===== Hamburger submenu ===== */
+.menu-item-parent {
+    margin-bottom: 0.5rem;
+}
+
+.menu-link--parent {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.menu-link--parent::after {
+    content: '›';
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--purple-accent);
+    transition: transform 0.3s ease;
+    transform: rotate(90deg);
+}
+
+.menu-submenu {
+    list-style: none;
+    padding-left: 1.5rem;
+    overflow: hidden;
+    max-height: 300px;
+    transition: max-height 0.35s ease, opacity 0.3s ease;
+    opacity: 1;
+}
+
+.menu-sublink {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-gray);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-left: 1px solid var(--border-gray);
+    letter-spacing: 0.05em;
+    transition: all 0.2s ease;
+    margin-bottom: 0.25rem;
+}
+
+.menu-sublink:hover {
+    color: var(--purple-accent);
+    border-left-color: var(--purple-accent);
+    padding-left: 1.4rem;
+}
+
 /* ===== Hero Section ===== */
 .hero {
     margin-top: 130px;
