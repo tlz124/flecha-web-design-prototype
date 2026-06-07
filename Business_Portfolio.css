@@ -2529,22 +2529,181 @@ section::before {
     padding: 0.15rem 0;
 }
 
-/* ===== Questionnaire button colors ===== */
-.step-q-btn--download {
+/* ===== Before We Meet Section ===== */
+.before-we-meet {
+    position: relative;
+    padding: 4rem 0;
+    overflow: hidden;
+    background: var(--dark-gray);
+}
+
+/* Subtle animated glow lines */
+.before-we-meet::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(90deg, transparent 0%, rgba(212, 165, 255, 0.04) 50%, transparent 100%);
+    pointer-events: none;
+}
+
+.before-we-meet::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--purple-accent), transparent);
+    animation: scan-line 6s ease-in-out infinite;
+}
+
+@keyframes scan-line {
+    0%   { left: -60%; opacity: 0; }
+    20%  { opacity: 1; }
+    80%  { opacity: 1; }
+    100% { left: 110%; opacity: 0; }
+}
+
+.before-we-meet-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3rem;
+    border: 1px solid rgba(212, 165, 255, 0.25);
+    border-radius: 6px;
+    padding: 2.5rem;
+    background: rgba(212, 165, 255, 0.03);
+}
+
+.before-we-meet-text {
+    flex: 1;
+}
+
+.before-we-meet-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
     color: var(--purple-accent);
+    border: 1px solid rgba(212, 165, 255, 0.35);
+    background: rgba(212, 165, 255, 0.06);
+    padding: 0.3rem 0.75rem;
+    border-radius: 2px;
+    margin-bottom: 1rem;
+}
+
+.before-we-meet-badge::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--purple-accent);
+    box-shadow: 0 0 6px var(--purple-accent);
+    animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.4; transform: scale(0.7); }
+}
+
+.before-we-meet-title {
+    font-size: clamp(1.4rem, 2.5vw, 2rem);
+    font-weight: 700;
+    color: var(--text-white);
+    letter-spacing: -0.01em;
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+}
+
+.before-we-meet-desc {
+    font-size: 0.95rem;
+    color: var(--text-light);
+    line-height: 1.7;
+    max-width: 560px;
+}
+
+/* Action buttons */
+.before-we-meet-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.step-q-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.8rem 1.6rem;
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
     text-decoration: none;
+    border-radius: 3px;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+    cursor: pointer;
+    border: none;
+}
+
+.step-q-btn--download {
+    background: rgba(212, 165, 255, 0.1);
+    color: var(--purple-accent);
+    border: 1px solid rgba(212, 165, 255, 0.4);
+}
+
+.step-q-btn--download:hover {
+    background: rgba(212, 165, 255, 0.18);
+    border-color: var(--purple-accent);
+    color: var(--purple-light);
+    box-shadow: 0 0 16px rgba(212, 165, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.step-q-btn--download:visited {
+    color: var(--purple-accent);
 }
 
 .step-q-btn--online {
+    background: var(--purple-accent);
     color: var(--black);
-    text-decoration: none;
+    border: 1px solid var(--purple-accent);
 }
 
-/* ===== Questionnaire button visited state ===== */
-.step-q-btn--download:visited {
-    color: #d4a5ff;
+.step-q-btn--online:hover {
+    background: var(--purple-light);
+    border-color: var(--purple-light);
+    color: var(--black);
+    box-shadow: 0 0 20px rgba(212, 165, 255, 0.35);
+    transform: translateY(-1px);
 }
 
 .step-q-btn--online:visited {
-    color: #000000;
+    color: var(--black);
+}
+
+@media (max-width: 768px) {
+    .before-we-meet-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2rem;
+    }
+
+    .before-we-meet-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .step-q-btn {
+        flex: 1;
+        justify-content: center;
+        min-width: 140px;
+    }
 }
