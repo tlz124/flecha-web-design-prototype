@@ -2374,7 +2374,7 @@ section::before {
 .sphere-container {
     width: 100%;
     max-width: 100vw;
-    height: 550px;
+    height: 680px;
     position: relative;
     margin: 2rem 0;
     cursor: grab;
