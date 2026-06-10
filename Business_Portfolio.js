@@ -301,12 +301,32 @@ menuLinks.forEach(link => {
     });
 });
 
+const menuSublinks = document.querySelectorAll('.menu-sublink');
+menuSublinks.forEach(link => {
+    link.addEventListener('click', () => {
+        menuOverlay.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    });
+});
+
 menuOverlay.addEventListener('click', (e) => {
     if (e.target === menuOverlay) {
         menuOverlay.classList.remove('active');
         document.body.style.overflow = 'auto';
     }
 });
+
+// ===== Home Submenu Toggle =====
+const homeSubmenuToggle = document.getElementById('homeSubmenuToggle');
+const homeSubmenu = document.querySelector('.menu-submenu');
+
+if (homeSubmenuToggle && homeSubmenu) {
+    homeSubmenuToggle.addEventListener('click', () => {
+        const isCollapsed = homeSubmenu.classList.contains('menu-submenu--collapsed');
+        homeSubmenu.classList.toggle('menu-submenu--collapsed', !isCollapsed);
+        homeSubmenuToggle.classList.toggle('open', isCollapsed);
+    });
+}
 
 // ===== Project Modal Functionality =====
 const projectModal = document.getElementById('projectModal');

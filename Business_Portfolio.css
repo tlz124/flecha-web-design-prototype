@@ -311,19 +311,30 @@ header {
     margin-bottom: 0.5rem;
 }
 
-.menu-link--parent {
+.menu-item-parent-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-.menu-link--parent::after {
-    content: '›';
-    font-size: 1.4rem;
-    line-height: 1;
+.menu-link--parent {
+    flex: 1;
+}
+
+.menu-submenu-toggle {
+    background: none;
+    border: none;
     color: var(--purple-accent);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
     transition: transform 0.3s ease;
-    transform: rotate(90deg);
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.menu-submenu-toggle.open {
+    transform: rotate(180deg);
 }
 
 .menu-submenu {
@@ -331,8 +342,13 @@ header {
     padding-left: 1.5rem;
     overflow: hidden;
     max-height: 300px;
-    transition: max-height 0.35s ease, opacity 0.3s ease;
     opacity: 1;
+    transition: max-height 0.35s ease, opacity 0.3s ease;
+}
+
+.menu-submenu--collapsed {
+    max-height: 0;
+    opacity: 0;
 }
 
 .menu-sublink {
