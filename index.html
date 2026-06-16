@@ -54,8 +54,8 @@
             <ul>
                 <li class="menu-item-parent">
                     <div class="menu-item-parent-row">
-                    <a href="index.html" class="menu-link active-link menu-link--parent">Home</a>
-                    <button class="menu-submenu-toggle" id="homeSubmenuToggle" aria-label="Toggle Home submenu">&#8964;</button>
+                        <a href="index.html" class="menu-link active-link menu-link--parent">Home</a>
+                        <button class="menu-submenu-toggle" id="homeSubmenuToggle" aria-label="Toggle Home submenu">&#8964;</button>
                     </div>
                     <ul class="menu-submenu menu-submenu--collapsed">
                         <li><a href="#questionnaire" class="menu-sublink">Client Questionnaire</a></li>
@@ -241,7 +241,6 @@
                 </button>
             </div>
 
-            <div class="pricing-content-wrap">
             <!-- Non E-Commerce Pricing -->
             <div class="pricing-grid" id="nonEcomPricing">
 
@@ -451,14 +450,12 @@
                     </div>
                 </div>
 
-            </div>
 
             <p class="pricing-note">
                 All tiers include a 50% deposit at project start with the
                 remaining balance due on delivery. Optional maintenance &amp;
                 support plans available for all tiers.
             </p>
-            </div>
 
         </div>
     </section>
@@ -529,6 +526,7 @@
     <footer class="footer">
         <div class="container">
             <p>&copy; 2026 Flecha Web Design. All rights reserved.</p>
+            <!-- Social media links hidden until accounts are ready
             <div class="social-icons">
                 <a href="YOUR_FACEBOOK_URL" class="social-icon" target="_blank" aria-label="Facebook">
                     <i class="fa-brands fa-facebook"></i>
@@ -543,6 +541,7 @@
                     <i class="fa-brands fa-instagram"></i>
                 </a>
             </div>
+            -->
             <div class="footer-links">
                 <a href="#privacyModal" class="footer-link" id="privacyLink">Privacy Policy</a>
                 <a href="#accessibilityModal" class="footer-link" id="accessibilityLink">Accessibility Statement</a>
@@ -719,31 +718,31 @@
         const n = projects.length;
         const panelW = 2.1;
         const R = (panelW * n) / (2 * Math.PI);
-        const panelH = 3.2;
+        const panelH = 2.4;
         const faceMeshes = [];
 
         function makeFallbackTex(p) {
             const c = document.createElement('canvas');
-            c.width = 300; c.height = 560;
+            c.width = 300; c.height = 460;
             const ctx = c.getContext('2d');
             ctx.fillStyle = '#1a0a2e';
-            ctx.fillRect(0, 0, 300, 560);
+            ctx.fillRect(0, 0, 300, 460);
             addLabel(ctx, p);
             return new THREE.CanvasTexture(c);
         }
 
         function addLabel(ctx, p) {
             ctx.fillStyle = 'rgba(0,0,0,0.72)';
-            ctx.fillRect(0, 440, 300, 120);
+            ctx.fillRect(0, 340, 300, 120);
             ctx.fillStyle = '#9b30d4';
-            ctx.fillRect(0, 440, 300, 3);
+            ctx.fillRect(0, 340, 300, 3);
             ctx.fillStyle = '#d4a5ff';
             ctx.font = 'bold 13px sans-serif';
-            ctx.fillText(p.category.toUpperCase(), 14, 468);
+            ctx.fillText(p.category.toUpperCase(), 14, 368);
             ctx.fillStyle = '#ffffff';
             ctx.font = 'bold 22px sans-serif';
             const words = p.title.split(' ');
-            let line = '', y = 500;
+            let line = '', y = 400;
             words.forEach(w => {
                 const t = line + w + ' ';
                 if (ctx.measureText(t).width > 272 && line) { ctx.fillText(line.trim(), 14, y); y += 26; line = w + ' '; }
@@ -775,14 +774,14 @@
             img.crossOrigin = 'anonymous';
             img.onload = () => {
                 const c = document.createElement('canvas');
-                c.width = 300; c.height = 560;
+                c.width = 300; c.height = 460;
                 const ctx = c.getContext('2d');
                 // Crop top of restaurant photo to remove white sliver
                 if (p.title === 'Mexican Restaurant') {
                     const cropTop = img.height * 0.12;
-                    ctx.drawImage(img, 0, cropTop, img.width, img.height - cropTop, 0, 0, 300, 440);
+                    ctx.drawImage(img, 0, cropTop, img.width, img.height - cropTop, 0, 0, 300, 340);
                 } else {
-                    ctx.drawImage(img, 0, 0, 300, 440);
+                    ctx.drawImage(img, 0, 0, 300, 340);
                 }
                 addLabel(ctx, p);
                 const tex = new THREE.CanvasTexture(c);
