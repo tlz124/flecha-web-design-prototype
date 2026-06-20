@@ -222,8 +222,23 @@
         </div>
     </section>
 
+    <!-- Testimonial Section -->
+    <section id="testimonial" class="testimonial-section">
+        <div class="container">
 
-   
+            <div class="testimonial-feature">
+                <span class="testimonial-quote-mark">&ldquo;</span>
+                <p class="testimonial-text">
+                    Working with Flecha Web Design completely transformed how our business shows up online. They took the time to understand exactly what we needed and delivered a site that's not just beautiful, but actually works for our customers. We couldn't be happier with the results.
+                </p>
+                <div class="testimonial-author">
+                    <p class="testimonial-name">Client Name</p>
+                    <p class="testimonial-role">Owner, Business Name</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Pricing & Payment Section -->
     <section id="pricing" class="pricing-section">
         <div class="container">
@@ -241,6 +256,7 @@
                 </button>
             </div>
 
+            <div class="pricing-content-wrap">
             <!-- Non E-Commerce Pricing -->
             <div class="pricing-grid" id="nonEcomPricing">
 
@@ -269,9 +285,9 @@
 
                 <!-- Tier 2: Essential Plus -->
                 <div class="pricing-card pricing-card-featured">
-                    <div class="pricing-featured-label">Most Popular</div>
+                    <!-- <div class="pricing-featured-label"></div> -->
                     <div class="pricing-header">
-                        <h3 class="pricing-name">Coming Soon</h3>
+                        <h3 class="pricing-name">ESSENTIAL PLUS</h3>
                         <div class="pricing-amount">
                             <span class="pricing-total">$3,000</span>
                             <span class="pricing-label">Total Project Price</span>
@@ -376,7 +392,7 @@
 
                 <!-- E-Com Tier 2 -->
                 <div class="pricing-card pricing-card-featured">
-                    <div class="pricing-featured-label">Most Popular</div>
+                    <!-- <div class="pricing-featured-label"></div> -->
                     <div class="pricing-header">
                         <h3 class="pricing-name">E-Com Plus</h3>
                         <div class="pricing-amount">
@@ -450,12 +466,14 @@
                     </div>
                 </div>
 
+            </div>
 
             <p class="pricing-note">
                 All tiers include a 50% deposit at project start with the
                 remaining balance due on delivery. Optional maintenance &amp;
                 support plans available for all tiers.
             </p>
+            </div>
 
         </div>
     </section>
@@ -718,31 +736,31 @@
         const n = projects.length;
         const panelW = 2.1;
         const R = (panelW * n) / (2 * Math.PI);
-        const panelH = 2.4;
+        const panelH = 3.2;
         const faceMeshes = [];
 
         function makeFallbackTex(p) {
             const c = document.createElement('canvas');
-            c.width = 300; c.height = 460;
+            c.width = 300; c.height = 560;
             const ctx = c.getContext('2d');
             ctx.fillStyle = '#1a0a2e';
-            ctx.fillRect(0, 0, 300, 460);
+            ctx.fillRect(0, 0, 300, 560);
             addLabel(ctx, p);
             return new THREE.CanvasTexture(c);
         }
 
         function addLabel(ctx, p) {
             ctx.fillStyle = 'rgba(0,0,0,0.72)';
-            ctx.fillRect(0, 340, 300, 120);
+            ctx.fillRect(0, 440, 300, 120);
             ctx.fillStyle = '#9b30d4';
-            ctx.fillRect(0, 340, 300, 3);
+            ctx.fillRect(0, 440, 300, 3);
             ctx.fillStyle = '#d4a5ff';
             ctx.font = 'bold 13px sans-serif';
-            ctx.fillText(p.category.toUpperCase(), 14, 368);
+            ctx.fillText(p.category.toUpperCase(), 14, 468);
             ctx.fillStyle = '#ffffff';
             ctx.font = 'bold 22px sans-serif';
             const words = p.title.split(' ');
-            let line = '', y = 400;
+            let line = '', y = 500;
             words.forEach(w => {
                 const t = line + w + ' ';
                 if (ctx.measureText(t).width > 272 && line) { ctx.fillText(line.trim(), 14, y); y += 26; line = w + ' '; }
@@ -774,14 +792,14 @@
             img.crossOrigin = 'anonymous';
             img.onload = () => {
                 const c = document.createElement('canvas');
-                c.width = 300; c.height = 460;
+                c.width = 300; c.height = 560;
                 const ctx = c.getContext('2d');
                 // Crop top of restaurant photo to remove white sliver
                 if (p.title === 'Mexican Restaurant') {
                     const cropTop = img.height * 0.12;
-                    ctx.drawImage(img, 0, cropTop, img.width, img.height - cropTop, 0, 0, 300, 340);
+                    ctx.drawImage(img, 0, cropTop, img.width, img.height - cropTop, 0, 0, 300, 440);
                 } else {
-                    ctx.drawImage(img, 0, 0, 300, 340);
+                    ctx.drawImage(img, 0, 0, 300, 440);
                 }
                 addLabel(ctx, p);
                 const tex = new THREE.CanvasTexture(c);
