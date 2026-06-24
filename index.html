@@ -6,10 +6,36 @@
     <meta http-equiv="Content-Security-Policy" content="...">
     <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-    <title>Flecha Web Design - Web Design for Education & Small Business</title>
+	<title>Flecha Web Design - Web Design for Education & Small Business</title>
+	<meta name="description" content="Flecha Web Design builds purposeful, professional websites for educational institutions and local businesses across Arizona. Mobile-friendly, fast, and built to grow with you.">
+    <meta property="og:title" content="Flecha Web Design - Web Design for Education & Small Business">
+    <meta property="og:description" content="Flecha Web Design builds purposeful, professional websites for educational institutions and local businesses across Arizona. Mobile-friendly, fast, and built to grow with you.">
+    <meta property="og:image" content="https://www.flecha-webdesign.com/flecha-web-design-logo.png">
+    <meta property="og:url" content="https://www.flecha-webdesign.com">
+    <meta property="og:type" content="website">
     <link rel="icon" type="image/png" href="flecha-web-design-logo.png">
     <link rel="stylesheet" href="Business_Portfolio.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "Flecha Web Design",
+      "image": "https://www.flecha-webdesign.com/flecha-web-design-logo.png",
+      "url": "https://www.flecha-webdesign.com",
+      "telephone": "+1-480-995-7487",
+      "priceRange": "$1000-$7500+",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Phoenix",
+        "addressRegion": "AZ",
+        "addressCountry": "US"
+      },
+      "areaServed": "Phoenix-Scottsdale Metro Area, Arizona",
+      "description": "Flecha Web Design builds purposeful, professional websites for educational institutions and local businesses across Arizona.",
+      "sameAs": []
+    }
+    </script>
 </head>
 <body>
     <!-- Cookie Consent Banner -->
@@ -877,9 +903,21 @@
             }
         }
 
+		let lastCenterIndex = null;
+
         function animate() {
             requestAnimationFrame(animate);
             if (!dragging) { vx *= 0.92; group.rotation.y += vx; }
+
+            // Haptic feedback when a panel crosses front-center
+            const step = (2 * Math.PI) / n;
+            const normalized = ((-group.rotation.y % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+            const centerIndex = Math.round(normalized / step) % n;
+            if (centerIndex !== lastCenterIndex) {
+                lastCenterIndex = centerIndex;
+                if (navigator.vibrate) navigator.vibrate(10);
+            }
+
             renderer.render(scene, camera);
         }
         animate();
