@@ -82,10 +82,11 @@
                     <div class="menu-item-parent-row">
                         <a href="index.html" class="menu-link active-link menu-link--parent">Home</a>
                         <button class="menu-submenu-toggle" id="homeSubmenuToggle" aria-label="Toggle Home submenu">&#8964;</button>
-                    </div>
+                    </div>    
                     <ul class="menu-submenu menu-submenu--collapsed">
                         <li><a href="#questionnaire" class="menu-sublink">Client Questionnaire</a></li>
                         <li><a href="#our-process" class="menu-sublink">Our Process</a></li>
+                        <li><a href="index.html#portfolio" class="menu-sublink">Our Work</a></li>
                         <li><a href="#pricing" class="menu-sublink">Pricing</a></li>
                         <li><a href="#contact" class="menu-sublink">Contact Us</a></li>
                     </ul>
@@ -249,6 +250,7 @@
     </section>
 
     <!-- Testimonial Section -->
+<!-- 
     <section id="testimonial" class="testimonial-section">
         <div class="container">
 
@@ -264,6 +266,7 @@
             </div>
         </div>
     </section>
+ -->
 
     <!-- Pricing & Payment Section -->
     <section id="pricing" class="pricing-section">
@@ -793,8 +796,8 @@
                 else line = t;
             });
             ctx.fillText(line.trim(), 14, y);
-        }
-
+        }  
+    
         projects.forEach((p, i) => {
             const angle = (2 * Math.PI / n) * i;
             const x = R * Math.sin(angle);
@@ -885,7 +888,7 @@
         });
         window.addEventListener('touchend', e => {
             if (!dragging) return; dragging=false;
-            if (Math.abs(vx) < 0.002) {
+            if (Math.abs(vx) < 0.0005) {
                 const t=e.changedTouches[0];
                 const rect=canvas.getBoundingClientRect();
                 mouse.x=((t.clientX-rect.left)/rect.width)*2-1;
