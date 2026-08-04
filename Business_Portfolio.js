@@ -676,11 +676,16 @@ filterButtons.forEach(button => {
     }
 
     heroCanvas.addEventListener('mousemove', (e) => {
+        if (window.innerWidth <= 768) return;
         const rect = heroCanvas.getBoundingClientRect();
         mouse.x = e.clientX - rect.left;
         mouse.y = e.clientY - rect.top;
     });
-    heroCanvas.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
+    heroCanvas.addEventListener('mouseleave', () => {
+        if (window.innerWidth <= 768) return;
+        mouse.x = null;
+        mouse.y = null;
+    });
 
     // Tap-based scatter for touch devices: a tap briefly scatters nearby
     // nodes, then automatically settles back on its own after a short
