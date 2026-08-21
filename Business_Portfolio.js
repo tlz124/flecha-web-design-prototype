@@ -325,6 +325,7 @@ if (homeSubmenuToggle && homeSubmenu) {
         const isCollapsed = homeSubmenu.classList.contains('menu-submenu--collapsed');
         homeSubmenu.classList.toggle('menu-submenu--collapsed', !isCollapsed);
         homeSubmenuToggle.classList.toggle('open', isCollapsed);
+        if (navigator.vibrate) navigator.vibrate(30);
     });
 }
 
