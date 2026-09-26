@@ -1,3 +1,37 @@
+/*
+
+
+DESKTOP CODE
+
+mousemove listener: 
+
+mouseleave listener
+
+touchmove listener
+
+
+
+
+
+*/
+
+
+
+
+
+
+
+
+
+
+/*
+
+
+MOBILE CODE
+
+
+*/
+
 // Project data with detailed information
 const projects = [
     {
@@ -287,6 +321,7 @@ const menuLinks = document.querySelectorAll('.menu-link');
 hamburgerBtn.addEventListener('click', () => {
     menuOverlay.classList.add('active');
     document.body.style.overflow = 'hidden';
+    if (navigator.vibrate) navigator.vibrate(30);
 });
 
 closeMenuBtn.addEventListener('click', () => {
@@ -317,6 +352,9 @@ menuOverlay.addEventListener('click', (e) => {
 });
 
 // ===== Home Submenu Toggle =====
+
+
+
 const homeSubmenuToggle = document.getElementById('homeSubmenuToggle');
 const homeSubmenu = document.querySelector('.menu-submenu');
 
@@ -388,7 +426,7 @@ document.querySelectorAll('.tier-card').forEach(card => {
         const tierContent = document.getElementById('tierModalContent');
         tierContent.className = 'tier-modal-content tier-modal-content--' + (tierIndex + 1);
 
-        // Populate modal
+        // Populate modal   
         document.getElementById('tierModalName').textContent = tier.label;
         document.getElementById('tierModalDiamonds').textContent = '◆'.repeat(tierIndex + 1);
         document.getElementById('tierModalPrice').textContent = tier.price;
@@ -698,8 +736,8 @@ filterButtons.forEach(button => {
             }
         }
     }
-
-    heroCanvas.addEventListener('mousemove', (e) => {
+	// This is specifically for desktop
+    heroCanvas.addEventListener('mousemove', (e) => {   
         if (window.innerWidth <= 768) return;
         const rect = heroCanvas.getBoundingClientRect();
         mouse.x = e.clientX - rect.left;
