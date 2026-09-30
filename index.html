@@ -201,6 +201,9 @@
                 <div class="process-arrow">→</div>
 
                 <div class="process-step">
+                    <div class="step-icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    </div>
                     <div class="step-left">
                         <div class="step-number">3</div>
                     </div>
@@ -221,6 +224,9 @@
                 <div class="process-arrow">→</div>
 
                 <div class="process-step">
+                    <div class="step-icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(35deg);"><path d="M12 15a4 4 0 0 0 4-4c0-3-2-6-4-9-2 3-4 6-4 9a4 4 0 0 0 4 4z"/><path d="M9.5 14l-2 4"/><path d="M14.5 14l2 4"/><path d="M10.5 19c-.5 1.8.2 3 1.5 3s2-1.2 1.5-3"/></svg>
+                    </div>
                     <div class="step-left">
                         <div class="step-number">4</div>
                     </div>
@@ -264,6 +270,12 @@
 
             <div class="sphere-container">
                 <canvas id="portfolioSphere"></canvas>
+                <button class="sphere-arrow sphere-arrow--left" aria-label="Previous project">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <button class="sphere-arrow sphere-arrow--right" aria-label="Next project">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
             </div>
         </div>
     </section>
@@ -916,14 +928,36 @@
             }
         }
 
+        // Desktop arrow buttons: step to the next/previous panel with a
+        // smooth eased rotation, canceling any drag momentum in progress.
+        let easeTarget = null;
+        const step = (2 * Math.PI) / n;
+        const leftArrow = document.querySelector('.sphere-arrow--left');
+        const rightArrow = document.querySelector('.sphere-arrow--right');
+        function goToStep(direction) {
+            dragging = false;
+            vx = 0;
+            const base = easeTarget !== null ? easeTarget : group.rotation.y;
+            easeTarget = base + direction * step;
+        }
+        if (leftArrow) leftArrow.addEventListener('click', () => goToStep(-1));
+        if (rightArrow) rightArrow.addEventListener('click', () => goToStep(1));
+
 		let lastCenterIndex = null;
 
         function animate() {
             requestAnimationFrame(animate);
-            if (!dragging) { vx *= 0.92; group.rotation.y += vx; }
+            if (easeTarget !== null) {
+                group.rotation.y += (easeTarget - group.rotation.y) * 0.18;
+                if (Math.abs(easeTarget - group.rotation.y) < 0.001) {
+                    group.rotation.y = easeTarget;
+                    easeTarget = null;
+                }
+            } else if (!dragging) {
+                vx *= 0.92; group.rotation.y += vx;
+            }
 
             // Haptic feedback when a panel crosses front-center
-            const step = (2 * Math.PI) / n;
             const normalized = ((-group.rotation.y % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
             const centerIndex = Math.round(normalized / step) % n;
             if (centerIndex !== lastCenterIndex) {
