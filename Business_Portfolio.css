@@ -2940,6 +2940,10 @@ section::before {
     display: none;
 }
 
+.sphere-scrub-track {
+    display: none;
+}
+
 @media (min-width: 769px) {
     .desktop-nav-links {
         display: flex;
@@ -3012,5 +3016,35 @@ section::before {
     }
     .sphere-arrow--right {
         right: 1.5rem;
+    }
+    .sphere-scrub-track {
+        display: block;
+        position: relative;
+        width: 280px;
+        height: 8px;
+        border-radius: 4px;
+        background: transparent;
+        border: 1px solid rgba(212, 165, 255, 0.3);
+        margin: 1.5rem auto 0;
+    }
+    .sphere-scrub-handle {
+        position: absolute;
+        top: 50%;
+        left: 120px;
+        width: 40px;
+        height: 16px;
+        border-radius: 8px;
+        background: var(--dark-gray);
+        border: 1px solid var(--purple-accent);
+        transform: translateY(-50%);
+        cursor: grab;
+        touch-action: none;
+        transition: border-color 0.2s ease, background 0.2s ease;
+    }
+    .sphere-scrub-handle:hover {
+        background: rgba(212, 165, 255, 0.1);
+    }
+    .sphere-scrub-handle:active {
+        cursor: grabbing;
     }
 }
