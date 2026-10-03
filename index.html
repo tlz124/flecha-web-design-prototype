@@ -268,7 +268,12 @@
             <h2 class="section-title">View Our Work</h2>
             <p class="section-subtitle">Swipe to spin · tap a panel to visit the live site</p>
 
-            <div class="sphere-container">
+            <div class="portfolio-view-toggle-wrap">
+                <button class="portfolio-view-toggle-btn portfolio-view-toggle-btn--left active" id="carouselViewBtn">Carousel</button>
+                <button class="portfolio-view-toggle-btn portfolio-view-toggle-btn--right" id="gridViewBtn">Grid</button>
+            </div>
+
+            <div class="sphere-container" id="portfolioCarouselView">
                 <canvas id="portfolioSphere"></canvas>
                 <button class="sphere-arrow sphere-arrow--left" aria-label="Previous project">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -279,6 +284,65 @@
             </div>
             <div class="sphere-scrub-track" id="sphereScrubTrack">
                 <div class="sphere-scrub-handle" id="sphereScrubHandle" aria-label="Drag to rotate projects"></div>
+            </div>
+
+            <div class="portfolio-grid" id="portfolioGridView">
+                <a class="portfolio-grid-card" href="https://tlz124.github.io/Watsons-Flowers/" target="_blank">
+                    <img src="floral_shop.jpg" alt="Local Flower Shop">
+                    <div class="portfolio-grid-card-label">
+                        <span class="portfolio-grid-card-category">Small Business</span>
+                        <span class="portfolio-grid-card-title">Local Flower Shop</span>
+                    </div>
+                </a>
+                <a class="portfolio-grid-card" href="https://tlz124.github.io/restaurant/" target="_blank">
+                    <img src="mexican_restaurant.jpg" alt="Mexican Restaurant">
+                    <div class="portfolio-grid-card-label">
+                        <span class="portfolio-grid-card-category">Food & Beverage</span>
+                        <span class="portfolio-grid-card-title">Mexican Restaurant</span>
+                    </div>
+                </a>
+                <a class="portfolio-grid-card" href="https://tlz124.github.io/dental-office-website/" target="_blank">
+                    <img src="dental_office.jpg" alt="Modern Dental Office">
+                    <div class="portfolio-grid-card-label">
+                        <span class="portfolio-grid-card-category">Healthcare</span>
+                        <span class="portfolio-grid-card-title">Modern Dental Office</span>
+                    </div>
+                </a>
+                <a class="portfolio-grid-card" href="https://tlz124.github.io/architecture-essential/" target="_blank">
+                    <img src="architecture_firm.jpg" alt="Architecture Firm">
+                    <div class="portfolio-grid-card-label">
+                        <span class="portfolio-grid-card-category">Professional Services</span>
+                        <span class="portfolio-grid-card-title">Architecture Firm</span>
+                    </div>
+                </a>
+                <a class="portfolio-grid-card" href="https://tlz124.github.io/school/" target="_blank">
+                    <img src="school_website.jpg" alt="K-12 School">
+                    <div class="portfolio-grid-card-label">
+                        <span class="portfolio-grid-card-category">Education</span>
+                        <span class="portfolio-grid-card-title">K-12 School</span>
+                    </div>
+                </a>
+                <a class="portfolio-grid-card" href="https://tlz124.github.io/nonprofit/" target="_blank">
+                    <img src="non_profit_organization.jpg" alt="Nonprofit Organization">
+                    <div class="portfolio-grid-card-label">
+                        <span class="portfolio-grid-card-category">Nonprofit</span>
+                        <span class="portfolio-grid-card-title">Nonprofit Organization</span>
+                    </div>
+                </a>
+                <a class="portfolio-grid-card" href="https://tlz124.github.io/Beauty" target="_blank">
+                    <img src="beauty_supply_store.jpg" alt="Beauty Supply Store">
+                    <div class="portfolio-grid-card-label">
+                        <span class="portfolio-grid-card-category">Retail</span>
+                        <span class="portfolio-grid-card-title">Beauty Supply Store</span>
+                    </div>
+                </a>
+                <a class="portfolio-grid-card" href="https://tlz124.github.io/legal" target="_blank">
+                    <img src="law_firm.jpg" alt="Corporate Law Firm">
+                    <div class="portfolio-grid-card-label">
+                        <span class="portfolio-grid-card-category">Professional Services</span>
+                        <span class="portfolio-grid-card-title">Corporate Law Firm</span>
+                    </div>
+                </a>
             </div>
         </div>
     </section>
@@ -753,6 +817,33 @@
     <script src="Business_Portfolio.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
     <script src="portfolio-carousel.js"></script>
+    <script>
+    // First-pass view toggle: just shows/hides the two views. Does not yet
+    // pause the carousel's render loop while hidden (noted as a follow-up).
+    (function() {
+        const carouselBtn = document.getElementById('carouselViewBtn');
+        const gridBtn = document.getElementById('gridViewBtn');
+        const carouselView = document.getElementById('portfolioCarouselView');
+        const scrubTrack = document.getElementById('sphereScrubTrack');
+        const gridView = document.getElementById('portfolioGridView');
+        if (!carouselBtn || !gridBtn) return;
+
+        carouselBtn.addEventListener('click', () => {
+            carouselBtn.classList.add('active');
+            gridBtn.classList.remove('active');
+            carouselView.style.display = '';
+            scrubTrack.style.display = '';
+            gridView.style.display = 'none';
+        });
+        gridBtn.addEventListener('click', () => {
+            gridBtn.classList.add('active');
+            carouselBtn.classList.remove('active');
+            gridView.style.display = 'grid';
+            carouselView.style.display = 'none';
+            scrubTrack.style.display = 'none';
+        });
+    })();
+    </script>
 
     <!-- Consultation Form Submission -->
     <script>

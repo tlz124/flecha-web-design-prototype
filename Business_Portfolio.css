@@ -2944,6 +2944,14 @@ section::before {
     display: none;
 }
 
+.portfolio-view-toggle-wrap {
+    display: none;
+}
+
+.portfolio-grid {
+    display: none;
+}
+
 @media (min-width: 769px) {
     .desktop-nav-links {
         display: flex;
@@ -3046,5 +3054,80 @@ section::before {
     }
     .sphere-scrub-handle:active {
         cursor: grabbing;
+    }
+    .portfolio-view-toggle-wrap {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+    .portfolio-view-toggle-btn {
+        padding: 0.75rem 2rem;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        border: 2px solid var(--purple-accent);
+        background: transparent;
+        color: var(--text-light);
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
+    .portfolio-view-toggle-btn--left {
+        border-radius: 50px 0 0 50px;
+        border-right: 1px solid var(--purple-accent);
+    }
+    .portfolio-view-toggle-btn--right {
+        border-radius: 0 50px 50px 0;
+        border-left: 1px solid var(--purple-accent);
+    }
+    .portfolio-view-toggle-btn.active {
+        background: var(--purple-accent);
+        color: var(--black);
+    }
+    .portfolio-view-toggle-btn:hover:not(.active) {
+        background: rgba(212, 165, 255, 0.1);
+    }
+    .portfolio-grid {
+        display: none;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+    .portfolio-grid-card {
+        display: block;
+        text-decoration: none;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid var(--border-gray);
+        background: var(--medium-gray);
+        transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+    .portfolio-grid-card:hover {
+        border-color: var(--purple-accent);
+        transform: translateY(-2px);
+    }
+    .portfolio-grid-card img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        display: block;
+    }
+    .portfolio-grid-card-label {
+        padding: 0.9rem 1rem;
+    }
+    .portfolio-grid-card-category {
+        display: block;
+        font-size: 0.7rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--purple-accent);
+        margin-bottom: 0.25rem;
+    }
+    .portfolio-grid-card-title {
+        display: block;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-white);
     }
 }
