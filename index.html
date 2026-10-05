@@ -266,7 +266,7 @@
     <section id="portfolio" class="portfolio">
         <div class="container">
             <h2 class="section-title">View Our Work</h2>
-            <p class="section-subtitle">Swipe to spin · tap a panel to visit the live site</p>
+            <p class="section-subtitle">Spin the carousel or browse the grid<br>Click or tap a project to visit the live site</p>
 
             <div class="portfolio-view-toggle-wrap">
                 <button class="portfolio-view-toggle-btn portfolio-view-toggle-btn--left active" id="carouselViewBtn">Carousel</button>
@@ -287,7 +287,7 @@
             </div>
 
             <div class="portfolio-grid" id="portfolioGridView">
-                <a class="portfolio-grid-card" href="https://tlz124.github.io/Watsons-Flowers/" target="_blank">
+                <a class="portfolio-grid-card" href="https://tlz124.github.io/Watsons-Flowers/" target="_blank" data-preview="true" data-preview-title="Local Flower Shop">
                     <img src="floral_shop.jpg" alt="Local Flower Shop">
                     <div class="portfolio-grid-card-label">
                         <span class="portfolio-grid-card-category">Small Business</span>
@@ -814,6 +814,21 @@
         </svg>
     </button>
 
+    <!-- Site Preview Popup (desktop only) -->
+    <div class="site-preview-modal" id="sitePreviewModal" role="dialog" aria-modal="true" aria-labelledby="sitePreviewTitle">
+        <div class="site-preview-window">
+            <div class="site-preview-header">
+                <span class="site-preview-title" id="sitePreviewTitle"></span>
+                <a class="site-preview-open" id="sitePreviewOpen" href="#" target="_blank" rel="noopener">Open in new tab &#8599;</a>
+                <button class="site-preview-close" id="sitePreviewClose" aria-label="Close preview">&times;</button>
+            </div>
+            <div class="site-preview-body">
+                <div class="site-preview-loading" id="sitePreviewLoading">Loading preview&hellip;</div>
+                <iframe class="site-preview-frame" id="sitePreviewFrame" title="Website preview" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
+            </div>
+        </div>
+    </div>
+
     <script src="Business_Portfolio.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
     <script src="portfolio-carousel.js"></script>
@@ -841,6 +856,55 @@
             gridView.style.display = 'grid';
             carouselView.style.display = 'none';
             scrubTrack.style.display = 'none';
+        });
+    })();
+    </script>
+    <script>
+    // Desktop-only site preview popup. Cards marked data-preview="true"
+    // open in a popup instead of a new tab. Plain clicks only: Cmd/Ctrl/
+    // Shift-click and middle-click still open the link normally.
+    (function() {
+        const modal = document.getElementById('sitePreviewModal');
+        const frame = document.getElementById('sitePreviewFrame');
+        const loading = document.getElementById('sitePreviewLoading');
+        const titleEl = document.getElementById('sitePreviewTitle');
+        const openLink = document.getElementById('sitePreviewOpen');
+        const closeBtn = document.getElementById('sitePreviewClose');
+        const desktop = window.matchMedia('(min-width: 769px)');
+        if (!modal || !frame) return;
+
+        function openPreview(card) {
+            titleEl.textContent = card.dataset.previewTitle || 'Preview';
+            openLink.href = card.href;
+            loading.classList.remove('hidden');
+            frame.src = card.href;
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePreview() {
+            modal.classList.remove('open');
+            frame.src = 'about:blank';
+            document.body.style.overflow = '';
+        }
+
+        frame.addEventListener('load', () => {
+            if (frame.src !== 'about:blank') loading.classList.add('hidden');
+        });
+
+        document.querySelectorAll('.portfolio-grid-card[data-preview="true"]').forEach(card => {
+            card.addEventListener('click', e => {
+                if (!desktop.matches) return;
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+                e.preventDefault();
+                openPreview(card);
+            });
+        });
+
+        closeBtn.addEventListener('click', closePreview);
+        modal.addEventListener('click', e => { if (e.target === modal) closePreview(); });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && modal.classList.contains('open')) closePreview();
         });
     })();
     </script>
