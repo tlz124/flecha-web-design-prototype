@@ -270,7 +270,8 @@
 
             <div class="portfolio-view-toggle-wrap">
                 <button class="portfolio-view-toggle-btn portfolio-view-toggle-btn--left active" id="carouselViewBtn">Carousel</button>
-                <button class="portfolio-view-toggle-btn portfolio-view-toggle-btn--right" id="gridViewBtn">Grid</button>
+                <button class="portfolio-view-toggle-btn portfolio-view-toggle-btn--mid" id="gridViewBtn">Grid</button>
+                <button class="portfolio-view-toggle-btn portfolio-view-toggle-btn--right" id="driftViewBtn">Drifting</button>
             </div>
 
             <div class="sphere-container" id="portfolioCarouselView">
@@ -343,6 +344,14 @@
                         <span class="portfolio-grid-card-title">Corporate Law Firm</span>
                     </div>
                 </a>
+            </div>
+
+            <div class="portfolio-drift" id="portfolioDriftView">
+                <div class="portfolio-drift-row"><div class="portfolio-drift-track"></div></div>
+                <button class="portfolio-drift-pause" id="portfolioDriftPause" aria-label="Pause motion" aria-pressed="false">
+                    <svg class="icon-pause" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+                    <svg class="icon-play" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><polygon points="7 4 20 12 7 20"/></svg>
+                </button>
             </div>
         </div>
     </section>
@@ -833,30 +842,65 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
     <script src="portfolio-carousel.js"></script>
     <script>
-    // First-pass view toggle: just shows/hides the two views. Does not yet
-    // pause the carousel's render loop while hidden (noted as a follow-up).
+    // View toggle for "View Our Work": Carousel, Grid, or Drifting.
+    // Only one view is visible at a time. (The carousel's render loop still
+    // keeps running while hidden - noted as a follow-up cleanup.)
     (function() {
         const carouselBtn = document.getElementById('carouselViewBtn');
         const gridBtn = document.getElementById('gridViewBtn');
+        const driftBtn = document.getElementById('driftViewBtn');
         const carouselView = document.getElementById('portfolioCarouselView');
         const scrubTrack = document.getElementById('sphereScrubTrack');
         const gridView = document.getElementById('portfolioGridView');
-        if (!carouselBtn || !gridBtn) return;
+        const driftView = document.getElementById('portfolioDriftView');
+        if (!carouselBtn || !gridBtn || !driftBtn || !driftView) return;
 
-        carouselBtn.addEventListener('click', () => {
-            carouselBtn.classList.add('active');
-            gridBtn.classList.remove('active');
-            carouselView.style.display = '';
-            scrubTrack.style.display = '';
-            gridView.style.display = 'none';
-        });
-        gridBtn.addEventListener('click', () => {
-            gridBtn.classList.add('active');
-            carouselBtn.classList.remove('active');
-            gridView.style.display = 'grid';
-            carouselView.style.display = 'none';
-            scrubTrack.style.display = 'none';
-        });
+        // Build the drifting row by copying the grid cards (no second project
+        // list to maintain). This only runs the first time "Drifting" is
+        // clicked, so nothing extra is created on page load. The row holds 3
+        // copies of all the cards so the loop is seamless even on wide
+        // screens; copies after the first are hidden from screen readers and
+        // keyboard focus.
+        let driftBuilt = false;
+        function buildDrift() {
+            if (driftBuilt) return;
+            driftBuilt = true;
+            const cards = Array.from(gridView.querySelectorAll('.portfolio-grid-card'));
+            const track = driftView.querySelector('.portfolio-drift-track');
+            for (let copy = 0; copy < 3; copy++) {
+                cards.forEach(card => {
+                    const clone = card.cloneNode(true);
+                    if (copy > 0) {
+                        clone.setAttribute('aria-hidden', 'true');
+                        clone.tabIndex = -1;
+                        clone.classList.add('portfolio-drift-copy');
+                    }
+                    track.appendChild(clone);
+                });
+            }
+        }
+
+        // Pause / play button
+        const pauseBtn = document.getElementById('portfolioDriftPause');
+        if (pauseBtn) {
+            pauseBtn.addEventListener('click', () => {
+                const paused = driftView.classList.toggle('is-paused');
+                pauseBtn.setAttribute('aria-pressed', String(paused));
+                pauseBtn.setAttribute('aria-label', paused ? 'Play motion' : 'Pause motion');
+            });
+        }
+
+        const buttons = { carousel: carouselBtn, grid: gridBtn, drift: driftBtn };
+        function showView(name) {
+            Object.keys(buttons).forEach(k => buttons[k].classList.toggle('active', k === name));
+            carouselView.style.display = name === 'carousel' ? '' : 'none';
+            scrubTrack.style.display = name === 'carousel' ? '' : 'none';
+            gridView.style.display = name === 'grid' ? 'grid' : 'none';
+            driftView.style.display = name === 'drift' ? 'block' : 'none';
+        }
+        carouselBtn.addEventListener('click', () => showView('carousel'));
+        gridBtn.addEventListener('click', () => showView('grid'));
+        driftBtn.addEventListener('click', () => { buildDrift(); showView('drift'); });
     })();
     </script>
     <script>
@@ -880,25 +924,28 @@
             frame.src = card.href;
             modal.classList.add('open');
             document.body.style.overflow = 'hidden';
+            document.body.classList.add('site-preview-open');
         }
 
         function closePreview() {
             modal.classList.remove('open');
             frame.src = 'about:blank';
             document.body.style.overflow = '';
+            document.body.classList.remove('site-preview-open');
         }
 
         frame.addEventListener('load', () => {
             if (frame.src !== 'about:blank') loading.classList.add('hidden');
         });
 
-        document.querySelectorAll('.portfolio-grid-card[data-preview="true"]').forEach(card => {
-            card.addEventListener('click', e => {
-                if (!desktop.matches) return;
-                if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
-                e.preventDefault();
-                openPreview(card);
-            });
+        // Delegated so it also covers cards copied into the drifting view.
+        document.addEventListener('click', e => {
+            const card = e.target.closest('.portfolio-grid-card[data-preview="true"]');
+            if (!card) return;
+            if (!desktop.matches) return;
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+            e.preventDefault();
+            openPreview(card);
         });
 
         closeBtn.addEventListener('click', closePreview);
