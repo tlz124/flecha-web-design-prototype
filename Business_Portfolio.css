@@ -2932,10 +2932,6 @@ section::before {
 
 
 /* ===== Desktop-only overrides (kept last so they win the cascade) ===== */
-.step-icon {
-    display: none;
-}
-
 .sphere-arrow {
     display: none;
 }
@@ -2956,6 +2952,10 @@ section::before {
     display: none;
 }
 
+.footer-desktop {
+    display: none;
+}
+
 .portfolio-drift {
     display: none;
 }
@@ -2963,44 +2963,6 @@ section::before {
 @media (min-width: 769px) {
     .desktop-nav-links {
         display: flex;
-    }
-    .step-toggle {
-        display: none;
-    }
-    .step-header {
-        cursor: default;
-    }
-    .step-body {
-        max-height: none;
-        margin-top: 1rem;
-    }
-    .step-body {
-        display: flex;
-        flex-direction: column;
-    }
-    .step-time {
-        margin-top: auto;
-        align-self: flex-start;
-        padding-top: 1rem;
-    }
-    .process-timeline {
-        margin-top: 4.5rem;
-    }
-    .step-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: absolute;
-        top: -56px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 40px;
-        height: 40px;
-        color: var(--purple-accent);
-    }
-    .step-icon svg {
-        width: 32px;
-        height: 32px;
     }
     .sphere-arrow {
         display: flex;
@@ -3226,6 +3188,94 @@ section::before {
         border: 0;
         background: transparent;
     }
+
+    /* ----- Desktop footer ----- */
+    .footer {
+        padding: 4rem 0 2rem;
+        text-align: left;
+    }
+    .footer .container {
+        row-gap: 0;
+    }
+    .footer-desktop {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr 1.2fr;
+        gap: 4rem;
+        flex-basis: 100%;
+        width: 100%;
+        padding-bottom: 2.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border-gray);
+    }
+    .footer-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-decoration: none;
+        margin-bottom: 1rem;
+    }
+    .footer-brand-chevrons {
+        height: 22px;
+        width: auto;
+    }
+    .footer-brand-text {
+        color: var(--text-white);
+        font-weight: 700;
+        letter-spacing: 3px;
+        font-size: 1.1rem;
+    }
+    .footer-brand-text span {
+        color: var(--purple-accent);
+    }
+    .footer-tagline {
+        color: var(--text-light);
+        margin: 0 0 0.5rem;
+    }
+    .footer-location {
+        color: var(--text-gray);
+        font-size: 0.9rem;
+        margin: 0;
+    }
+    .footer-col-title {
+        color: var(--text-white);
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin: 0 0 1rem;
+    }
+    .footer-col-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+    .footer-col-list a {
+        color: var(--text-gray);
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    .footer-col-list a:hover {
+        color: var(--purple-accent);
+    }
+    .footer-col-list .footer-cta {
+        color: var(--purple-accent);
+        font-weight: 600;
+    }
+    .footer-col-list .footer-cta:hover {
+        color: var(--purple-light);
+    }
+    .footer-links {
+        margin-right: 4rem;
+    }
+    .footer-link {
+        color: #c4c4c4;
+    }
+    .footer-link:hover {
+        text-decoration: underline;
+    }
     .portfolio-drift {
         margin: 2rem 0;
         position: relative;
@@ -3302,4 +3352,261 @@ section::before {
     .portfolio-drift .portfolio-drift-pause {
         display: none;
     }
+}
+
+
+/* ===== How It Works: desktop scroll layout (desktop only) =====
+   Phones never see this: .hiw-scroll is hidden below 769px and the
+   original stacked .process-timeline cards are shown instead. */
+.hiw-scroll {
+    display: none;
+}
+
+@media (min-width: 769px) {
+    /* Pinning ("position: sticky") doesn't work when BOTH html and body hide
+       sideways overflow. Body still hides it (line 39), and the browser
+       applies that to the whole window, so nothing can scroll sideways. */
+    html {
+        overflow-x: visible;
+    }
+
+    .our-process .process-timeline {
+        display: none;
+    }
+
+    .hiw-scroll {
+        display: block;
+        position: relative;
+        height: 380vh;              /* scroll distance for the 4 cards */
+        margin-top: 1rem;
+    }
+
+    .hiw-pin {
+        position: sticky;
+        top: var(--hiw-header, 90px);
+        height: calc(100vh - var(--hiw-header, 90px));
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1.1fr;
+        gap: 3rem;
+        align-items: center;
+        overflow: hidden;           /* hides the cards waiting below */
+    }
+
+    /* Card stack (left) */
+    .hiw-stack {
+        position: relative;
+        height: min(470px, calc((100vh - var(--hiw-header, 90px)) * 0.7));
+    }
+
+    .hiw-card {
+        position: absolute;
+        inset: 0;
+        background: var(--medium-gray);
+        border: 1px solid var(--border-gray);
+        border-radius: 10px;
+        padding: 2.75rem 3rem;
+        display: flex;
+        flex-direction: column;
+        transform: translateY(110vh);
+        box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.6);
+        transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.8s ease, opacity 0.8s ease;
+    }
+
+    .hiw-card.is-active {
+        transform: none;
+    }
+
+    .hiw-card.is-past {
+        transform: translateY(-28px) scale(0.94);
+        filter: brightness(0.45);
+    }
+
+    .hiw-card.is-past.is-far {
+        transform: translateY(-48px) scale(0.88);
+        opacity: 0;
+    }
+
+    .hiw-eyebrow {
+        color: var(--purple-accent);
+        font-size: 0.8rem;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        font-weight: 700;
+        margin: 0 0 1rem;
+    }
+
+    .hiw-head {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .hiw-num {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: var(--purple-accent);
+        color: var(--black);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 900;
+        flex-shrink: 0;
+    }
+
+    .hiw-title {
+        margin: 0;
+        font-size: 2.1rem;
+        font-weight: 900;
+        color: var(--text-white);
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        line-height: 1.15;
+    }
+
+    .hiw-desc {
+        color: var(--text-light);
+        font-size: 1.2rem;
+        line-height: 1.75;
+        margin: 0 0 1.25rem;
+    }
+
+    .hiw-reminder {
+        color: var(--text-white);
+        font-size: 1.05rem;
+        margin: 0 0 1.25rem;
+    }
+
+    .hiw-time {
+        align-self: flex-start;
+        margin-top: auto;
+        padding: 0.55rem 1.2rem;
+        background: rgba(139, 122, 184, 0.2);
+        border: 1px solid var(--purple-accent);
+        border-radius: 20px;
+        font-size: 0.85rem;
+        color: var(--purple-light);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+    }
+
+    .hiw-dots {
+        position: absolute;
+        left: 0;
+        bottom: -2.75rem;
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .hiw-dots i {
+        width: 28px;
+        height: 3px;
+        border-radius: 2px;
+        background: var(--border-gray);
+        transition: background 0.4s ease, width 0.4s ease;
+    }
+
+    .hiw-dots i.on {
+        background: var(--purple-accent);
+        width: 48px;
+    }
+
+    .hiw-count {
+        margin-left: 0.75rem;
+        color: var(--text-gray);
+        font-size: 0.75rem;
+        letter-spacing: 2px;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Large drawing (right) */
+    .hiw-art {
+        position: relative;
+        height: min(560px, calc((100vh - var(--hiw-header, 90px)) * 0.8));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .hiw-art::before {
+        content: '';
+        position: absolute;
+        inset: 8%;
+        border-radius: 50%;
+        background: radial-gradient(closest-side, rgba(212, 165, 255, 0.10), transparent);
+    }
+
+    .hiw-svg {
+        position: absolute;
+        color: var(--purple-accent);
+        overflow: visible;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .hiw-svg.is-active { opacity: 1; }
+    .hiw-svg--talk     { width: 96%; }
+    .hiw-svg--sign     { width: 70%; }
+    .hiw-svg--build    { width: 86%; }
+    .hiw-svg--launch   { width: 52%; }
+
+    /* Smaller desktops / laptops */
+    @media (max-width: 1100px) {
+        .hiw-pin { gap: 2rem; }
+        .hiw-card { padding: 2rem 2.25rem; }
+        .hiw-num { width: 52px; height: 52px; font-size: 1.6rem; }
+        .hiw-title { font-size: 1.6rem; letter-spacing: 2px; }
+        .hiw-desc { font-size: 1.05rem; }
+    }
+}
+
+/* Draw-in: lines start hidden once the script is running, then draw in
+   order when their card arrives. (If the script never runs, they just show.) */
+@media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
+    .hiw-ready .hiw-d       { stroke-dasharray: 1; stroke-dashoffset: 1; }
+    .hiw-ready .hiw-pop     { opacity: 0; }
+    .hiw-ready .hiw-fillbar { transform: scaleX(0); }
+
+    .hiw-svg.is-play .hiw-d {
+        animation: hiw-draw 0.75s ease-in-out forwards;
+        animation-delay: calc(var(--i) * 0.22s);
+    }
+    .hiw-svg.is-play .hiw-pop {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: hiw-pop 0.45s cubic-bezier(0.3, 1.6, 0.6, 1) forwards;
+        animation-delay: var(--at);
+    }
+    .hiw-svg.is-play .hiw-fillbar {
+        transform-box: fill-box;
+        transform-origin: left center;
+        animation: hiw-grow 1.4s ease-in-out forwards;
+        animation-delay: var(--at);
+    }
+}
+
+@media (min-width: 769px) and (prefers-reduced-motion: reduce) {
+    .hiw-card,
+    .hiw-svg {
+        transition: none;
+    }
+}
+
+@keyframes hiw-draw {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes hiw-pop {
+    0%   { opacity: 0; transform: scale(0.3); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes hiw-grow {
+    to { transform: scaleX(1); }
 }
