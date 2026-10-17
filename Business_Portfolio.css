@@ -3357,19 +3357,18 @@ section::before {
 
 /* ===== How It Works: desktop scroll layout (desktop only) =====
    Phones never see this: .hiw-scroll is hidden below 769px and the
-   original stacked .process-timeline cards are shown instead. */
+   original stacked .process-timeline cards are shown instead.
+   How it behaves (script at the bottom of index.html):
+   - When this block is fully on screen, the page holds in place.
+   - Each card's icon draws at its own speed (about 2 seconds).
+   - Then the progress bar under the card fills as you scroll.
+   - When the bar is full, the next card slides up.
+   - After card 4, the page scrolls on normally. Scrolling up always works. */
 .hiw-scroll {
     display: none;
 }
 
 @media (min-width: 769px) {
-    /* Pinning ("position: sticky") doesn't work when BOTH html and body hide
-       sideways overflow. Body still hides it (line 39), and the browser
-       applies that to the whole window, so nothing can scroll sideways. */
-    html {
-        overflow-x: visible;
-    }
-
     .our-process .process-timeline {
         display: none;
     }
@@ -3377,27 +3376,27 @@ section::before {
     .hiw-scroll {
         display: block;
         position: relative;
-        height: 380vh;              /* scroll distance for the 4 cards */
-        margin-top: 1rem;
+        /* Sized to fit on screen below the header, with room to spare */
+        height: min(560px, calc(100vh - var(--hiw-header, 90px) - 56px));
+        margin-top: 0.5rem;
     }
 
     .hiw-pin {
-        position: sticky;
-        top: var(--hiw-header, 90px);
-        height: calc(100vh - var(--hiw-header, 90px));
+        height: 100%;
         max-width: 1200px;
         margin: 0 auto;
+        padding-top: 36px;          /* room for the previous card peeking above */
         display: grid;
         grid-template-columns: 1fr 1.1fr;
+        grid-template-rows: minmax(0, 1fr);  /* one row that exactly fills the height */
         gap: 3rem;
-        align-items: center;
         overflow: hidden;           /* hides the cards waiting below */
     }
 
     /* Card stack (left) */
     .hiw-stack {
         position: relative;
-        height: min(470px, calc((100vh - var(--hiw-header, 90px)) * 0.7));
+        height: calc(100% - 2.75rem); /* leaves room for the progress bar */
     }
 
     .hiw-card {
@@ -3406,11 +3405,10 @@ section::before {
         background: var(--medium-gray);
         border: 1px solid var(--border-gray);
         border-radius: 10px;
-        padding: 2.75rem 3rem;
+        padding: 2.5rem 3rem;
         display: flex;
         flex-direction: column;
-        transform: translateY(110vh);
-        box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.6);
+        transform: translateY(calc(100% + 8rem));
         transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.8s ease, opacity 0.8s ease;
     }
 
@@ -3418,13 +3416,18 @@ section::before {
         transform: none;
     }
 
+    .hiw-card.is-active,
     .hiw-card.is-past {
-        transform: translateY(-28px) scale(0.94);
+        box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.45);
+    }
+
+    .hiw-card.is-past {
+        transform: translateY(-22px) scale(0.95);
         filter: brightness(0.45);
     }
 
     .hiw-card.is-past.is-far {
-        transform: translateY(-48px) scale(0.88);
+        transform: translateY(-36px) scale(0.9);
         opacity: 0;
     }
 
@@ -3495,26 +3498,40 @@ section::before {
         font-weight: 600;
     }
 
-    .hiw-dots {
+    /* Progress bar under the card: one segment per step.
+       The current segment fills as you scroll after its drawing is done. */
+    .hiw-progress {
         position: absolute;
         left: 0;
+        right: 0;
         bottom: -2.75rem;
+        height: 2.75rem;
         display: flex;
         gap: 0.5rem;
         align-items: center;
     }
 
-    .hiw-dots i {
-        width: 28px;
-        height: 3px;
+    .hiw-seg {
+        width: 40px;
+        height: 4px;
         border-radius: 2px;
         background: var(--border-gray);
-        transition: background 0.4s ease, width 0.4s ease;
+        overflow: hidden;
+        transition: width 0.4s ease;
     }
 
-    .hiw-dots i.on {
+    .hiw-seg.is-current {
+        width: 96px;
+    }
+
+    .hiw-seg i {
+        display: block;
+        width: 100%;
+        height: 100%;
         background: var(--purple-accent);
-        width: 48px;
+        transform: scaleX(0);
+        transform-origin: left center;
+        transition: transform 0.15s linear;
     }
 
     .hiw-count {
@@ -3523,27 +3540,46 @@ section::before {
         font-size: 0.75rem;
         letter-spacing: 2px;
         font-variant-numeric: tabular-nums;
+        white-space: nowrap;
     }
 
-    /* Large drawing (right) */
+    .hiw-hint {
+        white-space: nowrap;
+        margin-left: auto;
+        color: var(--purple-light);
+        font-size: 0.75rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .hiw-scroll.is-waiting .hiw-hint {
+        opacity: 1;
+    }
+
+    /* Drawing (right). All four drawings share one centered spot, and each
+       is sized by height so it always fits beside the card. */
     .hiw-art {
         position: relative;
-        height: min(560px, calc((100vh - var(--hiw-header, 90px)) * 0.8));
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        height: calc(100% - 2.75rem);
+        display: grid;
+        grid-template: 100% / 100%;
+        place-items: center;
     }
 
     .hiw-art::before {
         content: '';
         position: absolute;
-        inset: 8%;
+        inset: 6%;
         border-radius: 50%;
         background: radial-gradient(closest-side, rgba(212, 165, 255, 0.10), transparent);
     }
 
     .hiw-svg {
-        position: absolute;
+        grid-area: 1 / 1;
+        width: auto;
+        max-width: 90%;
         color: var(--purple-accent);
         overflow: visible;
         opacity: 0;
@@ -3551,10 +3587,10 @@ section::before {
     }
 
     .hiw-svg.is-active { opacity: 1; }
-    .hiw-svg--talk     { width: 96%; }
-    .hiw-svg--sign     { width: 70%; }
-    .hiw-svg--build    { width: 86%; }
-    .hiw-svg--launch   { width: 52%; }
+    .hiw-svg--talk     { height: 60%; --stagger: 0.13s; }
+    .hiw-svg--sign     { height: 70%; --stagger: 0.2s; }
+    .hiw-svg--build    { height: 62%; --stagger: 0.22s; }
+    .hiw-svg--launch   { height: 64%; --stagger: 0.12s; }
 
     /* Smaller desktops / laptops */
     @media (max-width: 1100px) {
@@ -3563,6 +3599,19 @@ section::before {
         .hiw-num { width: 52px; height: 52px; font-size: 1.6rem; }
         .hiw-title { font-size: 1.6rem; letter-spacing: 2px; }
         .hiw-desc { font-size: 1.05rem; }
+        .hiw-seg { width: 24px; }
+        .hiw-seg.is-current { width: 56px; }
+        .hiw-hint { letter-spacing: 1px; }
+    }
+
+    /* Short screens */
+    @media (max-height: 760px) {
+        .hiw-card { padding: 1.75rem 2.25rem; }
+        .hiw-eyebrow { margin-bottom: 0.6rem; }
+        .hiw-head { margin-bottom: 1rem; }
+        .hiw-num { width: 48px; height: 48px; font-size: 1.5rem; }
+        .hiw-title { font-size: 1.5rem; }
+        .hiw-desc { font-size: 1rem; line-height: 1.65; }
     }
 }
 
@@ -3575,7 +3624,7 @@ section::before {
 
     .hiw-svg.is-play .hiw-d {
         animation: hiw-draw 0.75s ease-in-out forwards;
-        animation-delay: calc(var(--i) * 0.22s);
+        animation-delay: calc(var(--i) * var(--stagger, 0.2s));
     }
     .hiw-svg.is-play .hiw-pop {
         transform-box: fill-box;
@@ -3586,14 +3635,16 @@ section::before {
     .hiw-svg.is-play .hiw-fillbar {
         transform-box: fill-box;
         transform-origin: left center;
-        animation: hiw-grow 1.4s ease-in-out forwards;
+        animation: hiw-grow 0.8s ease-in-out forwards;
         animation-delay: var(--at);
     }
 }
 
 @media (min-width: 769px) and (prefers-reduced-motion: reduce) {
     .hiw-card,
-    .hiw-svg {
+    .hiw-svg,
+    .hiw-seg,
+    .hiw-seg i {
         transition: none;
     }
 }

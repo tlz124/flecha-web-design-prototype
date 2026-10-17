@@ -235,9 +235,11 @@
 
             <!-- ===== How It Works: DESKTOP ONLY scroll layout =====
                  Hidden on phones (Business_Portfolio.css). Phones keep the
-                 stacked .process-timeline cards above, unchanged. While this
-                 block is on screen it stays pinned, and each bit of scrolling
-                 slides the next card up and draws its icon on the right. -->
+                 stacked .process-timeline cards above, unchanged. When this
+                 block is fully on screen the page holds in place. Each card's
+                 icon draws at its own speed, then the progress bar fills as
+                 you scroll; when it's full the next card slides up. After
+                 card 4 the page scrolls on normally. -->
             <div class="hiw-scroll" id="hiwScroll">
                 <div class="hiw-pin">
                     <div class="hiw-stack">
@@ -266,7 +268,11 @@
                             <p class="hiw-desc">We'll guide you through launch day and show you how to make simple updates. Plus, we're here if you need help down the road.</p>
                             <span class="hiw-time">Ongoing</span>
                         </article>
-                        <div class="hiw-dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><span class="hiw-count">01 / 04</span></div>
+                        <div class="hiw-progress" aria-hidden="true">
+                            <span class="hiw-seg"><i></i></span><span class="hiw-seg"><i></i></span><span class="hiw-seg"><i></i></span><span class="hiw-seg"><i></i></span>
+                            <span class="hiw-count">01 / 04</span>
+                            <span class="hiw-hint">Scroll to continue &darr;</span>
+                        </div>
                     </div>
 
                     <div class="hiw-art" aria-hidden="true">
@@ -291,7 +297,7 @@
                             <path class="hiw-d" style="--i:3" pathLength="1" d="M36 58 H80"/>
                             <path class="hiw-d" style="--i:4" pathLength="1" d="M36 70 H62"/>
                             <path class="hiw-d" style="--i:6" pathLength="1" d="M34 88 C37 78 41 78 41 86 C41 92 45 80 49 84 C53 88 54 80 60 82 S68 86 72 80"/>
-                            <g class="hiw-pop" style="--at:2s"><circle cx="90" cy="92" r="15" fill="#0a0a0a"/><path d="M83 92 L88 97 L97 86"/></g>
+                            <g class="hiw-pop" style="--at:1.5s"><circle cx="90" cy="92" r="15" fill="#0a0a0a"/><path d="M83 92 L88 97 L97 86"/></g>
                         </svg>
                         <!-- 3: monitor, loading bar, check -->
                         <svg class="hiw-svg hiw-svg--build" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 100" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -299,8 +305,8 @@
                             <path class="hiw-d" style="--i:1" pathLength="1" d="M60 74V88M44 88H76"/>
                             <path class="hiw-d" style="--i:2" pathLength="1" d="M26 26H60"/>
                             <rect class="hiw-d" style="--i:3" pathLength="1" x="26" y="38" width="68" height="10" rx="5"/>
-                            <rect class="hiw-fillbar" style="--at:1.4s" x="29" y="41" width="62" height="4" rx="2" fill="currentColor" stroke="none"/>
-                            <g class="hiw-pop" style="--at:2.9s"><circle cx="98" cy="20" r="14" fill="#0a0a0a"/><path d="M92 20L96.5 24.5L104 15"/></g>
+                            <rect class="hiw-fillbar" style="--at:0.9s" x="29" y="41" width="62" height="4" rx="2" fill="currentColor" stroke="none"/>
+                            <g class="hiw-pop" style="--at:1.6s"><circle cx="98" cy="20" r="14" fill="#0a0a0a"/><path d="M92 20L96.5 24.5L104 15"/></g>
                         </svg>
                         <!-- 4: rocket (draws in only, no launch) -->
                         <svg class="hiw-svg hiw-svg--launch" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 30" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(35deg);">
@@ -1168,85 +1174,287 @@
     </script>
 
     <script>
-    // "How It Works" scroll layout (desktop only, 769px and wider).
-    // The section stays pinned while you scroll through it. Each quarter of the
-    // scroll brings up the next card and draws its icon on the right. The
-    // drawings only start once the section is on screen, and replay if you
-    // scroll away and come back. On phones this block is hidden and the
-    // script does nothing.
+    // "How It Works" step-by-step layout (desktop only, 769px and wider).
+    //
+    // What it does:
+    //  1. When the cards block is fully on screen and you scroll down, the
+    //     page holds in place.
+    //  2. The current card's icon draws at its own speed (DRAW_MS). Scrolling
+    //     down while it draws does nothing.
+    //  3. When the drawing is done, the progress bar under the card fills as
+    //     you scroll (about half a screen of scrolling, SCROLL_FRACTION).
+    //  4. When the bar is full, the next card slides up and its icon draws.
+    //  5. After card 4, the page lets go and scrolls on normally.
+    //  Scrolling up always lets go right away. Menu links, the back-to-top
+    //  button and dragging the scrollbar are never blocked.
+    //
+    // On phones none of this runs: the block is hidden and no scroll or touch
+    // listeners are added, so mobile scrolling is exactly as before.
     (function() {
-        const scroller = document.getElementById('hiwScroll');
-        if (!scroller) return;
+        const stage = document.getElementById('hiwScroll');
+        if (!stage) return;
+
+        const DRAW_MS = 2100;          // how long each icon takes to draw
+        const SCROLL_FRACTION = 0.5;   // scrolling needed to fill the bar (share of screen height)
+
         const desktop = window.matchMedia('(min-width: 769px)');
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
         const header = document.querySelector('header');
-        const cards = Array.from(scroller.querySelectorAll('.hiw-card'));
-        const arts = Array.from(scroller.querySelectorAll('.hiw-svg'));
-        const dots = Array.from(scroller.querySelectorAll('.hiw-dots i'));
-        const count = scroller.querySelector('.hiw-count');
-        let current = -1;
-        let onScreen = false;
-        let ticking = false;
+        const cards = Array.from(stage.querySelectorAll('.hiw-card'));
+        const arts = Array.from(stage.querySelectorAll('.hiw-svg'));
+        const segs = Array.from(stage.querySelectorAll('.hiw-seg'));
+        const count = stage.querySelector('.hiw-count');
+        const LAST = cards.length - 1;
 
-        scroller.classList.add('hiw-ready');
+        let step = 0;
+        let phase = 'idle';      // 'idle' (not started) | 'drawing' | 'ready'
+        let progress = 0;        // 0 to 1, how full the current bar is
+        let held = false;        // page is being held in place
+        let finished = false;    // all four steps done
+        let holdY = 0;           // scroll position the page is held at
+        let heldAt = 0;
+        let lastY = window.scrollY;
+        let lastDownInput = 0;   // time of the last downward wheel/key/swipe
+        let touchY = null;
+        let drawTimer = null;
+        let lastInputAt = 0;     // time of the previous wheel/swipe event
+        let needFreshScroll = false; // ignore leftover momentum until a new scroll starts
 
-        function setHeaderHeight() {
-            const h = header ? header.offsetHeight : 0;
-            scroller.style.setProperty('--hiw-header', h + 'px');
+        stage.classList.add('hiw-ready');
+
+        function headerHeight() {
+            return header ? header.offsetHeight : 0;
         }
 
-        function draw(i) {
-            arts.forEach(svg => svg.classList.remove('is-play'));
-            void arts[i].getBoundingClientRect(); // restart the draw-in
-            arts[i].classList.add('is-play');
+        // Where the page should hold: the whole cards block visible, sitting
+        // just above the bottom of the screen (so the heading shows above it
+        // when there's room), and never tucked under the header.
+        function getHoldY() {
+            const top = stage.getBoundingClientRect().top + window.scrollY;
+            const bottomAligned = top + stage.offsetHeight + 24 - window.innerHeight;
+            const topAligned = top - headerHeight() - 16;
+            return Math.round(Math.min(bottomAligned, topAligned));
         }
 
-        function setStep(i) {
-            if (i === current) return;
-            current = i;
+        function jumpTo(y) {
+            window.scrollTo({ top: y, behavior: 'instant' });
+        }
+
+        function render() {
             cards.forEach((card, k) => {
-                card.classList.toggle('is-active', k === i);
-                card.classList.toggle('is-past', k < i);
-                card.classList.toggle('is-far', k < i - 1);
+                card.classList.toggle('is-active', k === step);
+                card.classList.toggle('is-past', k < step);
+                card.classList.toggle('is-far', k < step - 1);
                 card.style.zIndex = k + 1;
-                card.inert = k !== i;
+                card.inert = k !== step;
             });
-            dots.forEach((dot, k) => dot.classList.toggle('on', k === i));
-            if (count) count.textContent = '0' + (i + 1) + ' / 04';
-            arts.forEach((svg, k) => svg.classList.toggle('is-active', k === i));
-            if (onScreen) draw(i);
+            segs.forEach((seg, k) => {
+                let fill = 0;
+                if (k < step || finished) fill = 1;
+                else if (k === step && phase === 'ready') fill = progress;
+                seg.classList.toggle('is-current', k === step);
+                seg.firstElementChild.style.transform = 'scaleX(' + fill + ')';
+            });
+            if (count) count.textContent = '0' + (step + 1) + ' / 0' + cards.length;
+            stage.classList.toggle('is-waiting', phase === 'ready' && !finished);
         }
 
-        function update() {
-            ticking = false;
-            if (!desktop.matches) return;
-            const r = scroller.getBoundingClientRect();
-            const headerH = header ? header.offsetHeight : 0;
-            const pinH = window.innerHeight - headerH;
-            const total = scroller.offsetHeight - pinH;
-            const progress = Math.min(Math.max((headerH - r.top) / total, 0), 0.999);
-            setStep(Math.floor(progress * cards.length));
+        function startDrawing() {
+            clearTimeout(drawTimer);
+            phase = 'drawing';
+            progress = 0;
+            arts.forEach((svg, k) => {
+                svg.classList.remove('is-play');
+                svg.classList.toggle('is-active', k === step);
+            });
+            void arts[step].getBoundingClientRect(); // restart the draw-in
+            arts[step].classList.add('is-play');
+            render();
+            drawTimer = setTimeout(() => {
+                phase = 'ready';
+                needFreshScroll = true;
+                render();
+            }, reduceMotion.matches ? 0 : DRAW_MS);
+        }
 
-            // Start drawing once the section is well into view; reset once it's gone.
-            const visible = r.top < window.innerHeight * 0.5 && r.bottom > headerH;
-            const gone = r.bottom <= headerH || r.top >= window.innerHeight;
-            if (visible && !onScreen) {
-                onScreen = true;
-                draw(current);
-            } else if (gone && onScreen) {
-                onScreen = false;
-                arts.forEach(svg => svg.classList.remove('is-play'));
+        function reset() {
+            clearTimeout(drawTimer);
+            step = 0;
+            phase = 'idle';
+            progress = 0;
+            finished = false;
+            held = false;
+            arts.forEach((svg, k) => {
+                svg.classList.remove('is-play');
+                svg.classList.toggle('is-active', k === 0);
+            });
+            render();
+        }
+
+        function hold() {
+            holdY = getHoldY();
+            held = true;
+            heldAt = performance.now();
+            needFreshScroll = true;
+            jumpTo(holdY);
+            lastY = holdY;
+            if (phase === 'idle') startDrawing();
+        }
+
+        function release() {
+            held = false;
+        }
+
+        // Downward scrolling while held: fills the bar once the drawing is done.
+        function fillBar(amount) {
+            if (phase !== 'ready') return;
+            progress = Math.min(1, progress + amount / (window.innerHeight * SCROLL_FRACTION));
+            render();
+            if (progress < 1) return;
+            if (step < LAST) {
+                step++;
+                startDrawing();
+            } else {
+                finished = true;
+                release();
+                render();
             }
         }
 
-        function requestUpdate() {
-            if (!ticking) { ticking = true; requestAnimationFrame(update); }
+        // Shared by mouse wheel / trackpad and touch swipes. dy > 0 = down.
+        function handleDelta(dy, e) {
+            const now = performance.now();
+            const gap = now - lastInputAt;
+            lastInputAt = now;
+            if (dy > 0) {
+                lastDownInput = now;
+                if (held) {
+                    e.preventDefault();
+                    // Leftover momentum from the scroll that got us here (or that
+                    // was going on while the icon drew) doesn't count. The bar
+                    // only fills once a new scroll starts.
+                    if (needFreshScroll) {
+                        if (gap < 180) return;
+                        needFreshScroll = false;
+                    }
+                    fillBar(dy);
+                    return;
+                }
+                if (!finished) {
+                    const y = window.scrollY;
+                    const target = getHoldY();
+                    // This scroll would reach (or already sits at) the hold point.
+                    if (Math.abs(y - target) <= 1 || (y < target && y + dy >= target)) {
+                        e.preventDefault();
+                        hold();
+                    }
+                }
+            } else if (dy < 0 && held) {
+                release(); // let the page scroll up normally
+            }
         }
 
-        setHeaderHeight();
-        setStep(0);
-        update();
-        window.addEventListener('scroll', requestUpdate, { passive: true });
-        window.addEventListener('resize', () => { setHeaderHeight(); requestUpdate(); });
+        function onWheel(e) {
+            if (e.ctrlKey) return; // pinch / ctrl+wheel zoom
+            let dy = e.deltaY;
+            if (e.deltaMode === 1) dy *= 16;
+            else if (e.deltaMode === 2) dy *= window.innerHeight;
+            handleDelta(dy, e);
+        }
+
+        function onTouchStart(e) {
+            touchY = e.touches.length ? e.touches[0].clientY : null;
+        }
+
+        function onTouchMove(e) {
+            if (touchY === null || !e.touches.length) return;
+            const y = e.touches[0].clientY;
+            const dy = touchY - y;
+            touchY = y;
+            handleDelta(dy, e);
+        }
+
+        function onKeyDown(e) {
+            const t = e.target;
+            if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+            const down = e.key === 'ArrowDown' || e.key === 'PageDown' || (e.key === ' ' && !e.shiftKey);
+            const up = e.key === 'ArrowUp' || e.key === 'PageUp' || e.key === 'Home' || e.key === 'End' || (e.key === ' ' && e.shiftKey);
+            if (down) {
+                lastDownInput = performance.now();
+                if (held) {
+                    e.preventDefault();
+                    fillBar(window.innerHeight * SCROLL_FRACTION); // one key press = one card
+                }
+            } else if (up && held) {
+                release();
+            }
+        }
+
+        function onScroll() {
+            const y = window.scrollY;
+            const now = performance.now();
+
+            if (held) {
+                if (Math.abs(y - holdY) > 4) {
+                    // Leftover scroll momentum right after holding: stay put.
+                    // Anything else (menu link, scrollbar, back-to-top): let go.
+                    if (now - heldAt < 600 || now - lastDownInput < 250) jumpTo(holdY);
+                    else release();
+                }
+            } else if (!finished && now - lastDownInput < 250) {
+                // A fast scroll jumped past the hold point: bring it back.
+                const target = getHoldY();
+                if (lastY < target - 1 && y >= target - 1) hold();
+            }
+
+            const r = stage.getBoundingClientRect();
+            // Back above the section entirely: start fresh next time.
+            if (r.top > window.innerHeight && (phase !== 'idle' || finished)) reset();
+            // Start drawing card 1 once most of the block is on screen.
+            if (phase === 'idle' && !finished &&
+                r.top < window.innerHeight - stage.offsetHeight * 0.6 && r.bottom > headerHeight()) {
+                startDrawing();
+            }
+
+            lastY = window.scrollY;
+        }
+
+        function onResize() {
+            stage.style.setProperty('--hiw-header', headerHeight() + 'px');
+            if (held) {
+                holdY = getHoldY();
+                jumpTo(holdY);
+            }
+        }
+
+        let bound = false;
+        function bind() {
+            if (bound) return;
+            bound = true;
+            window.addEventListener('wheel', onWheel, { passive: false });
+            window.addEventListener('touchstart', onTouchStart, { passive: true });
+            window.addEventListener('touchmove', onTouchMove, { passive: false });
+            window.addEventListener('keydown', onKeyDown);
+            window.addEventListener('scroll', onScroll, { passive: true });
+            window.addEventListener('resize', onResize);
+            onResize();
+            onScroll();
+        }
+        function unbind() {
+            if (!bound) return;
+            bound = false;
+            window.removeEventListener('wheel', onWheel);
+            window.removeEventListener('touchstart', onTouchStart);
+            window.removeEventListener('touchmove', onTouchMove);
+            window.removeEventListener('keydown', onKeyDown);
+            window.removeEventListener('scroll', onScroll);
+            window.removeEventListener('resize', onResize);
+            reset();
+        }
+
+        render();
+        if (desktop.matches) bind();
+        desktop.addEventListener('change', () => (desktop.matches ? bind() : unbind()));
     })();
     </script>
 </body>
