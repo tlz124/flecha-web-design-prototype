@@ -118,6 +118,7 @@
     <!-- Hero/Landing Section -->
     <section id="home" class="hero">
         <canvas id="heroCanvas" class="hero-canvas"></canvas>
+        <canvas id="heroWaves" class="hero-canvas hero-canvas--waves" aria-hidden="true"></canvas>
         <div class="hero-content">
             <h2 class="hero-title">Moving Your Vision Forward</h2>
             <p class="hero-subtitle">Web design for businesses, schools, and nonprofits that points you in the right direction</p>
@@ -1222,7 +1223,10 @@
         let touchY = null;
         let drawTimer = null;
         let lastInputAt = 0;     // time of the previous wheel/swipe event
+        let lastSize = 0;        // size of the previous downward wheel/swipe movement
         let needFreshScroll = false; // ignore leftover momentum until a new scroll starts
+        let upAmount = 0;        // upward scrolling added up while held
+        const UP_RELEASE = 30;   // px of clear upward scrolling needed to let go
 
         stage.classList.add('hiw-ready');
 
@@ -1287,7 +1291,7 @@
             phase = 'idle';
             progress = 0;
             finished = false;
-            held = false;
+            if (held) release();
             arts.forEach((svg, k) => {
                 svg.classList.remove('is-play');
                 svg.classList.toggle('is-active', k === 0);
@@ -1295,11 +1299,25 @@
             render();
         }
 
+        // While held, the page itself is locked (overflow: hidden). This is what
+        // makes trackpads work: Chrome decides at the start of a trackpad swipe
+        // whether the page may stop it, so a swipe that began above the cards
+        // can't be stopped by the scroll events alone. Locking the page stops it
+        // either way. "scrollbar-gutter" keeps the layout from shifting when the
+        // scrollbar hides.
+        function lockPage(on) {
+            const html = document.documentElement;
+            html.style.overflow = on ? 'hidden' : '';
+            html.style.scrollbarGutter = on ? 'stable' : '';
+        }
+
         function hold() {
             holdY = getHoldY();
             held = true;
             heldAt = performance.now();
             needFreshScroll = true;
+            upAmount = 0;
+            lockPage(true);
             jumpTo(holdY);
             lastY = holdY;
             if (phase === 'idle') startDrawing();
@@ -1307,6 +1325,8 @@
 
         function release() {
             held = false;
+            upAmount = 0;
+            lockPage(false);
         }
 
         // Downward scrolling while held: fills the bar once the drawing is done.
@@ -1325,20 +1345,33 @@
             }
         }
 
+        // Is this downward movement the start of a new scroll, rather than the
+        // glide (momentum) still trickling in from the last one?
+        //  - Mouse wheel: there's a short pause between clicks.
+        //  - Trackpad: the glide only ever gets smaller, so a sudden jump in
+        //    size means the fingers are swiping again.
+        function isFreshScroll(size, gap) {
+            return gap >= 150 || size > lastSize * 1.6 + 3;
+        }
+
         // Shared by mouse wheel / trackpad and touch swipes. dy > 0 = down.
         function handleDelta(dy, e) {
             const now = performance.now();
             const gap = now - lastInputAt;
             lastInputAt = now;
+
             if (dy > 0) {
                 lastDownInput = now;
+                upAmount = 0;
+                const fresh = isFreshScroll(dy, gap);
+                lastSize = dy;
                 if (held) {
-                    e.preventDefault();
-                    // Leftover momentum from the scroll that got us here (or that
-                    // was going on while the icon drew) doesn't count. The bar
-                    // only fills once a new scroll starts.
+                    if (e.cancelable) e.preventDefault();
+                    // Leftover glide from the scroll that got us here (or that was
+                    // going on while the icon drew) doesn't count. The bar only
+                    // fills once a new scroll starts.
                     if (needFreshScroll) {
-                        if (gap < 180) return;
+                        if (!fresh) return;
                         needFreshScroll = false;
                     }
                     fillBar(dy);
@@ -1349,20 +1382,37 @@
                     const target = getHoldY();
                     // This scroll would reach (or already sits at) the hold point.
                     if (Math.abs(y - target) <= 1 || (y < target && y + dy >= target)) {
-                        e.preventDefault();
+                        if (e.cancelable) e.preventDefault();
                         hold();
                     }
                 }
-            } else if (dy < 0 && held) {
-                release(); // let the page scroll up normally
+            } else if (dy < 0) {
+                if (!held) return;
+                // Trackpads send small accidental upward wiggles. Only let go once
+                // the upward scrolling clearly adds up.
+                upAmount += -dy;
+                if (upAmount < UP_RELEASE) {
+                    if (e.cancelable) e.preventDefault();
+                    return;
+                }
+                const back = upAmount;
+                release();
+                jumpTo(Math.max(0, window.scrollY - back)); // start moving up right away
             }
         }
 
         function onWheel(e) {
             if (e.ctrlKey) return; // pinch / ctrl+wheel zoom
             let dy = e.deltaY;
-            if (e.deltaMode === 1) dy *= 16;
-            else if (e.deltaMode === 2) dy *= window.innerHeight;
+            let dx = e.deltaX;
+            if (e.deltaMode === 1) { dy *= 16; dx *= 16; }
+            else if (e.deltaMode === 2) { dy *= window.innerHeight; dx *= window.innerWidth; }
+            // Mostly-sideways trackpad swipes (e.g. back/forward) aren't
+            // up/down scrolling, so they're ignored.
+            if (Math.abs(dx) > Math.abs(dy)) {
+                if (held && e.cancelable) e.preventDefault();
+                return;
+            }
             handleDelta(dy, e);
         }
 
@@ -1454,6 +1504,7 @@
             window.removeEventListener('scroll', onScroll);
             window.removeEventListener('resize', onResize);
             reset();
+            lockPage(false);
         }
 
         render();

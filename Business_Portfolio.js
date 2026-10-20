@@ -819,6 +819,7 @@ filterButtons.forEach(button => {
 
     function animateParticles(currentTime) {
         animationFrameId = requestAnimationFrame(animateParticles);
+        if (heroCanvas.offsetParent === null) return; // hidden on desktop: the flowing lines run there instead
         const deltaTime = currentTime - lastFrameTime;
         if (deltaTime < frameInterval) return;
         lastFrameTime = currentTime - (deltaTime % frameInterval);
@@ -914,3 +915,133 @@ document.querySelectorAll('.pricing-feature-toggle').forEach(btn => {
         btn.classList.toggle('open', !isOpen);
     });
 });
+
+// ===== Hero "Flowing Lines" Background (desktop only, 769px and wider) =====
+// Thin purple and blue lines ripple across the hero and bend around the
+// mouse. Phones never run this: the canvas is hidden there and the node
+// network is used instead. It pauses when the hero is scrolled out of view
+// or the tab is hidden, and shows a still frame for visitors who ask their
+// computer for less motion.
+(function() {
+    const canvas = document.getElementById('heroWaves');
+    const hero = document.getElementById('home');
+    if (!canvas || !hero) return;
+
+    const ctx = canvas.getContext('2d');
+    const desktop = window.matchMedia('(min-width: 769px)');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const LINES = 22;          // how many lines
+    const BEND = 170;          // how far (px) around the mouse the lines bend
+    const mouse = { x: null, y: null };
+    let w = 0;
+    let h = 0;
+    let running = false;
+    let onScreen = true;
+
+    function resize() {
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        w = hero.offsetWidth;
+        h = hero.offsetHeight;
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function draw(time) {
+        const t = time / 1000;
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, w, h);
+
+        for (let i = 0; i < LINES; i++) {
+            const k = i / (LINES - 1);
+            const baseY = h * (0.18 + 0.64 * k);
+            const strength = Math.sin(k * Math.PI); // middle lines are brightest
+
+            const g = ctx.createLinearGradient(0, 0, w, 0);
+            g.addColorStop(0, 'rgba(102, 126, 234, 0)');
+            g.addColorStop(0.3, 'rgba(102, 126, 234, ' + (0.18 + 0.25 * strength) + ')');
+            g.addColorStop(0.7, 'rgba(212, 165, 255, ' + (0.2 + 0.3 * strength) + ')');
+            g.addColorStop(1, 'rgba(212, 165, 255, 0)');
+            ctx.strokeStyle = g;
+            ctx.lineWidth = 1.2;
+
+            ctx.beginPath();
+            for (let x = 0; x <= w; x += 8) {
+                const nx = x / w;
+                let y = baseY
+                    + Math.sin(nx * 5 + t * 0.8 + k * 2.2) * h * 0.06
+                    + Math.sin(nx * 11 - t * 0.5 + k * 5) * h * 0.018;
+                if (mouse.x !== null) {
+                    const dx = x - mouse.x;
+                    const dy = y - mouse.y;
+                    const d = Math.hypot(dx, dy);
+                    if (d < BEND) y += (dy / (d || 1)) * (BEND - d) * 0.35;
+                }
+                if (x === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+        }
+    }
+
+    function loop(time) {
+        if (!running) return;
+        draw(time);
+        requestAnimationFrame(loop);
+    }
+
+    function update() {
+        if (!desktop.matches) {
+            running = false;
+            return;
+        }
+        if (onScreen && !document.hidden && !reduceMotion.matches) {
+            if (!running) {
+                running = true;
+                requestAnimationFrame(loop);
+            }
+        } else {
+            running = false;
+            if (reduceMotion.matches) draw(0); // still frame
+        }
+    }
+
+    hero.addEventListener('mousemove', (e) => {
+        const r = hero.getBoundingClientRect();
+        mouse.x = e.clientX - r.left;
+        mouse.y = e.clientY - r.top;
+    });
+    hero.addEventListener('mouseleave', () => {
+        mouse.x = null;
+        mouse.y = null;
+    });
+
+    if ('IntersectionObserver' in window) {
+        new IntersectionObserver((entries) => {
+            onScreen = entries[0].isIntersecting;
+            update();
+        }).observe(hero);
+    }
+    document.addEventListener('visibilitychange', update);
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            if (desktop.matches) {
+                resize();
+                draw(performance.now());
+            }
+        }, 200);
+    });
+    desktop.addEventListener('change', () => {
+        if (desktop.matches) resize();
+        update();
+    });
+
+    if (desktop.matches) {
+        resize();
+        draw(0);
+    }
+    update();
+})();

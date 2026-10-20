@@ -3759,3 +3759,20 @@ section::before {
         box-shadow: 0 0 22px rgba(212, 165, 255, 0.7), 0 0 48px rgba(212, 165, 255, 0.3);
     }
 }
+
+/* ===== Hero "flowing lines" background (desktop only) =====
+   On desktop the flowing-lines canvas replaces the node network.
+   Phones keep the node network exactly as before. */
+.hero-canvas--waves {
+    display: none;
+}
+
+@media (min-width: 769px) {
+    #heroCanvas {
+        display: none;
+    }
+
+    .hero-canvas--waves {
+        display: block;
+    }
+}
