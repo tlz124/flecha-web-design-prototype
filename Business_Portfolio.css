@@ -3776,3 +3776,104 @@ section::before {
         display: block;
     }
 }
+
+/* ===== Checkmarks box: one-at-a-time reveal (desktop only) =====
+   Phones keep the plain ✓ lines exactly as before: the drawn checkmark
+   and the progress hint below are hidden there. On desktop the page holds
+   at this box while each line slides in from the left with its checkmark
+   drawing in, until all three are showing. */
+.reassurance-check-svg,
+.reassurance-hint {
+    display: none;
+}
+
+@media (min-width: 769px) {
+    .reassurance-check-text {
+        display: none;
+    }
+
+    .reassurance-check-svg {
+        display: block;
+        width: 30px;
+        height: 30px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2.6;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    /* Sits along the bottom edge of the box, outside the grid, so the three
+       lines keep exactly the same layout as before. */
+    .process-reassurance {
+        position: relative;
+    }
+
+    .reassurance-hint {
+        display: flex;
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 1rem;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        pointer-events: none;
+    }
+
+    .reassurance-dots {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .reassurance-dots i {
+        width: 28px;
+        height: 3px;
+        border-radius: 2px;
+        background: var(--border-gray);
+        transition: background 0.4s ease, width 0.4s ease;
+    }
+
+    .reassurance-dots i.on {
+        background: var(--purple-accent);
+        width: 44px;
+    }
+
+    .reassurance-hint-text {
+        color: var(--purple-light);
+        font-size: 0.72rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .process-reassurance.is-waiting .reassurance-hint-text {
+        opacity: 1;
+    }
+}
+
+/* Hidden until shown. Only when the script is running ("rs-ready") and the
+   visitor hasn't asked for less motion; otherwise all three just show. */
+@media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
+    .rs-ready .reassurance-item {
+        opacity: 0;
+        transform: translateX(-48px);
+        transition: opacity 0.55s ease, transform 0.65s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .rs-ready .reassurance-item.is-shown {
+        opacity: 1;
+        transform: none;
+    }
+
+    .rs-ready .reassurance-check-svg path {
+        stroke-dasharray: 1;
+        stroke-dashoffset: 1;
+        transition: stroke-dashoffset 0.5s ease-out 0.1s;
+    }
+
+    .rs-ready .reassurance-item.is-shown .reassurance-check-svg path {
+        stroke-dashoffset: 0;
+    }
+}

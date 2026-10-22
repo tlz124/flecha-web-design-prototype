@@ -129,7 +129,7 @@
     <section class="company-intro">
         <div class="container">
             <h2 class="section-title">Welcome to Flecha Web Design</h2>
-            <p class="intro-text">At Flecha Web Design, we specialize in creating purposeful, user-friendly websites for businesses, schools, and nonprofits. Our name, "Flecha" (Spanish for "arrow"), represents our mission: to point your business or organization in the right direction and help you move forward in the digital world.</p>
+            <p class="intro-text">We create purposeful, user-friendly websites for businesses, schools, and nonprofits. Our name, "Flecha" (Spanish for "arrow"), represents our mission: to point your business or organization in the right direction and help you move forward in the digital world.</p>
         </div>
     </section>
 
@@ -328,19 +328,23 @@
             </div>
             <!-- ===== end How It Works desktop scroll layout ===== -->
 
-            <div class="process-reassurance">
+            <!-- Checkmarks. Phones: the same three lines as always (the plain ✓).
+                 Desktop: the page holds here while the lines slide in one at a
+                 time with a drawn checkmark (script at the bottom of this file). -->
+            <div class="process-reassurance" id="reassureHold">
                 <div class="reassurance-item">
-                    <span class="reassurance-icon">✓</span>
+                    <span class="reassurance-icon"><span class="reassurance-check-text">✓</span><svg class="reassurance-check-svg" viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M4 12.5l5 5L20 6"/></svg></span>
                     <p>No technical knowledge needed</p>
                 </div>
                 <div class="reassurance-item">
-                    <span class="reassurance-icon">✓</span>
+                    <span class="reassurance-icon"><span class="reassurance-check-text">✓</span><svg class="reassurance-check-svg" viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M4 12.5l5 5L20 6"/></svg></span>
                     <p>Clear communication, no confusing jargon</p>
                 </div>
                 <div class="reassurance-item">
-                    <span class="reassurance-icon">✓</span>
+                    <span class="reassurance-icon"><span class="reassurance-check-text">✓</span><svg class="reassurance-check-svg" viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M4 12.5l5 5L20 6"/></svg></span>
                     <p>You're in control every step of the way</p>
                 </div>
+                <div class="reassurance-hint" aria-hidden="true"><span class="reassurance-dots"><i></i><i></i><i></i></span><span class="reassurance-hint-text">Scroll &darr;</span></div>
             </div>
         </div>
     </section>
@@ -1193,6 +1197,11 @@
     //  Scrolling up always lets go right away. Menu links, the back-to-top
     //  button and dragging the scrollbar are never blocked.
     //
+    // The checkmarks box just below works the same way (one script controls
+    // both, so they never get in each other's way): when it reaches the
+    // middle of the screen the page holds, each new scroll slides in the
+    // next line, and after the third line has appeared the page lets go.
+    //
     // On phones none of this runs: the block is hidden and no scroll or touch
     // listeners are added, so mobile scrolling is exactly as before.
     (function() {
@@ -1227,6 +1236,18 @@
         let needFreshScroll = false; // ignore leftover momentum until a new scroll starts
         let upAmount = 0;        // upward scrolling added up while held
         const UP_RELEASE = 30;   // px of clear upward scrolling needed to let go
+        let heldBy = null;       // which part is holding the page: 'cards' or 'checks'
+
+        // Checkmarks box
+        const RS_SHOW_MS = 750;  // time for a line to finish sliding in
+        const rsBox = document.getElementById('reassureHold');
+        const rsItems = rsBox ? Array.from(rsBox.querySelectorAll('.reassurance-item')) : [];
+        const rsDots = rsBox ? Array.from(rsBox.querySelectorAll('.reassurance-dots i')) : [];
+        const RS_LAST = rsItems.length - 1;
+        let rsStep = -1;         // last line shown (-1 = none yet)
+        let rsReady = false;     // current line has finished appearing
+        let rsFinished = !rsBox || reduceMotion.matches; // less motion: lines just show, no hold
+        let rsTimer = null;
 
         stage.classList.add('hiw-ready');
 
@@ -1312,6 +1333,7 @@
         }
 
         function hold() {
+            heldBy = 'cards';
             holdY = getHoldY();
             held = true;
             heldAt = performance.now();
@@ -1324,9 +1346,83 @@
         }
 
         function release() {
+            const wasChecks = heldBy === 'checks';
             held = false;
+            heldBy = null;
             upAmount = 0;
             lockPage(false);
+            if (wasChecks) rsRender();
+        }
+
+        // ----- Checkmarks box -----
+        // Hold so the box sits in the middle of the screen (never under the header).
+        function rsHoldY() {
+            const r = rsBox.getBoundingClientRect();
+            const top = r.top + window.scrollY;
+            const centered = top - (window.innerHeight - r.height) / 2;
+            const topAligned = top - headerHeight() - 16;
+            return Math.round(Math.min(centered, topAligned));
+        }
+
+        function rsRender() {
+            if (!rsBox) return;
+            rsItems.forEach((item, k) => item.classList.toggle('is-shown', k <= rsStep));
+            rsDots.forEach((dot, k) => dot.classList.toggle('on', k === rsStep));
+            rsBox.classList.toggle('is-waiting', heldBy === 'checks' && rsReady && !rsFinished);
+        }
+
+        function rsShow(i) {
+            clearTimeout(rsTimer);
+            rsStep = i;
+            rsReady = false;
+            rsRender();
+            rsTimer = setTimeout(() => {
+                rsReady = true;
+                needFreshScroll = true;
+                if (rsStep === RS_LAST) {
+                    rsFinished = true;
+                    if (heldBy === 'checks') release();
+                }
+                rsRender();
+            }, RS_SHOW_MS);
+        }
+
+        function rsHold() {
+            heldBy = 'checks';
+            holdY = rsHoldY();
+            held = true;
+            heldAt = performance.now();
+            needFreshScroll = true;
+            upAmount = 0;
+            lockPage(true);
+            jumpTo(holdY);
+            lastY = holdY;
+            if (rsStep < 0) rsShow(0);
+            else rsRender();
+        }
+
+        function rsReset() {
+            clearTimeout(rsTimer);
+            rsStep = -1;
+            rsReady = false;
+            rsFinished = !rsBox || reduceMotion.matches;
+            if (heldBy === 'checks') release();
+            rsRender();
+        }
+
+        // Next line, once the current one has finished appearing.
+        function rsNext(fresh) {
+            if (!rsReady) return;
+            if (needFreshScroll) {
+                if (!fresh) return;
+                needFreshScroll = false;
+            }
+            if (rsStep < RS_LAST) rsShow(rsStep + 1);
+        }
+
+        // Would this downward scroll reach (or does it sit at) a hold point?
+        function reaches(target, y, dy) {
+            return Math.abs(y - target) <= 1 || (y < target && y + dy >= target);
         }
 
         // Downward scrolling while held: fills the bar once the drawing is done.
@@ -1367,6 +1463,10 @@
                 lastSize = dy;
                 if (held) {
                     if (e.cancelable) e.preventDefault();
+                    if (heldBy === 'checks') {
+                        rsNext(fresh);
+                        return;
+                    }
                     // Leftover glide from the scroll that got us here (or that was
                     // going on while the icon drew) doesn't count. The bar only
                     // fills once a new scroll starts.
@@ -1377,14 +1477,13 @@
                     fillBar(dy);
                     return;
                 }
-                if (!finished) {
-                    const y = window.scrollY;
-                    const target = getHoldY();
-                    // This scroll would reach (or already sits at) the hold point.
-                    if (Math.abs(y - target) <= 1 || (y < target && y + dy >= target)) {
-                        if (e.cancelable) e.preventDefault();
-                        hold();
-                    }
+                const y = window.scrollY;
+                if (!finished && reaches(getHoldY(), y, dy)) {
+                    if (e.cancelable) e.preventDefault();
+                    hold();
+                } else if (!rsFinished && reaches(rsHoldY(), y, dy)) {
+                    if (e.cancelable) e.preventDefault();
+                    rsHold();
                 }
             } else if (dy < 0) {
                 if (!held) return;
@@ -1437,7 +1536,8 @@
                 lastDownInput = performance.now();
                 if (held) {
                     e.preventDefault();
-                    fillBar(window.innerHeight * SCROLL_FRACTION); // one key press = one card
+                    if (heldBy === 'checks') rsNext(true);               // one key press = one line
+                    else fillBar(window.innerHeight * SCROLL_FRACTION);  // one key press = one card
                 }
             } else if (up && held) {
                 release();
@@ -1455,11 +1555,15 @@
                     if (now - heldAt < 600 || now - lastDownInput < 250) jumpTo(holdY);
                     else release();
                 }
-            } else if (!finished && now - lastDownInput < 250) {
-                // A fast scroll jumped past the hold point: bring it back.
-                const target = getHoldY();
-                if (lastY < target - 1 && y >= target - 1) hold();
+            } else if (now - lastDownInput < 250) {
+                // A fast scroll jumped past a hold point: bring it back.
+                if (!finished && lastY < getHoldY() - 1 && y >= getHoldY() - 1) hold();
+                else if (!rsFinished && lastY < rsHoldY() - 1 && y >= rsHoldY() - 1) rsHold();
             }
+
+            // Back above the checkmarks box entirely: replay it next time.
+            if (rsBox && heldBy !== 'checks' && rsBox.getBoundingClientRect().top > window.innerHeight &&
+                (rsStep >= 0 || rsFinished)) rsReset();
 
             const r = stage.getBoundingClientRect();
             // Back above the section entirely: start fresh next time.
@@ -1476,7 +1580,7 @@
         function onResize() {
             stage.style.setProperty('--hiw-header', headerHeight() + 'px');
             if (held) {
-                holdY = getHoldY();
+                holdY = heldBy === 'checks' ? rsHoldY() : getHoldY();
                 jumpTo(holdY);
             }
         }
@@ -1491,6 +1595,7 @@
             window.addEventListener('keydown', onKeyDown);
             window.addEventListener('scroll', onScroll, { passive: true });
             window.addEventListener('resize', onResize);
+            if (rsBox) rsBox.classList.add('rs-ready');
             onResize();
             onScroll();
         }
@@ -1504,6 +1609,8 @@
             window.removeEventListener('scroll', onScroll);
             window.removeEventListener('resize', onResize);
             reset();
+            rsReset();
+            if (rsBox) rsBox.classList.remove('rs-ready');
             lockPage(false);
         }
 
