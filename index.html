@@ -142,11 +142,15 @@
                 <div class="before-we-meet-text">
                     <div class="before-we-meet-badge">Start Here</div>
                     <h3 class="before-we-meet-title">Before Your Consultation</h3>
-                    <p class="before-we-meet-desc">Before we meet, we ask you to complete a short questionnaire about your organization, goals, and vision. This helps us make the most of our time together and come prepared with the right questions and ideas.</p>
+                    <!-- Phones show the full text; desktop shows the short version (Business_Portfolio.css). -->
+                    <p class="before-we-meet-desc before-we-meet-desc--full">Before we meet, we ask you to complete a short questionnaire about your organization, goals, and vision. This helps us make the most of our time together and come prepared with the right questions and ideas.</p>
+                    <p class="before-we-meet-desc before-we-meet-desc--short">A few quick questions about your goals, so we come to your consultation prepared.</p>
                 </div>
                 <div class="before-we-meet-actions">
                     <a href="flecha-client-questionnaire.pdf" download class="step-q-btn step-q-btn--download"><span>⬇</span> Download PDF</a>
                     <a href="questionnaire.html" target="_blank" class="step-q-btn step-q-btn--online"><span>✏</span> Fill Out Online</a>
+                    <!-- Desktop only: the PDF as a small link under the button (phones keep the Download PDF button above). -->
+                    <p class="pdf-link-note">Prefer paper? <a href="flecha-client-questionnaire.pdf" download>Download the PDF &darr;</a></p>
                 </div>
             </div>
         </div>

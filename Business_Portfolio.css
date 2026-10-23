@@ -3877,3 +3877,41 @@ section::before {
         stroke-dashoffset: 0;
     }
 }
+
+/* ===== "Before Your Consultation" box: desktop-only changes =====
+   Phones keep the full paragraph and both buttons exactly as before.
+   Desktop shows the short sentence, and the PDF moves from a button to a
+   small "Prefer paper?" link under the Fill Out Online button. */
+.before-we-meet-desc--short,
+.pdf-link-note {
+    display: none;
+}
+
+@media (min-width: 769px) {
+    .before-we-meet-desc--full,
+    .before-we-meet-actions .step-q-btn--download {
+        display: none;
+    }
+
+    .before-we-meet-desc--short {
+        display: block;
+    }
+
+    .pdf-link-note {
+        display: block;
+        margin: 0;
+        font-size: 0.85rem;
+        color: var(--text-gray);
+        text-align: center;
+    }
+
+    .pdf-link-note a {
+        color: var(--purple-accent);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
+
+    .pdf-link-note a:hover {
+        color: var(--purple-light);
+    }
+}
