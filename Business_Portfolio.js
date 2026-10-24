@@ -959,8 +959,8 @@ document.querySelectorAll('.pricing-feature-toggle').forEach(btn => {
 
             const g = ctx.createLinearGradient(0, 0, w, 0);
             g.addColorStop(0, 'rgba(102, 126, 234, 0)');
-            g.addColorStop(0.3, 'rgba(102, 126, 234, ' + (0.18 + 0.25 * strength) + ')');
-            g.addColorStop(0.7, 'rgba(212, 165, 255, ' + (0.2 + 0.3 * strength) + ')');
+			g.addColorStop(0.3, 'rgba(102, 126, 234, ' + (0.35 + 0.4 * strength) + ')');
+            g.addColorStop(0.7, 'rgba(212, 165, 255, ' + (0.4 + 0.45 * strength) + ')');
             g.addColorStop(1, 'rgba(212, 165, 255, 0)');
             ctx.strokeStyle = g;
             ctx.lineWidth = 1.2;
