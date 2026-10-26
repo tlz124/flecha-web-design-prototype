@@ -1045,3 +1045,40 @@ document.querySelectorAll('.pricing-feature-toggle').forEach(btn => {
     }
     update();
 })();
+
+// ===== Intro Section Pulsing Squares (desktop only, 769px and wider) =====
+// Fills the intro section with a grid of squares; about 1 in 8 gently
+// pulse. Phones never build the grid (it is also hidden there by CSS).
+(function() {
+    const layer = document.getElementById('introTiles');
+    if (!layer) return;
+    const desktop = window.matchMedia('(min-width: 769px)');
+    const SIZE = 60; // 52px square + 8px gap
+
+    function build() {
+        layer.innerHTML = '';
+        if (!desktop.matches) return;
+        const cols = Math.ceil(layer.offsetWidth / SIZE);
+        const rows = Math.ceil(layer.offsetHeight / SIZE);
+        const frag = document.createDocumentFragment();
+        for (let i = 0; i < cols * rows; i++) {
+            const tile = document.createElement('div');
+            tile.className = 'intro-tile';
+            if (Math.random() < 0.13) {
+                tile.classList.add('is-lit');
+                tile.style.setProperty('--d', (3 + Math.random() * 3).toFixed(1) + 's');
+                tile.style.setProperty('--w', (-Math.random() * 6).toFixed(1) + 's');
+            }
+            frag.appendChild(tile);
+        }
+        layer.appendChild(frag);
+    }
+
+    let timer;
+    window.addEventListener('resize', () => {
+        clearTimeout(timer);
+        timer = setTimeout(build, 250);
+    });
+    desktop.addEventListener('change', build);
+    build();
+})();

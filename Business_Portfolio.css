@@ -3897,6 +3897,10 @@ section::before {
         display: block;
     }
 
+    .before-we-meet-actions .step-q-btn--online {
+        justify-content: center;
+    }
+
     .pdf-link-note {
         display: block;
         margin: 0;
@@ -3913,5 +3917,116 @@ section::before {
 
     .pdf-link-note a:hover {
         color: var(--purple-light);
+    }
+}
+
+/* ===== "Follow us on X" link in the desktop footer =====
+   Lives inside .footer-desktop, which is already hidden on phones. */
+.footer-follow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1.25rem;
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.footer-follow-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border-gray);
+    border-radius: 50%;
+    color: var(--text-white);
+    font-size: 0.9rem;
+    transition: border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.footer-follow:hover,
+.footer-follow:focus-visible {
+    color: var(--purple-accent);
+}
+
+.footer-follow:hover .footer-follow-icon,
+.footer-follow:focus-visible .footer-follow-icon {
+    border-color: var(--purple-accent);
+    color: var(--purple-accent);
+    box-shadow: 0 0 12px rgba(212, 165, 255, 0.3);
+}
+
+/* ===== Contact form box: soft pulsing purple glow (desktop only) ===== */
+@media (min-width: 769px) {
+    .contact .consultation-form {
+        border-color: rgba(212, 165, 255, 0.45);
+        box-shadow: 0 0 14px rgba(212, 165, 255, 0.22), 0 0 34px rgba(212, 165, 255, 0.10);
+    }
+}
+@media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
+    .contact .consultation-form {
+        animation: contact-glow-breathe 3.2s ease-in-out infinite;
+    }
+}
+@keyframes contact-glow-breathe {
+    50% {
+        border-color: rgba(212, 165, 255, 0.75);
+        box-shadow: 0 0 22px rgba(212, 165, 255, 0.38), 0 0 52px rgba(212, 165, 255, 0.18);
+    }
+}
+
+/* ===== Intro section: pulsing square grid (desktop only) ===== */
+.intro-tiles {
+    display: none;
+}
+@media (min-width: 769px) {
+    .company-intro {
+        overflow: hidden;
+    }
+    .company-intro .container {
+        position: relative;
+        z-index: 1;
+    }
+    .intro-tiles {
+        display: grid;
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        grid-template-columns: repeat(auto-fill, 52px);
+        grid-auto-rows: 52px;
+        gap: 8px;
+        padding: 8px;
+        justify-content: center;
+        /* keeps the middle clear so the text stays easy to read */
+        -webkit-mask-image: radial-gradient(ellipse 42% 62% at 50% 50%, transparent 55%, #000 100%);
+                mask-image: radial-gradient(ellipse 42% 62% at 50% 50%, transparent 55%, #000 100%);
+    }
+    .intro-tile {
+        border: 1px solid rgba(212, 165, 255, 0.18);
+        border-radius: 4px;
+    }
+    .intro-tile.is-lit {
+        border-color: rgba(212, 165, 255, 0.4);
+    }
+}
+@media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
+    .intro-tile.is-lit {
+        animation: intro-tile-pulse var(--d, 4s) ease-in-out var(--w, 0s) infinite;
+    }
+}
+@keyframes intro-tile-pulse {
+    0%, 100% {
+        background: transparent;
+        border-color: rgba(212, 165, 255, 0.18);
+        box-shadow: none;
+    }
+    50% {
+        background: rgba(212, 165, 255, 0.2);
+        border-color: rgba(212, 165, 255, 0.75);
+        box-shadow: 0 0 16px rgba(212, 165, 255, 0.4);
     }
 }
