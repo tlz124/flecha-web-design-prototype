@@ -1082,3 +1082,91 @@ document.querySelectorAll('.pricing-feature-toggle').forEach(btn => {
     desktop.addEventListener('change', build);
     build();
 })();
+
+// ===== "Before Your Consultation" Pulsing Circles (desktop only, 769px and wider) =====
+// Places glowing circles in the space around the box (never inside it).
+// Circles near the mouse fade away and come back when the mouse moves on.
+// Phones never build them (the layer is also hidden there by CSS).
+(function() {
+    const layer = document.getElementById('bwmCircles');
+    const section = document.getElementById('questionnaire');
+    const box = section ? section.querySelector('.before-we-meet-content') : null;
+    if (!layer || !section || !box) return;
+    const desktop = window.matchMedia('(min-width: 769px)');
+    const COUNT = 22;   // how many circles
+    const NEAR = 110;   // how close (px) the mouse must be to make a circle vanish
+    let circles = [];
+
+    function build() {
+        layer.innerHTML = '';
+        circles = [];
+        if (!desktop.matches) return;
+        const s = section.getBoundingClientRect();
+        const b = box.getBoundingClientRect();
+        const bx = { l: b.left - s.left, t: b.top - s.top, r: b.right - s.left, btm: b.bottom - s.top };
+        const W = s.width;
+        const H = s.height;
+        let tries = 0;
+        while (circles.length < COUNT && tries < 2000) {
+            tries++;
+            const size = 14 + Math.random() * 26;
+            const half = size / 2 + 6;
+            const x = half + Math.random() * (W - half * 2);
+            const y = half + Math.random() * (H - half * 2);
+            // skip spots that would touch the box
+            if (x > bx.l - half && x < bx.r + half && y > bx.t - half && y < bx.btm + half) continue;
+            // skip spots that overlap another circle
+            if (circles.some(c => Math.hypot(c.x - x, c.y - y) < (c.size + size) / 2 + 10)) continue;
+            const el = document.createElement('span');
+            el.className = 'bwm-circle';
+            el.style.cssText = 'left:' + x.toFixed(1) + 'px;top:' + y.toFixed(1) + 'px;width:' + size.toFixed(1) + 'px;height:' + size.toFixed(1) + 'px';
+            el.style.setProperty('--d', (3 + Math.random() * 3).toFixed(1) + 's');
+            el.style.setProperty('--w', (-Math.random() * 6).toFixed(1) + 's');
+            layer.appendChild(el);
+            circles.push({ el: el, x: x, y: y, size: size });
+        }
+    }
+
+    section.addEventListener('mousemove', (e) => {
+        if (!circles.length) return;
+        const s = section.getBoundingClientRect();
+        const mx = e.clientX - s.left;
+        const my = e.clientY - s.top;
+        circles.forEach(c => {
+            c.el.classList.toggle('is-gone', Math.hypot(mx - c.x, my - c.y) < NEAR);
+        });
+    });
+    section.addEventListener('mouseleave', () => {
+        circles.forEach(c => c.el.classList.remove('is-gone'));
+    });
+
+    let timer;
+    window.addEventListener('resize', () => {
+        clearTimeout(timer);
+        timer = setTimeout(build, 250);
+    });
+    desktop.addEventListener('change', build);
+    window.addEventListener('load', build);
+    build();
+})();
+
+// ===== Essential Pricing Card Flip (desktop and mobile) =====
+// "Flip" turns the card over to show the price breakdown; "Flip back"
+// returns it. The hidden side is made unclickable so keyboard and screen
+// reader users only ever reach the side that is showing.
+document.querySelectorAll('.pricing-card--flip').forEach(card => {
+    const front = card.querySelector('.pcf-front');
+    const back = card.querySelector('.pcf-back');
+    if (!front || !back) return;
+
+    function setFlipped(flipped) {
+        card.classList.toggle('is-flipped', flipped);
+        front.inert = flipped;
+        back.inert = !flipped;
+        const showing = flipped ? back : front;
+        setTimeout(() => showing.querySelector('.pcf-btn').focus({ preventScroll: true }), 350);
+    }
+
+    front.querySelector('.pcf-btn').addEventListener('click', () => setFlipped(true));
+    back.querySelector('.pcf-btn').addEventListener('click', () => setFlipped(false));
+});

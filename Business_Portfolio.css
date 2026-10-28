@@ -4030,3 +4030,251 @@ section::before {
         box-shadow: 0 0 16px rgba(212, 165, 255, 0.4);
     }
 }
+
+/* ===== "Before Your Consultation": pulsing circles around the box (desktop only) =====
+   Circles sit only in the space outside the box and fade away near the
+   cursor. The box itself gets a solid background so nothing shows inside. */
+.bwm-circles {
+    display: none;
+}
+
+@media (min-width: 769px) {
+    .bwm-circles {
+        display: block;
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    .before-we-meet .container {
+        position: relative;
+        z-index: 1;
+    }
+
+    .before-we-meet-content {
+        background: #100e12;
+    }
+
+    .bwm-circle {
+        position: absolute;
+        border-radius: 50%;
+        border: 1.5px solid rgba(212, 165, 255, 0.55);
+        box-shadow: 0 0 10px rgba(212, 165, 255, 0.25), inset 0 0 8px rgba(212, 165, 255, 0.15);
+        transform: translate(-50%, -50%);
+        transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    .bwm-circle.is-gone {
+        opacity: 0 !important;
+        transform: translate(-50%, -50%) scale(0.4);
+    }
+}
+
+@media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
+    .bwm-circle {
+        animation: bwm-circle-pulse var(--d, 4s) ease-in-out var(--w, 0s) infinite;
+    }
+}
+
+@keyframes bwm-circle-pulse {
+    0%, 100% {
+        opacity: 0.35;
+        scale: 0.9;
+        background: transparent;
+    }
+    50% {
+        opacity: 1;
+        scale: 1.08;
+        background: rgba(212, 165, 255, 0.08);
+    }
+}
+
+/* ===== Essential pricing card: flips over to show the price breakdown =====
+   Desktop AND mobile. Only the Essential (Non E-Commerce) card uses this. */
+.pricing-card--flip {
+    border: none;
+    overflow: visible;
+    perspective: 1600px;
+    display: flex;
+    flex-direction: column;
+}
+
+.pcf-inner {
+    flex: 1;
+    display: grid;
+    position: relative;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    transition: transform 0.7s cubic-bezier(0.4, 0.2, 0.2, 1);
+}
+
+.pricing-card--flip.is-flipped .pcf-inner {
+    transform: rotateY(180deg);
+}
+
+.pcf-face {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border-gray);
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--dark-gray);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transition: border-color 0.3s ease;
+}
+
+.pcf-face .pricing-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.pcf-face .pricing-features {
+    flex: 1;
+}
+
+/* keeps the total right under the list; spare space goes below it */
+.pcf-total {
+    margin-bottom: auto !important;
+}
+
+.pricing-card--flip:hover .pcf-face {
+    border-color: var(--purple-accent);
+}
+
+.pcf-back {
+    transform: rotateY(180deg);
+}
+
+.pcf-face .pricing-header {
+    position: relative;
+}
+
+/* "Flip" button */
+.pcf-btn {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: transparent;
+    border: 1px solid rgba(212, 165, 255, 0.45);
+    border-radius: 999px;
+    color: var(--purple-accent);
+    padding: 0.3rem 0.8rem;
+    font-family: inherit;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pcf-btn svg {
+    width: 12px;
+    height: 12px;
+}
+
+.pcf-btn:hover {
+    background: var(--purple-accent);
+    border-color: var(--purple-accent);
+    color: var(--black);
+    box-shadow: 0 0 12px rgba(212, 165, 255, 0.4);
+}
+
+.pcf-btn:focus-visible {
+    outline: 2px solid var(--purple-accent);
+    outline-offset: 3px;
+}
+
+/* Back side */
+.pcf-kicker {
+    color: var(--text-gray);
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.pcf-back .pricing-name {
+    margin-bottom: 0.4rem;
+}
+
+.pcf-rows {
+    list-style: none;
+    margin: 0;
+}
+
+.pcf-rows li {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border-gray);
+    color: var(--text-light);
+    font-size: 0.92rem;
+    line-height: 1.4;
+}
+
+.pcf-rows small {
+    display: block;
+    color: var(--text-gray);
+    font-size: 0.78rem;
+    margin-top: 0.15rem;
+}
+
+.pcf-rows b {
+    color: var(--text-white);
+    white-space: nowrap;
+}
+
+.pcf-total {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.9rem 0 1.25rem;
+    margin: 0;
+    font-weight: 800;
+    font-size: 1.05rem;
+}
+
+.pcf-total b {
+    color: var(--purple-accent);
+}
+
+/* Phones: tighter back side so the card stays the same height as before */
+@media (max-width: 768px) {
+    .pcf-back .pricing-header {
+        padding-top: 2.75rem;
+        padding-bottom: 1.25rem;
+    }
+
+    .pcf-back .pricing-body {
+        padding-top: 1rem;
+        padding-bottom: 1.5rem;
+    }
+
+    .pcf-rows li {
+        padding: 0.45rem 0;
+        font-size: 0.88rem;
+    }
+
+    .pcf-rows small {
+        font-size: 0.74rem;
+    }
+
+    .pcf-total {
+        padding: 0.7rem 0 1rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pcf-inner {
+        transition: none;
+    }
+}
