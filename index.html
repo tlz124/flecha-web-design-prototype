@@ -542,41 +542,71 @@
                     </div>
                 </div>
 
-                <!-- Tier 2: Essential Plus -->
-                <div class="pricing-card pricing-card-featured">
-                    <!-- <div class="pricing-featured-label"></div> -->
-                    <div class="pricing-header">
-                        <h3 class="pricing-name">ESSENTIAL PLUS</h3>
-                        <div class="pricing-amount">
-                            <span class="pricing-total">$3,000</span>
-                            <span class="pricing-label">Total Project Price</span>
-                        </div>
-                    </div>
-                    <div class="pricing-body">
-                        <ul class="pricing-features">
-                            <li class="pricing-feature-expandable">
-                                <div class="pricing-feature-header">
-                                    <span>✓ Everything in Essential</span>
-                                    <button class="pricing-feature-toggle" aria-label="Show Essential features">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                                    </button>
+                <!-- Tier 2: Essential Plus (flips over to show the price breakdown) -->
+                <div class="pricing-card pricing-card-featured pricing-card--flip">
+                    <div class="pcf-inner">
+
+                        <!-- Front -->
+                        <div class="pcf-face pcf-front">
+                            <div class="pricing-header">
+                                <button type="button" class="pcf-btn" aria-label="Flip to see what the Essential Plus price includes"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8a6 6 0 0 1 10.2-4.2L14 5.5"/><path d="M14 2v3.5h-3.5"/><path d="M14 8a6 6 0 0 1-10.2 4.2L2 10.5"/><path d="M2 14v-3.5h3.5"/></svg>Flip</button>
+                                <h3 class="pricing-name">ESSENTIAL PLUS</h3>
+                                <div class="pricing-amount">
+                                    <span class="pricing-total">$3,000</span>
+                                    <span class="pricing-label">Total Project Price</span>
                                 </div>
-                                <ul class="pricing-feature-sub">
-                                    <li>— Mobile Responsive Design</li>
-                                    <li>— Photo Gallery</li>
-                                    <li>— Contact Form</li>
-                                    <li>— Business Hours, Location & Google Maps</li>
-                                    <li>— Social Media Links</li>
+                            </div>
+                            <div class="pricing-body">
+                                <ul class="pricing-features">
+                                    <li class="pricing-feature-expandable">
+                                        <div class="pricing-feature-header">
+                                            <span>✓ Everything in Essential</span>
+                                            <button class="pricing-feature-toggle" aria-label="Show Essential features">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                            </button>
+                                        </div>
+                                        <ul class="pricing-feature-sub">
+                                            <li>— Mobile Responsive Design</li>
+                                            <li>— Photo Gallery</li>
+                                            <li>— Contact Form</li>
+                                            <li>— Business Hours, Location & Google Maps</li>
+                                            <li>— Social Media Links</li>
+                                        </ul>
+                                    </li>
+                                    <li>✓ Product Catalog with Pricing</li>
+                                    <li>✓ Delivery Area Section</li>
+                                    <li>✓ Testimonials Section</li>
+                                    <li>✓ Expanded Navigation</li>
                                 </ul>
-                            </li>
-                            <li>✓ Product Catalog with Pricing</li>
-                            <li>✓ Delivery Area Section</li>
-                            <li>✓ Testimonials Section</li>
-                            <li>✓ Expanded Navigation</li>
-                        </ul>
-                        <a href="#contact" class="pricing-cta">
-                            Request Consultation <span class="arrow-icon">→</span>
-                        </a>
+                                <a href="#contact" class="pricing-cta">
+                                    Request Consultation <span class="arrow-icon">→</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Back: price breakdown (edit the amounts here) -->
+                        <div class="pcf-face pcf-back" inert>
+                            <div class="pricing-header">
+                                <button type="button" class="pcf-btn" aria-label="Flip back to the Essential Plus card"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8a6 6 0 0 1 10.2-4.2L14 5.5"/><path d="M14 2v3.5h-3.5"/><path d="M14 8a6 6 0 0 1-10.2 4.2L2 10.5"/><path d="M2 14v-3.5h3.5"/></svg>Flip back</button>
+                                <h3 class="pricing-name">ESSENTIAL PLUS</h3>
+                                <p class="pcf-kicker">Where your $3,000 goes</p>
+                            </div>
+                            <div class="pricing-body">
+                                <ul class="pcf-rows">
+                                    <li class="pcf-carry"><span>Everything in Essential<small>The full $1,000 package</small></span><b>$1,000</b></li>
+                                    <li><span>Product catalog<small>Each item with photo, details and price</small></span><b>$800</b></li>
+                                    <li><span>Expanded navigation<small>More pages, and menus to organize them</small></span><b>$500</b></li>
+                                    <li><span>Delivery area section<small>Shows customers where you deliver</small></span><b>$250</b></li>
+                                    <li><span>Testimonials section<small>Reviews from happy customers</small></span><b>$250</b></li>
+                                    <li><span>Extra review rounds<small>More chances to request changes</small></span><b>$200</b></li>
+                                </ul>
+                                <p class="pcf-total"><span>Total</span><b>$3,000</b></p>
+                                <a href="#contact" class="pricing-cta">
+                                    Request Consultation <span class="arrow-icon">→</span>
+                                </a>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 

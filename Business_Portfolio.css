@@ -4278,3 +4278,44 @@ section::before {
         transition: none;
     }
 }
+
+/* ===== Essential Plus flip card: keeps its purple "featured" border on both sides ===== */
+.pricing-card-featured.pricing-card--flip .pcf-face {
+    border-color: var(--purple-accent);
+}
+
+.pcf-carry span {
+    color: var(--purple-light);
+}
+
+/* Six-line breakdown: a little tighter so the card stays its normal height */
+.pricing-card-featured .pcf-back .pricing-header {
+    padding-bottom: 1.25rem;
+}
+
+.pricing-card-featured .pcf-back .pricing-body {
+    padding-top: 1.5rem;
+}
+
+.pricing-card-featured .pcf-rows li {
+    padding: 0.45rem 0;
+}
+
+@media (max-width: 768px) {
+    .pricing-card-featured .pcf-rows li {
+        padding: 0.3rem 0;
+    }
+
+    .pricing-card-featured .pcf-back .pricing-body {
+        padding-top: 0.75rem;
+    }
+}
+
+/* ===== Phones & small tablets: room above the swipeable price cards =====
+   When a card is tapped it lifts up a little and glows. The swipe row was
+   cutting off the top of the card, so the row gets a bit of space on top. */
+@media (max-width: 968px) {
+    .pricing-grid {
+        padding-top: 1rem;
+    }
+}
