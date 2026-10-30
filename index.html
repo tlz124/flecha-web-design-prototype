@@ -610,44 +610,74 @@
                     </div>
                 </div>
 
-                <!-- Tier 3: Custom -->
-                <div class="pricing-card">
-                    <div class="pricing-header">
-                        <h3 class="pricing-name">Custom</h3>
-                        <div class="pricing-amount">
-                            <span class="pricing-total">$5,000+</span>
-                            <span class="pricing-label">Starting Price</span>
-                        </div>
-                    </div>
-                    <div class="pricing-body">
-                        <ul class="pricing-features">
-                            <li class="pricing-feature-expandable">
-                                <div class="pricing-feature-header">
-                                    <span>✓ Everything in Tier 2</span>
-                                    <button class="pricing-feature-toggle" aria-label="Show Tier 2 features">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                                    </button>
+                <!-- Tier 3: Custom (flips over to show the price breakdown) -->
+                <div class="pricing-card pricing-card--flip pricing-card--flip-custom">
+                    <div class="pcf-inner">
+
+                        <!-- Front -->
+                        <div class="pcf-face pcf-front">
+                            <div class="pricing-header">
+                                <button type="button" class="pcf-btn" aria-label="Flip to see what the Custom price includes"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8a6 6 0 0 1 10.2-4.2L14 5.5"/><path d="M14 2v3.5h-3.5"/><path d="M14 8a6 6 0 0 1-10.2 4.2L2 10.5"/><path d="M2 14v-3.5h3.5"/></svg>Flip</button>
+                                <h3 class="pricing-name">Custom</h3>
+                                <div class="pricing-amount">
+                                    <span class="pricing-total">$5,000+</span>
+                                    <span class="pricing-label">Starting Price</span>
                                 </div>
-                                <ul class="pricing-feature-sub">
-                                    <li>— Mobile Responsive Design</li>
-                                    <li>— Photo Gallery</li>
-                                    <li>— Contact Form</li>
-                                    <li>— Business Hours, Location & Google Maps</li>
-                                    <li>— Social Media Links</li>
-                                    <li>— Product Catalog with Pricing</li>
-                                    <li>— Delivery Area Section</li>
-                                    <li>— Testimonials Section</li>
-                                    <li>— Expanded Navigation</li>
+                            </div>
+                            <div class="pricing-body">
+                                <ul class="pricing-features">
+                                    <li class="pricing-feature-expandable">
+                                        <div class="pricing-feature-header">
+                                            <span>✓ Everything in Tier 2</span>
+                                            <button class="pricing-feature-toggle" aria-label="Show Tier 2 features">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                            </button>
+                                        </div>
+                                        <ul class="pricing-feature-sub">
+                                            <li>— Mobile Responsive Design</li>
+                                            <li>— Photo Gallery</li>
+                                            <li>— Contact Form</li>
+                                            <li>— Business Hours, Location & Google Maps</li>
+                                            <li>— Social Media Links</li>
+                                            <li>— Product Catalog with Pricing</li>
+                                            <li>— Delivery Area Section</li>
+                                            <li>— Testimonials Section</li>
+                                            <li>— Expanded Navigation</li>
+                                        </ul>
+                                    </li>
+                                    <li>✓ Complex Functionality</li>
+                                    <li>✓ Custom Quote Based on Scope</li>
+                                    <li>✓ Priority Support</li>
+                                    <li>✓ Extended Launch Support</li>
                                 </ul>
-                            </li>
-                            <li>✓ Complex Functionality</li>
-                            <li>✓ Custom Quote Based on Scope</li>
-                            <li>✓ Priority Support</li>
-                            <li>✓ Extended Launch Support</li>
-                        </ul>
-                        <a href="#contact" class="pricing-cta">
-                            Request Consultation <span class="arrow-icon">→</span>
-                        </a>
+                                <a href="#contact" class="pricing-cta">
+                                    Request Consultation <span class="arrow-icon">→</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Back: price breakdown (edit the amounts here) -->
+                        <div class="pcf-face pcf-back" inert>
+                            <div class="pricing-header">
+                                <button type="button" class="pcf-btn" aria-label="Flip back to the Custom card"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8a6 6 0 0 1 10.2-4.2L14 5.5"/><path d="M14 2v3.5h-3.5"/><path d="M14 8a6 6 0 0 1-10.2 4.2L2 10.5"/><path d="M2 14v-3.5h3.5"/></svg>Flip back</button>
+                                <h3 class="pricing-name">Custom</h3>
+                                <p class="pcf-kicker">Where your $5,000+ goes</p>
+                            </div>
+                            <div class="pricing-body">
+                                <ul class="pcf-rows">
+                                    <li class="pcf-carry"><span>Everything in Essential Plus<small>The full $3,000 package</small></span><b>$3,000</b></li>
+                                    <li><span>Custom features<small>Booking, logins, or whatever you need built</small></span><b>from $1,200</b></li>
+                                    <li><span>Priority support<small>Your requests go to the front of the line</small></span><b>$400</b></li>
+                                    <li><span>Extended launch support<small>Help and fixes for weeks after going live</small></span><b>$400</b></li>
+                                </ul>
+                                <p class="pcf-total"><span>Starting total</span><b>$5,000+</b></p>
+                                <p class="pcf-fine">Your final price depends on what you need. We'll give you an exact quote after your free consultation.</p>
+                                <a href="#contact" class="pricing-cta">
+                                    Request Consultation <span class="arrow-icon">→</span>
+                                </a>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 

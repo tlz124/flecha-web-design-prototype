@@ -4319,3 +4319,23 @@ section::before {
         padding-top: 1rem;
     }
 }
+
+/* ===== Custom flip card: note under the starting total ===== */
+.pcf-fine {
+    color: var(--text-gray);
+    font-size: 0.8rem;
+    font-style: italic;
+    line-height: 1.5;
+    margin: 0 0 1.25rem;
+}
+
+/* the note sits right under the total; spare space goes below the note */
+.pricing-card--flip-custom .pcf-total {
+    margin-bottom: 0 !important;
+    padding-bottom: 0.6rem;
+}
+
+.pricing-card--flip-custom .pcf-fine {
+    margin-bottom: auto;
+    padding-bottom: 1.25rem;
+}
