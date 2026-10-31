@@ -4339,3 +4339,31 @@ section::before {
     margin-bottom: auto;
     padding-bottom: 1.25rem;
 }
+
+/* ===== E-Com Essential flip card: six-line breakdown, a little tighter
+   so the card stays its normal height ===== */
+.pricing-card--flip-six .pcf-back .pricing-header {
+    padding-bottom: 1.25rem;
+}
+
+.pricing-card--flip-six .pcf-back .pricing-body {
+    padding-top: 1.5rem;
+}
+
+.pricing-card--flip-six .pcf-rows li {
+    padding: 0.45rem 0;
+}
+
+@media (max-width: 768px) {
+    .pricing-card--flip-six .pcf-rows li {
+        padding: 0.25rem 0;
+    }
+
+    .pricing-card--flip-six .pcf-back .pricing-header {
+        padding-bottom: 0.75rem;
+    }
+
+    .pricing-card--flip-six .pcf-back .pricing-body {
+        padding-top: 0.6rem;
+    }
+}

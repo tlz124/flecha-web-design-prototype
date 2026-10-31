@@ -686,26 +686,57 @@
             <!-- E-Commerce Pricing -->
             <div class="pricing-grid" id="ecomPricing" style="display:none;">
 
-                <!-- E-Com Tier 1 -->
-                <div class="pricing-card">
-                    <div class="pricing-header">
-                        <h3 class="pricing-name">E-Com Essential</h3>
-                        <div class="pricing-amount">
-                            <span class="pricing-total">$2,500</span>
-                            <span class="pricing-label">Total Project Price</span>
+                <!-- E-Com Tier 1 (flips over to show the price breakdown) -->
+                <div class="pricing-card pricing-card--flip pricing-card--flip-six">
+                    <div class="pcf-inner">
+
+                        <!-- Front -->
+                        <div class="pcf-face pcf-front">
+                            <div class="pricing-header">
+                                <button type="button" class="pcf-btn" aria-label="Flip to see what the E-Com Essential price includes"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8a6 6 0 0 1 10.2-4.2L14 5.5"/><path d="M14 2v3.5h-3.5"/><path d="M14 8a6 6 0 0 1-10.2 4.2L2 10.5"/><path d="M2 14v-3.5h3.5"/></svg>Flip</button>
+                                <h3 class="pricing-name">E-Com Essential</h3>
+                                <div class="pricing-amount">
+                                    <span class="pricing-total">$2,500</span>
+                                    <span class="pricing-label">Total Project Price</span>
+                                </div>
+                            </div>
+                            <div class="pricing-body">
+                                <ul class="pricing-features">
+                                    <li>✓ Mobile Responsive Design</li>
+                                    <li>✓ Online Store Setup</li>
+                                    <li>✓ Up to 25 Products</li>
+                                    <li>✓ Secure Checkout</li>
+                                    <li>✓ Payment Gateway Integration</li>
+                                </ul>
+                                <a href="#contact" class="pricing-cta">
+                                    Request Consultation <span class="arrow-icon">→</span>
+                                </a>
+                            </div>
                         </div>
-                    </div>
-                    <div class="pricing-body">
-                        <ul class="pricing-features">
-                            <li>✓ Mobile Responsive Design</li>
-                            <li>✓ Online Store Setup</li>
-                            <li>✓ Up to 25 Products</li>
-                            <li>✓ Secure Checkout</li>
-                            <li>✓ Payment Gateway Integration</li>
-                        </ul>
-                        <a href="#contact" class="pricing-cta">
-                            Request Consultation <span class="arrow-icon">→</span>
-                        </a>
+
+                        <!-- Back: price breakdown (edit the amounts here) -->
+                        <div class="pcf-face pcf-back" inert>
+                            <div class="pricing-header">
+                                <button type="button" class="pcf-btn" aria-label="Flip back to the E-Com Essential card"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8a6 6 0 0 1 10.2-4.2L14 5.5"/><path d="M14 2v3.5h-3.5"/><path d="M14 8a6 6 0 0 1-10.2 4.2L2 10.5"/><path d="M2 14v-3.5h3.5"/></svg>Flip back</button>
+                                <h3 class="pricing-name">E-Com Essential</h3>
+                                <p class="pcf-kicker">Where your $2,500 goes</p>
+                            </div>
+                            <div class="pricing-body">
+                                <ul class="pcf-rows">
+                                    <li><span>Design &amp; layout<small>Your colors, fonts and store design</small></span><b>$500</b></li>
+                                    <li><span>Build &amp; mobile testing<small>Checked on phones, tablets and laptops</small></span><b>$500</b></li>
+                                    <li><span>Online store setup<small>Shop pages, cart and store settings</small></span><b>$600</b></li>
+                                    <li><span>Product entry (up to 25)<small>Photos, descriptions and prices added</small></span><b>$400</b></li>
+                                    <li><span>Secure checkout &amp; payments<small>Card payments set up and tested</small></span><b>$350</b></li>
+                                    <li><span>Launch &amp; search basics<small>Going live, plus Google-friendly setup</small></span><b>$150</b></li>
+                                </ul>
+                                <p class="pcf-total"><span>Total</span><b>$2,500</b></p>
+                                <a href="#contact" class="pricing-cta">
+                                    Request Consultation <span class="arrow-icon">→</span>
+                                </a>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
