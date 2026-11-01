@@ -740,41 +740,70 @@
                     </div>
                 </div>
 
-                <!-- E-Com Tier 2 -->
-                <div class="pricing-card pricing-card-featured">
-                    <!-- <div class="pricing-featured-label"></div> -->
-                    <div class="pricing-header">
-                        <h3 class="pricing-name">E-Com Plus</h3>
-                        <div class="pricing-amount">
-                            <span class="pricing-total">$4,500</span>
-                            <span class="pricing-label">Total Project Price</span>
-                        </div>
-                    </div>
-                    <div class="pricing-body">
-                        <ul class="pricing-features">
-                            <li class="pricing-feature-expandable">
-                                <div class="pricing-feature-header">
-                                    <span>✓ Everything in E-Com Essential</span>
-                                    <button class="pricing-feature-toggle" aria-label="Show features">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                                    </button>
+                <!-- E-Com Tier 2 (flips over to show the price breakdown) -->
+                <div class="pricing-card pricing-card-featured pricing-card--flip">
+                    <div class="pcf-inner">
+
+                        <!-- Front -->
+                        <div class="pcf-face pcf-front">
+                            <div class="pricing-header">
+                                <button type="button" class="pcf-btn" aria-label="Flip to see what the E-Com Plus price includes"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8a6 6 0 0 1 10.2-4.2L14 5.5"/><path d="M14 2v3.5h-3.5"/><path d="M14 8a6 6 0 0 1-10.2 4.2L2 10.5"/><path d="M2 14v-3.5h3.5"/></svg>Flip</button>
+                                <h3 class="pricing-name">E-Com Plus</h3>
+                                <div class="pricing-amount">
+                                    <span class="pricing-total">$4,500</span>
+                                    <span class="pricing-label">Total Project Price</span>
                                 </div>
-                                <ul class="pricing-feature-sub">
-                                    <li>— Mobile Responsive Design</li>
-                                    <li>— Online Store Setup</li>
-                                    <li>— Up to 25 Products</li>
-                                    <li>— Secure Checkout</li>
-                                    <li>— Payment Gateway Integration</li>
+                            </div>
+                            <div class="pricing-body">
+                                <ul class="pricing-features">
+                                    <li class="pricing-feature-expandable">
+                                        <div class="pricing-feature-header">
+                                            <span>✓ Everything in E-Com Essential</span>
+                                            <button class="pricing-feature-toggle" aria-label="Show features">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                            </button>
+                                        </div>
+                                        <ul class="pricing-feature-sub">
+                                            <li>— Mobile Responsive Design</li>
+                                            <li>— Online Store Setup</li>
+                                            <li>— Up to 25 Products</li>
+                                            <li>— Secure Checkout</li>
+                                            <li>— Payment Gateway Integration</li>
+                                        </ul>
+                                    </li>
+                                    <li>✓ Up to 100 Products</li>
+                                    <li>✓ Inventory Management</li>
+                                    <li>✓ Discount & Coupon System</li>
+                                    <li>✓ Customer Accounts</li>
                                 </ul>
-                            </li>
-                            <li>✓ Up to 100 Products</li>
-                            <li>✓ Inventory Management</li>
-                            <li>✓ Discount & Coupon System</li>
-                            <li>✓ Customer Accounts</li>
-                        </ul>
-                        <a href="#contact" class="pricing-cta">
-                            Request Consultation <span class="arrow-icon">→</span>
-                        </a>
+                                <a href="#contact" class="pricing-cta">
+                                    Request Consultation <span class="arrow-icon">→</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Back: price breakdown (edit the amounts here) -->
+                        <div class="pcf-face pcf-back" inert>
+                            <div class="pricing-header">
+                                <button type="button" class="pcf-btn" aria-label="Flip back to the E-Com Plus card"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8a6 6 0 0 1 10.2-4.2L14 5.5"/><path d="M14 2v3.5h-3.5"/><path d="M14 8a6 6 0 0 1-10.2 4.2L2 10.5"/><path d="M2 14v-3.5h3.5"/></svg>Flip back</button>
+                                <h3 class="pricing-name">E-Com Plus</h3>
+                                <p class="pcf-kicker">Where your $4,500 goes</p>
+                            </div>
+                            <div class="pricing-body">
+                                <ul class="pcf-rows">
+                                    <li class="pcf-carry"><span>Everything in E-Com Essential<small>The full $2,500 package</small></span><b>$2,500</b></li>
+                                    <li><span>Up to 100 products<small>75 more products added and organized</small></span><b>$700</b></li>
+                                    <li><span>Inventory management<small>Stock counts and low-stock alerts</small></span><b>$500</b></li>
+                                    <li><span>Discount &amp; coupon system<small>Sales, promo codes and special offers</small></span><b>$400</b></li>
+                                    <li><span>Customer accounts<small>Order history and faster checkout</small></span><b>$400</b></li>
+                                </ul>
+                                <p class="pcf-total"><span>Total</span><b>$4,500</b></p>
+                                <a href="#contact" class="pricing-cta">
+                                    Request Consultation <span class="arrow-icon">→</span>
+                                </a>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
