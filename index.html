@@ -807,41 +807,71 @@
                     </div>
                 </div>
 
-                <!-- E-Com Tier 3 -->
-                <div class="pricing-card">
-                    <div class="pricing-header">
-                        <h3 class="pricing-name">E-Com Custom</h3>
-                        <div class="pricing-amount">
-                            <span class="pricing-total">$7,500+</span>
-                            <span class="pricing-label">Starting Price</span>
-                        </div>
-                    </div>
-                    <div class="pricing-body">
-                        <ul class="pricing-features">
-                            <li class="pricing-feature-expandable">
-                                <div class="pricing-feature-header">
-                                    <span>✓ Everything in E-Com Plus</span>
-                                    <button class="pricing-feature-toggle" aria-label="Show features">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                                    </button>
+                <!-- E-Com Tier 3 (flips over to show the price breakdown) -->
+                <div class="pricing-card pricing-card--flip pricing-card--flip-custom pricing-card--flip-six">
+                    <div class="pcf-inner">
+
+                        <!-- Front -->
+                        <div class="pcf-face pcf-front">
+                            <div class="pricing-header">
+                                <button type="button" class="pcf-btn" aria-label="Flip to see what the E-Com Custom price includes"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8a6 6 0 0 1 10.2-4.2L14 5.5"/><path d="M14 2v3.5h-3.5"/><path d="M14 8a6 6 0 0 1-10.2 4.2L2 10.5"/><path d="M2 14v-3.5h3.5"/></svg>Flip</button>
+                                <h3 class="pricing-name">E-Com Custom</h3>
+                                <div class="pricing-amount">
+                                    <span class="pricing-total">$7,500+</span>
+                                    <span class="pricing-label">Starting Price</span>
                                 </div>
-                                <ul class="pricing-feature-sub">
-                                    <li>— Mobile Responsive Design</li>
-                                    <li>— Online Store Setup</li>
-                                    <li>— Up to 100 Products</li>
-                                    <li>— Inventory Management</li>
-                                    <li>— Discount & Coupon System</li>
-                                    <li>— Customer Accounts</li>
+                            </div>
+                            <div class="pricing-body">
+                                <ul class="pricing-features">
+                                    <li class="pricing-feature-expandable">
+                                        <div class="pricing-feature-header">
+                                            <span>✓ Everything in E-Com Plus</span>
+                                            <button class="pricing-feature-toggle" aria-label="Show features">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                            </button>
+                                        </div>
+                                        <ul class="pricing-feature-sub">
+                                            <li>— Mobile Responsive Design</li>
+                                            <li>— Online Store Setup</li>
+                                            <li>— Up to 100 Products</li>
+                                            <li>— Inventory Management</li>
+                                            <li>— Discount & Coupon System</li>
+                                            <li>— Customer Accounts</li>
+                                        </ul>
+                                    </li>
+                                    <li>✓ Unlimited Products</li>
+                                    <li>✓ Custom Integrations</li>
+                                    <li>✓ Priority Support</li>
+                                    <li>✓ Custom Quote Based on Scope</li>
                                 </ul>
-                            </li>
-                            <li>✓ Unlimited Products</li>
-                            <li>✓ Custom Integrations</li>
-                            <li>✓ Priority Support</li>
-                            <li>✓ Custom Quote Based on Scope</li>
-                        </ul>
-                        <a href="#contact" class="pricing-cta">
-                            Request Consultation <span class="arrow-icon">→</span>
-                        </a>
+                                <a href="#contact" class="pricing-cta">
+                                    Request Consultation <span class="arrow-icon">→</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Back: price breakdown (edit the amounts here) -->
+                        <div class="pcf-face pcf-back" inert>
+                            <div class="pricing-header">
+                                <button type="button" class="pcf-btn" aria-label="Flip back to the E-Com Custom card"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8a6 6 0 0 1 10.2-4.2L14 5.5"/><path d="M14 2v3.5h-3.5"/><path d="M14 8a6 6 0 0 1-10.2 4.2L2 10.5"/><path d="M2 14v-3.5h3.5"/></svg>Flip back</button>
+                                <h3 class="pricing-name">E-Com Custom</h3>
+                                <p class="pcf-kicker">Where your $7,500+ goes</p>
+                            </div>
+                            <div class="pricing-body">
+                                <ul class="pcf-rows">
+                                    <li class="pcf-carry"><span>Everything in E-Com Plus<small>The full $4,500 package</small></span><b>$4,500</b></li>
+                                    <li><span>Unlimited products<small>Your whole catalog, organized</small></span><b>from $1,200</b></li>
+                                    <li><span>Custom integrations<small>Shipping, email and other tools</small></span><b>from $1,400</b></li>
+                                    <li><span>Priority support<small>Your requests go to the front of the line</small></span><b>$400</b></li>
+                                </ul>
+                                <p class="pcf-total"><span>Starting total</span><b>$7,500+</b></p>
+                                <p class="pcf-fine">Final price depends on your store's needs. Exact quote after your free consultation.</p>
+                                <a href="#contact" class="pricing-cta">
+                                    Request Consultation <span class="arrow-icon">→</span>
+                                </a>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
