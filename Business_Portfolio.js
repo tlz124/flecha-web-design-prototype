@@ -1170,3 +1170,119 @@ document.querySelectorAll('.pricing-card--flip').forEach(card => {
     front.querySelector('.pcf-btn').addEventListener('click', () => setFlipped(true));
     back.querySelector('.pcf-btn').addEventListener('click', () => setFlipped(false));
 });
+
+// ===== Contact Section Dot Matrix Sweep (desktop only, 769px and wider) =====
+// A grid of purple dots that are brightest in the open space between the
+// contact boxes and the form, fading outward. A soft diagonal light sweeps
+// across every few seconds. Nothing is drawn behind the title, the boxes or
+// the form. Phones never run this (the canvas is hidden there by CSS).
+(function() {
+    const canvas = document.getElementById('contactDots');
+    const section = document.getElementById('contact');
+    if (!canvas || !section) return;
+    const ctx = canvas.getContext('2d');
+    const desktop = window.matchMedia('(min-width: 769px)');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const GAP = 22;          // space between dots (px)
+    const BASE = 0.22;       // brightness of the outer dots
+    const CENTER = 0.78;    // extra brightness at the middle
+    const SWEEP = 0.7;       // brightness added by the light sweep
+    const PERIOD = 7;        // seconds per sweep
+    let W = 0, H = 0, holes = [], cx = 0, cy = 0, rx = 1, ry = 1;
+    let t = 0, last = 0, running = false, onScreen = false;
+
+    function measure() {
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const s = section.getBoundingClientRect();
+        W = s.width; H = s.height;
+        canvas.width = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const rel = (el, pad) => {
+            const r = el.getBoundingClientRect();
+            return { x: r.left - s.left - pad, y: r.top - s.top - pad, w: r.width + pad * 2, h: r.height + pad * 2 };
+        };
+        holes = [];
+        section.querySelectorAll('.section-title, .contact-info h3').forEach(el => holes.push(rel(el, 10)));
+        section.querySelectorAll('.contact-item').forEach(el => holes.push(rel(el, 14)));
+        const formEl = section.querySelector('.consultation-form');
+        const items = section.querySelectorAll('.contact-item');
+        if (formEl) holes.push(rel(formEl, 24));
+        // glow center: the open space between the boxes and the form
+        if (formEl && items.length) {
+            const f = rel(formEl, 0);
+            const ph = items[items.length - 1].getBoundingClientRect();
+            const phRight = ph.right - s.left;
+            if (f.x > phRight) { cx = (phRight + f.x) / 2; cy = f.y + f.h * 0.62; }
+            else { cx = W / 2; cy = (ph.bottom - s.top + f.y) / 2; }
+        } else { cx = W / 2; cy = H / 2; }
+        rx = W * 0.55; ry = H * 0.75;
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, W, H);
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, 0, W, H);
+        holes.forEach(h => ctx.rect(h.x, h.y, h.w, h.h));
+        ctx.clip('evenodd');
+        const span = W + H;
+        const pos = ((t % PERIOD) / PERIOD) * (span + 600) - 300;
+        for (let y = GAP / 2; y < H; y += GAP) {
+            for (let x = GAP / 2; x < W; x += GAP) {
+                const k = Math.max(0, 1 - Math.hypot((x - cx) / rx, (y - cy) / ry));
+                const glow = Math.max(0, 1 - Math.abs(x + y - pos) / 160);
+                const a = Math.min(1, BASE + CENTER * k * k + SWEEP * glow * glow * (0.35 + 0.65 * k));
+                const r = 1.8 + 1.4 * k + 0.9 * glow;
+                ctx.fillStyle = 'rgba(212, 165, 255, ' + a.toFixed(3) + ')';
+                ctx.fillRect(x - r / 2, y - r / 2, r, r);
+            }
+        }
+        ctx.restore();
+    }
+
+    function loop(now) {
+        if (!running) return;
+        t += Math.max(0, Math.min(0.05, (now - last) / 1000));
+        last = now;
+        draw();
+        requestAnimationFrame(loop);
+    }
+
+    function update() {
+        const go = desktop.matches && onScreen && !document.hidden && !reduceMotion.matches;
+        if (go && !running) {
+            running = true;
+            last = performance.now();
+            requestAnimationFrame(loop);
+        } else if (!go) {
+            running = false;
+            if (desktop.matches) draw(); // still frame
+        }
+    }
+
+    function refresh() {
+        if (!desktop.matches) { running = false; return; }
+        measure();
+        draw();
+        update();
+    }
+
+    if ('IntersectionObserver' in window) {
+        new IntersectionObserver((entries) => {
+            onScreen = entries[0].isIntersecting;
+            update();
+        }).observe(section);
+    } else {
+        onScreen = true;
+    }
+    document.addEventListener('visibilitychange', update);
+    let timer;
+    window.addEventListener('resize', () => {
+        clearTimeout(timer);
+        timer = setTimeout(refresh, 200);
+    });
+    window.addEventListener('load', refresh);
+    desktop.addEventListener('change', refresh);
+    refresh();
+})();

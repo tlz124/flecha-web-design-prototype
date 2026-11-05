@@ -4367,3 +4367,203 @@ section::before {
         padding-top: 0.6rem;
     }
 }
+
+/* ===== About Us page: pulsing grid around the text + arrow shot =====
+   Desktop and mobile. Only the About page uses these (class .about--grid). */
+.about--grid {
+    overflow: hidden;
+}
+
+.about--grid .container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Grid lines with a clear box cut out around the text (edges set by the script) */
+.about-grid {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    --cell: 56px;
+    --fade: 36px;
+    --l: 30%;
+    --r: 70%;
+    --t: 30%;
+    --b: 70%;
+    -webkit-mask-image:
+        linear-gradient(to right, #000 calc(var(--l) - var(--fade)), transparent var(--l), transparent var(--r), #000 calc(var(--r) + var(--fade))),
+        linear-gradient(to bottom, #000 calc(var(--t) - var(--fade)), transparent var(--t), transparent var(--b), #000 calc(var(--b) + var(--fade)));
+            mask-image:
+        linear-gradient(to right, #000 calc(var(--l) - var(--fade)), transparent var(--l), transparent var(--r), #000 calc(var(--r) + var(--fade))),
+        linear-gradient(to bottom, #000 calc(var(--t) - var(--fade)), transparent var(--t), transparent var(--b), #000 calc(var(--b) + var(--fade)));
+    -webkit-mask-composite: source-over;
+            mask-composite: add;
+}
+
+.about-grid-lines {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(to right, rgba(212, 165, 255, 0.16) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(212, 165, 255, 0.16) 1px, transparent 1px);
+    background-size: var(--cell) var(--cell);
+    background-position: 0 0;
+}
+
+/* Single lines that glow and fade */
+.about-grid-glow {
+    position: absolute;
+    background: rgba(212, 165, 255, 0.85);
+    box-shadow: 0 0 8px rgba(212, 165, 255, 0.6);
+    opacity: 0;
+}
+
+.about-grid-glow.is-h { height: 1px; }
+.about-grid-glow.is-v { width: 1px; }
+
+@media (prefers-reduced-motion: no-preference) {
+    .about-grid-glow {
+        animation: about-grid-pulse var(--d, 4s) ease-in-out var(--w, 0s) infinite;
+    }
+}
+
+@keyframes about-grid-pulse {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 0.75; }
+}
+
+@media (max-width: 768px) {
+    .about-grid {
+        --cell: 40px;
+        --fade: 24px;
+    }
+}
+
+/* Arrow between the two paragraphs */
+.about--grid .about-content .about-p1 {
+    margin-bottom: 0;
+}
+
+.about-shot {
+    position: relative;
+    height: 28px;
+    margin: 1.5rem auto 1.75rem;
+}
+
+.about-shot-trail {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 165, 255, 0.7));
+}
+
+.about-shot-head {
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    width: 24px;
+    height: 16px;
+    transform: translate(-24px, -50%);
+}
+
+.about-shot-head svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Before it plays (only when the script is running and motion is allowed).
+   No transitions here, so the hidden state is applied instantly. */
+.about--grid.is-waiting .about-p1,
+.about--grid.is-waiting .about-p2 {
+    opacity: 0;
+    transform: translateY(8px);
+}
+
+.about--grid.is-waiting .about-shot-trail {
+    transform: scaleX(0);
+    transform-origin: left;
+}
+
+.about--grid.is-waiting .about-shot-head {
+    left: 0;
+    opacity: 0;
+}
+
+/* Playing: paragraph 1, then the arrow shoots across, then paragraph 2 */
+.about--grid.is-playing .about-p1 {
+    opacity: 1;
+    transform: none;
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.about--grid.is-playing .about-shot-trail {
+    transform: scaleX(1);
+    transition: transform 0.9s cubic-bezier(0.5, 0, 0.2, 1) 0.6s;
+}
+
+.about--grid.is-playing .about-shot-head {
+    left: 100%;
+    opacity: 1;
+    transition: left 0.9s cubic-bezier(0.5, 0, 0.2, 1) 0.6s, opacity 0.2s ease 0.6s;
+}
+
+.about--grid.is-playing .about-p2 {
+    opacity: 1;
+    transform: none;
+    transition: opacity 0.8s ease 1.4s, transform 0.8s ease 1.4s;
+}
+
+/* ===== What We Do page: circuit board background (desktop only) =====
+   Phones keep the section exactly as before: the canvas is hidden there. */
+.wwd-circuit {
+    display: none;
+}
+
+@media (min-width: 769px) {
+    .what-we-do--circuit {
+        overflow: hidden;
+    }
+
+    .what-we-do--circuit .container {
+        position: relative;
+        z-index: 1;
+    }
+
+    .wwd-circuit {
+        display: block;
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
+    }
+}
+
+/* ===== Contact section: dot matrix sweep (desktop only) =====
+   Dots are brightest in the open space between the columns and fade
+   outward; a soft diagonal light sweeps across. Nothing draws behind
+   the title, the Email/Phone boxes or the form. Hidden on phones. */
+.contact-dots {
+    display: none;
+}
+@media (min-width: 769px) {
+    .contact--dots .contact-dots {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
+    }
+    .contact--dots > .container {
+        position: relative;
+        z-index: 1;
+    }
+}
