@@ -3768,7 +3768,8 @@ section::before {
 }
 
 @media (min-width: 769px) {
-    #heroCanvas {
+    /* home page hero only: About and What We Do use the same id for their 3D logo */
+    .hero #heroCanvas {
         display: none;
     }
 
