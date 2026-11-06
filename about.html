@@ -133,7 +133,7 @@
 
     <script src="Business_Portfolio.js"></script>
     <script>
-    // ===== About Us: dot matrix shimmer + arrow shot (desktop and mobile) =====
+    // ===== About Us: dot matrix shimmer (desktop only) + arrow shot (desktop and mobile) =====
     (function () {
         var section = document.getElementById('aboutStory');
         if (!section) return;
@@ -141,7 +141,7 @@
         var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         // Dots around the text: brightest right next to it, fading outward.
-        // The shared code lives in Business_Portfolio.js (hover glow is desktop only).
+        // The shared code lives in Business_Portfolio.js. Desktop only; phones show no dots.
         if (typeof flechaDotSweep === 'function') {
             flechaDotSweep(section, document.getElementById('aboutDots'), function (rel, W, H, mobile) {
                 var box = rel(text, mobile ? 12 : 28);

@@ -282,8 +282,9 @@ const projects = [
 // ===== Dot Matrix Shimmer (shared by the home page Contact Us section and the About Us page) =====
 // A grid of purple dots, brightest near the content and fading outward, with a
 // soft diagonal light sweep (shimmer) that passes across every few seconds.
-// Runs on desktop and phones. On desktop, dots near the mouse also light up;
-// that hover glow is added on top and never changes the shimmer's timing.
+// Desktop only (769px and wider): phones never run it, and the canvas is
+// hidden there by CSS. Dots near the mouse also light up; that hover glow is
+// added on top and never changes the shimmer's timing.
 // Nothing is drawn in the "holes" (around text, boxes and the form).
 // It pauses when off screen or when the tab is hidden, and shows a still
 // frame for visitors who ask their computer for less motion.
@@ -292,6 +293,7 @@ const projects = [
 function flechaDotSweep(section, canvas, layout) {
     if (!section || !canvas) return;
     const ctx = canvas.getContext('2d');
+    const desktop = window.matchMedia('(min-width: 769px)');
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const canHover = window.matchMedia('(min-width: 769px) and (hover: hover) and (pointer: fine)');
     const GAP = 22;          // space between dots (px)
@@ -359,6 +361,7 @@ function flechaDotSweep(section, canvas, layout) {
     }
 
     function update() {
+        if (!desktop.matches) { running = false; return; }
         const go = onScreen && !document.hidden && !reduceMotion.matches;
         if (go && !running) {
             running = true;
@@ -371,6 +374,13 @@ function flechaDotSweep(section, canvas, layout) {
     }
 
     function refresh() {
+        if (!desktop.matches) {
+            // phones: stop and free the canvas memory
+            running = false;
+            canvas.width = 0;
+            canvas.height = 0;
+            return;
+        }
         measure();
         draw();
         update();
@@ -405,6 +415,7 @@ function flechaDotSweep(section, canvas, layout) {
         timer = setTimeout(refresh, 200);
     });
     window.addEventListener('load', refresh);
+    desktop.addEventListener('change', refresh);
     refresh();
 }
 
@@ -1300,7 +1311,7 @@ document.querySelectorAll('.pricing-card--flip').forEach(card => {
     back.querySelector('.pcf-btn').addEventListener('click', () => setFlipped(false));
 });
 
-// ===== Contact Us Dot Matrix Shimmer (desktop and phones; hover glow desktop only) =====
+// ===== Contact Us Dot Matrix Shimmer (desktop only) =====
 // Dots are brightest in the open space between the Email/Phone boxes and the
 // form, fading outward. Nothing is drawn behind the title, the boxes or the form.
 (function() {
