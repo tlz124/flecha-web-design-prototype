@@ -279,6 +279,135 @@ const projects = [
     }
 ];
 
+// ===== Dot Matrix Shimmer (shared by the home page Contact Us section and the About Us page) =====
+// A grid of purple dots, brightest near the content and fading outward, with a
+// soft diagonal light sweep (shimmer) that passes across every few seconds.
+// Runs on desktop and phones. On desktop, dots near the mouse also light up;
+// that hover glow is added on top and never changes the shimmer's timing.
+// Nothing is drawn in the "holes" (around text, boxes and the form).
+// It pauses when off screen or when the tab is hidden, and shows a still
+// frame for visitors who ask their computer for less motion.
+//   layout(rel, W, H, mobile) must return { holes: [...rects], glow: (x, y) => 0..1 }
+//   rel(el, pad) turns an element into a rect relative to the section.
+function flechaDotSweep(section, canvas, layout) {
+    if (!section || !canvas) return;
+    const ctx = canvas.getContext('2d');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const canHover = window.matchMedia('(min-width: 769px) and (hover: hover) and (pointer: fine)');
+    const GAP = 22;          // space between dots (px)
+    const BASE = 0.22;       // brightness of the outer dots
+    const CENTER = 0.78;     // extra brightness near the content
+    const SWEEP = 0.7;       // brightness added by the shimmer
+    const PERIOD = 7;        // seconds per shimmer pass
+    const HOVER_R = 110;     // how far (px) from the mouse dots light up (desktop)
+    const HOVER = 0.85;      // brightness added by the hover glow (desktop)
+    let W = 0, H = 0, holes = [], glow = () => 0;
+    let t = 0, last = 0, running = false, onScreen = false;
+    const mouse = { x: 0, y: 0, on: false };
+    let hov = 0;             // hover glow strength, eases in and out
+
+    function measure() {
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const s = section.getBoundingClientRect();
+        W = s.width; H = s.height;
+        canvas.width = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const rel = (el, pad) => {
+            const r = el.getBoundingClientRect();
+            return { x: r.left - s.left - pad, y: r.top - s.top - pad, w: r.width + pad * 2, h: r.height + pad * 2 };
+        };
+        const l = layout(rel, W, H, window.innerWidth <= 768);
+        holes = l.holes;
+        glow = l.glow;
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, W, H);
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, 0, W, H);
+        holes.forEach(h => ctx.rect(h.x, h.y, h.w, h.h));
+        ctx.clip('evenodd');
+        const pos = ((t % PERIOD) / PERIOD) * (W + H + 600) - 300;
+        for (let y = GAP / 2; y < H; y += GAP) {
+            for (let x = GAP / 2; x < W; x += GAP) {
+                const k = glow(x, y);
+                const sw = Math.max(0, 1 - Math.abs(x + y - pos) / 160);
+                let a = BASE + CENTER * k * k + SWEEP * sw * sw * (0.35 + 0.65 * k);
+                let r = 1.8 + 1.4 * k + 0.9 * sw;
+                if (hov > 0.01) {
+                    const h = Math.max(0, 1 - Math.hypot(x - mouse.x, y - mouse.y) / HOVER_R);
+                    a += HOVER * hov * h * h;
+                    r += 1.6 * hov * h;
+                }
+                ctx.fillStyle = 'rgba(212, 165, 255, ' + Math.min(1, a).toFixed(3) + ')';
+                ctx.fillRect(x - r / 2, y - r / 2, r, r);
+            }
+        }
+        ctx.restore();
+    }
+
+    function loop(now) {
+        if (!running) return;
+        const dt = Math.max(0, Math.min(0.05, (now - last) / 1000));
+        last = now;
+        t += dt;
+        hov += ((mouse.on ? 1 : 0) - hov) * Math.min(1, dt * 8);
+        draw();
+        requestAnimationFrame(loop);
+    }
+
+    function update() {
+        const go = onScreen && !document.hidden && !reduceMotion.matches;
+        if (go && !running) {
+            running = true;
+            last = performance.now();
+            requestAnimationFrame(loop);
+        } else if (!go) {
+            running = false;
+            draw(); // still frame
+        }
+    }
+
+    function refresh() {
+        measure();
+        draw();
+        update();
+    }
+
+    // Desktop hover glow (a mouse only; phones and tablets skip this)
+    section.addEventListener('mousemove', (e) => {
+        if (!canHover.matches) return;
+        const s = section.getBoundingClientRect();
+        mouse.x = e.clientX - s.left;
+        mouse.y = e.clientY - s.top;
+        mouse.on = true;
+        if (!running) { hov = 1; draw(); }
+    });
+    section.addEventListener('mouseleave', () => {
+        mouse.on = false;
+        if (!running) { hov = 0; draw(); }
+    });
+
+    if ('IntersectionObserver' in window) {
+        new IntersectionObserver((entries) => {
+            onScreen = entries[0].isIntersecting;
+            update();
+        }).observe(section);
+    } else {
+        onScreen = true;
+    }
+    document.addEventListener('visibilitychange', update);
+    let timer;
+    window.addEventListener('resize', () => {
+        clearTimeout(timer);
+        timer = setTimeout(refresh, 200);
+    });
+    window.addEventListener('load', refresh);
+    refresh();
+}
+
 // ===== Cookie Consent Functionality =====
 const cookieConsent = document.getElementById('cookieConsent');
 const acceptAllBtn = document.getElementById('acceptAll');
@@ -1171,118 +1300,26 @@ document.querySelectorAll('.pricing-card--flip').forEach(card => {
     back.querySelector('.pcf-btn').addEventListener('click', () => setFlipped(false));
 });
 
-// ===== Contact Section Dot Matrix Sweep (desktop only, 769px and wider) =====
-// A grid of purple dots that are brightest in the open space between the
-// contact boxes and the form, fading outward. A soft diagonal light sweeps
-// across every few seconds. Nothing is drawn behind the title, the boxes or
-// the form. Phones never run this (the canvas is hidden there by CSS).
+// ===== Contact Us Dot Matrix Shimmer (desktop and phones; hover glow desktop only) =====
+// Dots are brightest in the open space between the Email/Phone boxes and the
+// form, fading outward. Nothing is drawn behind the title, the boxes or the form.
 (function() {
-    const canvas = document.getElementById('contactDots');
     const section = document.getElementById('contact');
-    if (!canvas || !section) return;
-    const ctx = canvas.getContext('2d');
-    const desktop = window.matchMedia('(min-width: 769px)');
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const GAP = 22;          // space between dots (px)
-    const BASE = 0.22;       // brightness of the outer dots
-    const CENTER = 0.78;    // extra brightness at the middle
-    const SWEEP = 0.7;       // brightness added by the light sweep
-    const PERIOD = 7;        // seconds per sweep
-    let W = 0, H = 0, holes = [], cx = 0, cy = 0, rx = 1, ry = 1;
-    let t = 0, last = 0, running = false, onScreen = false;
-
-    function measure() {
-        const dpr = Math.min(2, window.devicePixelRatio || 1);
-        const s = section.getBoundingClientRect();
-        W = s.width; H = s.height;
-        canvas.width = Math.round(W * dpr);
-        canvas.height = Math.round(H * dpr);
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        const rel = (el, pad) => {
-            const r = el.getBoundingClientRect();
-            return { x: r.left - s.left - pad, y: r.top - s.top - pad, w: r.width + pad * 2, h: r.height + pad * 2 };
-        };
-        holes = [];
-        section.querySelectorAll('.section-title, .contact-info h3').forEach(el => holes.push(rel(el, 10)));
-        section.querySelectorAll('.contact-item').forEach(el => holes.push(rel(el, 14)));
+    flechaDotSweep(section, document.getElementById('contactDots'), function(rel, W, H, mobile) {
+        const holes = [];
+        section.querySelectorAll('.section-title, .contact-info h3').forEach(el => holes.push(rel(el, mobile ? 6 : 10)));
+        section.querySelectorAll('.contact-item').forEach(el => holes.push(rel(el, mobile ? 8 : 14)));
         const formEl = section.querySelector('.consultation-form');
         const items = section.querySelectorAll('.contact-item');
-        if (formEl) holes.push(rel(formEl, 24));
-        // glow center: the open space between the boxes and the form
+        if (formEl) holes.push(rel(formEl, mobile ? 10 : 24));
+        let cx = W / 2, cy = H / 2;
         if (formEl && items.length) {
             const f = rel(formEl, 0);
-            const ph = items[items.length - 1].getBoundingClientRect();
-            const phRight = ph.right - s.left;
-            if (f.x > phRight) { cx = (phRight + f.x) / 2; cy = f.y + f.h * 0.62; }
-            else { cx = W / 2; cy = (ph.bottom - s.top + f.y) / 2; }
-        } else { cx = W / 2; cy = H / 2; }
-        rx = W * 0.55; ry = H * 0.75;
-    }
-
-    function draw() {
-        ctx.clearRect(0, 0, W, H);
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(0, 0, W, H);
-        holes.forEach(h => ctx.rect(h.x, h.y, h.w, h.h));
-        ctx.clip('evenodd');
-        const span = W + H;
-        const pos = ((t % PERIOD) / PERIOD) * (span + 600) - 300;
-        for (let y = GAP / 2; y < H; y += GAP) {
-            for (let x = GAP / 2; x < W; x += GAP) {
-                const k = Math.max(0, 1 - Math.hypot((x - cx) / rx, (y - cy) / ry));
-                const glow = Math.max(0, 1 - Math.abs(x + y - pos) / 160);
-                const a = Math.min(1, BASE + CENTER * k * k + SWEEP * glow * glow * (0.35 + 0.65 * k));
-                const r = 1.8 + 1.4 * k + 0.9 * glow;
-                ctx.fillStyle = 'rgba(212, 165, 255, ' + a.toFixed(3) + ')';
-                ctx.fillRect(x - r / 2, y - r / 2, r, r);
-            }
+            const ph = rel(items[items.length - 1], 0);
+            if (f.x > ph.x + ph.w) { cx = (ph.x + ph.w + f.x) / 2; cy = f.y + f.h * 0.62; } // side by side
+            else { cy = (ph.y + ph.h + f.y) / 2; }                                         // stacked (phones)
         }
-        ctx.restore();
-    }
-
-    function loop(now) {
-        if (!running) return;
-        t += Math.max(0, Math.min(0.05, (now - last) / 1000));
-        last = now;
-        draw();
-        requestAnimationFrame(loop);
-    }
-
-    function update() {
-        const go = desktop.matches && onScreen && !document.hidden && !reduceMotion.matches;
-        if (go && !running) {
-            running = true;
-            last = performance.now();
-            requestAnimationFrame(loop);
-        } else if (!go) {
-            running = false;
-            if (desktop.matches) draw(); // still frame
-        }
-    }
-
-    function refresh() {
-        if (!desktop.matches) { running = false; return; }
-        measure();
-        draw();
-        update();
-    }
-
-    if ('IntersectionObserver' in window) {
-        new IntersectionObserver((entries) => {
-            onScreen = entries[0].isIntersecting;
-            update();
-        }).observe(section);
-    } else {
-        onScreen = true;
-    }
-    document.addEventListener('visibilitychange', update);
-    let timer;
-    window.addEventListener('resize', () => {
-        clearTimeout(timer);
-        timer = setTimeout(refresh, 200);
+        const rx = W * 0.55, ry = H * 0.75;
+        return { holes: holes, glow: (x, y) => Math.max(0, 1 - Math.hypot((x - cx) / rx, (y - cy) / ry)) };
     });
-    window.addEventListener('load', refresh);
-    desktop.addEventListener('change', refresh);
-    refresh();
 })();

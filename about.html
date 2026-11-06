@@ -92,11 +92,18 @@
     </section>
 
     <!-- About Content -->
-    <section class="about">
+    <section class="about about--grid" id="aboutStory">
+        <!-- Dot matrix shimmer around the text (never behind it) -->
+        <canvas class="dot-sweep" id="aboutDots" aria-hidden="true"></canvas>
         <div class="container">
             <div class="about-content">
-                <p>The name "Flecha Web Design" holds special meaning for us. "Flecha" is the Spanish word for "arrow," symbolizing direction, precision, and forward movement. Just as an arrow points toward a target with purpose and clarity, we help businesses and educational institutions navigate the digital landscape with confidence.</p>
-                <p>We chose this name because we believe great web design should do more than look good—it should guide users exactly where they need to go and help organizations move toward their goals. Every arrow has a direction, and we're here to make sure yours is pointed toward success.</p>
+                <p class="about-p1">The name "Flecha Web Design" holds special meaning for us. "Flecha" is the Spanish word for "arrow," symbolizing direction, precision, and forward movement. Just as an arrow points toward a target with purpose and clarity, we help businesses and educational institutions navigate the digital landscape with confidence.</p>
+                <!-- Arrow that shoots across between the paragraphs -->
+                <div class="about-shot" aria-hidden="true">
+                    <span class="about-shot-trail"></span>
+                    <span class="about-shot-head"><svg viewBox="0 0 24 16"><path d="M2 2 L10 8 L2 14" fill="none" stroke="#d4a5ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 2 L20 8 L12 14" fill="none" stroke="#d4a5ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                </div>
+                <p class="about-p2">We chose this name because we believe great web design should do more than look good—it should guide users exactly where they need to go and help organizations move toward their goals. Every arrow has a direction, and we're here to make sure yours is pointed toward success.</p>
             </div>
         </div>
     </section>
@@ -125,6 +132,45 @@
     </footer>
 
     <script src="Business_Portfolio.js"></script>
+    <script>
+    // ===== About Us: dot matrix shimmer + arrow shot (desktop and mobile) =====
+    (function () {
+        var section = document.getElementById('aboutStory');
+        if (!section) return;
+        var text = section.querySelector('.about-content');
+        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // Dots around the text: brightest right next to it, fading outward.
+        // The shared code lives in Business_Portfolio.js (hover glow is desktop only).
+        if (typeof flechaDotSweep === 'function') {
+            flechaDotSweep(section, document.getElementById('aboutDots'), function (rel, W, H, mobile) {
+                var box = rel(text, mobile ? 12 : 28);
+                var R = Math.max(140, W * 0.22);
+                return {
+                    holes: [box],
+                    glow: function (x, y) {
+                        var dx = Math.max(box.x - x, 0, x - (box.x + box.w));
+                        var dy = Math.max(box.y - y, 0, y - (box.y + box.h));
+                        return Math.max(0, 1 - Math.hypot(dx, dy) / R);
+                    }
+                };
+            });
+        }
+
+        // Arrow shot: plays once, when the text scrolls into view
+        if (reduce || !('IntersectionObserver' in window)) return;
+        section.classList.add('is-waiting');
+        void section.offsetWidth;   // let the browser draw the hidden state first
+        var io = new IntersectionObserver(function (entries) {
+            if (entries[0].isIntersecting) {
+                io.disconnect();
+                // short pause so it also plays when the text is already on screen at page load
+                setTimeout(function () { section.classList.add('is-playing'); }, 400);
+            }
+        }, { threshold: 0.35 });
+        io.observe(text);
+    })();
+    </script>
     <script type="importmap">
         {
             "imports": {
