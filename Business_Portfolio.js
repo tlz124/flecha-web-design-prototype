@@ -1334,3 +1334,92 @@ document.querySelectorAll('.pricing-card--flip').forEach(card => {
         return { holes: holes, glow: (x, y) => Math.max(0, 1 - Math.hypot((x - cx) / rx, (y - cy) / ry)) };
     });
 })();
+
+// ===== Footer "System Readout" Bar (desktop only, 769px and wider) =====
+// Every number is real: Phoenix time, how long this page took to load, and
+// how long the visitor has been on the page. A short line types itself out.
+// Phones never run this (the bar is hidden there by CSS). Pauses when the
+// footer is off screen; visitors who ask for less motion get static text.
+(function() {
+    const bar = document.getElementById('footerReadout');
+    if (!bar) return;
+    const desktop = window.matchMedia('(min-width: 769px)');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const el = (name) => bar.querySelector('[data-fr="' + name + '"]');
+    const clock = el('clock'), load = el('load'), session = el('session'), type = el('type'), hex = el('hex');
+    const LINES = ['building websites that work', 'now booking consultations', 'serving Phoenix, Gilbert & the Valley'];
+    const start = Date.now();
+    let onScreen = false, timers = [], typeTimer = null;
+
+    const phxTime = () => new Date().toLocaleTimeString('en-US', { timeZone: 'America/Phoenix', hour12: false }) + ' MST';
+    const sessionTime = () => {
+        const s = Math.floor((Date.now() - start) / 1000);
+        return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+    };
+    const randomHex = () => Array.from({ length: 14 }, () =>
+        Math.floor(Math.random() * 256).toString(16).padStart(2, '0').toUpperCase()).join(' ');
+
+    function tick() {
+        clock.textContent = phxTime();
+        session.textContent = sessionTime();
+    }
+
+    // real page load time, read once the page has finished loading
+    function showLoad() {
+        const nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+        const ms = nav && nav.loadEventEnd > 0 ? nav.loadEventEnd - nav.startTime : performance.now();
+        load.textContent = Math.round(ms) + ' ms';
+    }
+    if (document.readyState === 'complete') setTimeout(showLoad, 0);
+    else window.addEventListener('load', () => setTimeout(showLoad, 0));
+
+    // types a line, waits, erases it, then moves to the next
+    let li = 0, ci = LINES[0].length, erasing = true;
+    function typeStep() {
+        const line = LINES[li];
+        if (erasing) {
+            type.textContent = line.slice(0, --ci);
+            if (ci <= 0) { erasing = false; li = (li + 1) % LINES.length; }
+            typeTimer = setTimeout(typeStep, 26);
+        } else {
+            const next = LINES[li];
+            type.textContent = next.slice(0, ++ci);
+            if (ci >= next.length) { erasing = true; typeTimer = setTimeout(typeStep, 2400); return; }
+            typeTimer = setTimeout(typeStep, 58);
+        }
+    }
+
+    function stop() {
+        timers.forEach(clearInterval);
+        timers = [];
+        clearTimeout(typeTimer);
+        typeTimer = null;
+    }
+
+    function update() {
+        stop();
+        if (!desktop.matches) return;
+        tick();
+        hex.textContent = randomHex();
+        const run = onScreen && !document.hidden;
+        bar.classList.toggle('is-paused', !run);
+        if (!run) return;
+        timers.push(setInterval(tick, 1000));
+        if (!reduceMotion.matches) {
+            timers.push(setInterval(() => { hex.textContent = randomHex(); }, 900));
+            typeTimer = setTimeout(typeStep, 2400);
+        }
+    }
+
+    if ('IntersectionObserver' in window) {
+        new IntersectionObserver((entries) => {
+            onScreen = entries[0].isIntersecting;
+            update();
+        }).observe(bar);
+    } else {
+        onScreen = true;
+    }
+    document.addEventListener('visibilitychange', update);
+    desktop.addEventListener('change', update);
+    update();
+})();

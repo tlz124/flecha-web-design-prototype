@@ -4568,3 +4568,137 @@ section::before {
         z-index: 1;
     }
 }
+
+/* ===== Footer "system readout" bar (desktop only) =====
+   A terminal-style bar under the footer columns: live status, Phoenix time,
+   page load time, session timer, an activity meter, and a typed line.
+   Phones never show it (and the script never runs there). */
+.footer-readout {
+    display: none;
+}
+@media (min-width: 769px) {
+    .footer-readout {
+        display: block;
+        flex-basis: 100%;
+        width: 100%;
+        margin: -1.5rem 0 1.5rem;          /* sits right under the columns' divider line */
+        border-bottom: 1px solid var(--border-gray);
+        font-family: 'SFMono-Regular', Consolas, Menlo, 'Courier New', monospace;
+        font-size: 0.78rem;
+        color: var(--text-gray);
+        text-align: left;
+        position: relative;
+        overflow: hidden;
+    }
+    /* faint screen scanlines + a slow glow rolling down */
+    .footer-readout::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 3px);
+    }
+    .footer-readout::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 40px;
+        top: -40px;
+        pointer-events: none;
+        background: linear-gradient(180deg, transparent, rgba(212, 165, 255, 0.07), transparent);
+        animation: frRoll 6s linear infinite;
+    }
+    .fr-cells {
+        display: grid;
+        grid-template-columns: repeat(5, auto);
+        justify-content: space-between;
+        gap: 10px 22px;
+        padding: 14px 0;
+        border-bottom: 1px solid #1c1c1c;
+    }
+    .fr-k {
+        display: block;
+        color: #6a6a6a;
+        font-size: 0.66rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+    .fr-v {
+        color: var(--purple-light);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-variant-numeric: tabular-nums;
+    }
+    .fr-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #6ee7a8;
+        flex: none;
+        animation: frPing 2.2s ease-out infinite;
+    }
+    .fr-bars {
+        display: flex;
+        align-items: flex-end;
+        gap: 2px;
+        height: 14px;
+    }
+    .fr-bars s {
+        display: block;
+        width: 3px;
+        height: 8px;
+        background: var(--purple-accent);
+        opacity: 0.8;
+        animation: frEq 1.2s ease-in-out infinite alternate;
+    }
+    .fr-line {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 11px 0;
+    }
+    .fr-prompt {
+        color: var(--purple-accent);
+    }
+    .fr-caret {
+        display: inline-block;
+        width: 8px;
+        height: 1.05em;
+        background: var(--purple-accent);
+        vertical-align: -3px;
+        margin-left: 2px;
+        animation: frBlink 1s steps(1) infinite;
+    }
+    .fr-hex {
+        color: #4d4d4d;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: 46%;
+    }
+    /* paused while the footer is off screen */
+    .footer-readout.is-paused::before,
+    .footer-readout.is-paused .fr-dot,
+    .footer-readout.is-paused .fr-bars s,
+    .footer-readout.is-paused .fr-caret {
+        animation-play-state: paused;
+    }
+    @keyframes frRoll { to { top: 100%; } }
+    @keyframes frPing {
+        0% { box-shadow: 0 0 0 0 rgba(110, 231, 168, 0.55); }
+        80%, 100% { box-shadow: 0 0 0 9px rgba(110, 231, 168, 0); }
+    }
+    @keyframes frEq { from { height: 3px; } to { height: 14px; } }
+    @keyframes frBlink { 50% { opacity: 0; } }
+}
+@media (min-width: 769px) and (prefers-reduced-motion: reduce) {
+    .footer-readout::before,
+    .fr-dot,
+    .fr-bars s,
+    .fr-caret {
+        animation: none;
+    }
+}
