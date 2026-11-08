@@ -4518,34 +4518,7 @@ section::before {
     transition: opacity 0.8s ease 1.4s, transform 0.8s ease 1.4s;
 }
 
-/* ===== What We Do page: circuit board background (desktop only) =====
-   Phones keep the section exactly as before: the canvas is hidden there. */
-.wwd-circuit {
-    display: none;
-}
-
-@media (min-width: 769px) {
-    .what-we-do--circuit {
-        overflow: hidden;
-    }
-
-    .what-we-do--circuit .container {
-        position: relative;
-        z-index: 1;
-    }
-
-    .wwd-circuit {
-        display: block;
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 0;
-        pointer-events: none;
-    }
-}
-
-/* ===== Dot matrix shimmer (home Contact Us + About Us) =====
+/* ===== Dot matrix shimmer (home Contact Us, About Us, What We Do) =====
    Purple dots with a light sweep, drawn on a canvas behind the content.
    Desktop only: phones never show or run it. The script leaves the text,
    boxes and form clear. */
@@ -4563,7 +4536,8 @@ section::before {
         pointer-events: none;
         display: block;
     }
-    .contact--dots > .container {
+    .contact--dots > .container,
+    .what-we-do--dots > .container {
         position: relative;
         z-index: 1;
     }

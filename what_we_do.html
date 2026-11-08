@@ -83,7 +83,9 @@
     </section>
 
     <!-- What We Do Content -->
-    <section class="what-we-do">
+    <section class="what-we-do what-we-do--dots" id="whatWeDo">
+        <!-- Dot matrix shimmer around the text (desktop only, never behind the text) -->
+        <canvas class="dot-sweep" id="wwdDots" aria-hidden="true"></canvas>
         <div class="container">
             <p class="what-we-do-text">Every project begins with understanding your unique goals and audience. We don't believe in one-size-fits-all templates. Instead, we take time to learn about your vision, your values, and what sets you apart. Our design strategy focuses on three core principles: clarity, functionality, and purpose. Whether you're an educational platform helping students achieve their dreams or a local business serving your community, we craft websites that are intuitive, professional, and designed to grow with you. We combine clean aesthetics with practical features to ensure your site doesn't just look good—it works hard for you.</p>
         </div>
@@ -113,6 +115,30 @@
     </footer>
 
     <script src="Business_Portfolio.js"></script>
+    <script>
+    // ===== What We Do: dot matrix shimmer (desktop only, 769px and wider) =====
+    // Same effect as the home page Contact Us section and the About Us page.
+    // Dots are brightest right next to the text and fade outward; dots near the
+    // mouse light up. Nothing is drawn behind the text. Phones show no dots.
+    // The shared code lives in Business_Portfolio.js.
+    (function () {
+        var section = document.getElementById('whatWeDo');
+        if (!section || typeof flechaDotSweep !== 'function') return;
+        var text = section.querySelector('.what-we-do-text');
+        flechaDotSweep(section, document.getElementById('wwdDots'), function (rel, W, H, mobile) {
+            var box = rel(text, mobile ? 12 : 28);
+            var R = Math.max(140, W * 0.22);
+            return {
+                holes: [box],
+                glow: function (x, y) {
+                    var dx = Math.max(box.x - x, 0, x - (box.x + box.w));
+                    var dy = Math.max(box.y - y, 0, y - (box.y + box.h));
+                    return Math.max(0, 1 - Math.hypot(dx, dy) / R);
+                }
+            };
+        });
+    })();
+    </script>
     <script type="importmap">
         {
             "imports": {
