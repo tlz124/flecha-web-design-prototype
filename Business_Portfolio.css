@@ -4032,18 +4032,22 @@ section::before {
     }
 }
 
-/* ===== "Before Your Consultation": pulsing circles around the box (desktop only) =====
-   Circles sit only in the space outside the box and fade away near the
-   cursor. The box itself gets a solid background so nothing shows inside. */
-.bwm-circles {
+/* ===== "Before Your Consultation": plus-sign grid around the box (desktop only) =====
+   A neat grid of tiny + markers in the space outside the box. A few twinkle,
+   and the ones near the mouse brighten and turn. Drawn on a canvas by
+   Business_Portfolio.js. Phones never show it. */
+.bwm-plus {
     display: none;
 }
 
 @media (min-width: 769px) {
-    .bwm-circles {
+    .bwm-plus {
         display: block;
         position: absolute;
-        inset: 0;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
         z-index: 0;
         pointer-events: none;
     }
@@ -4055,39 +4059,6 @@ section::before {
 
     .before-we-meet-content {
         background: #100e12;
-    }
-
-    .bwm-circle {
-        position: absolute;
-        border-radius: 50%;
-        border: 1.5px solid rgba(212, 165, 255, 0.55);
-        box-shadow: 0 0 10px rgba(212, 165, 255, 0.25), inset 0 0 8px rgba(212, 165, 255, 0.15);
-        transform: translate(-50%, -50%);
-        transition: opacity 0.45s ease, transform 0.45s ease;
-    }
-
-    .bwm-circle.is-gone {
-        opacity: 0 !important;
-        transform: translate(-50%, -50%) scale(0.4);
-    }
-}
-
-@media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
-    .bwm-circle {
-        animation: bwm-circle-pulse var(--d, 4s) ease-in-out var(--w, 0s) infinite;
-    }
-}
-
-@keyframes bwm-circle-pulse {
-    0%, 100% {
-        opacity: 0.35;
-        scale: 0.9;
-        background: transparent;
-    }
-    50% {
-        opacity: 1;
-        scale: 1.08;
-        background: rgba(212, 165, 255, 0.08);
     }
 }
 

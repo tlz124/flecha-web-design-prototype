@@ -1223,71 +1223,127 @@ document.querySelectorAll('.pricing-feature-toggle').forEach(btn => {
     build();
 })();
 
-// ===== "Before Your Consultation" Pulsing Circles (desktop only, 769px and wider) =====
-// Places glowing circles in the space around the box (never inside it).
-// Circles near the mouse fade away and come back when the mouse moves on.
-// Phones never build them (the layer is also hidden there by CSS).
+// ===== "Before Your Consultation" Plus-Sign Grid (desktop only, 769px and wider) =====
+// A neat grid of tiny + markers fills the space around the box (never inside
+// it). About 1 in 8 gently twinkle, and the ones near the mouse brighten and
+// turn. Phones never run this (the canvas is also hidden there by CSS).
+// Pauses when off screen or when the tab is hidden; visitors who ask for less
+// motion get a still grid that still reacts to the mouse.
 (function() {
-    const layer = document.getElementById('bwmCircles');
+    const canvas = document.getElementById('bwmPlus');
     const section = document.getElementById('questionnaire');
     const box = section ? section.querySelector('.before-we-meet-content') : null;
-    if (!layer || !section || !box) return;
+    if (!canvas || !section || !box) return;
+    const ctx = canvas.getContext('2d');
     const desktop = window.matchMedia('(min-width: 769px)');
-    const COUNT = 22;   // how many circles
-    const NEAR = 110;   // how close (px) the mouse must be to make a circle vanish
-    let circles = [];
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const COLOR = '212, 165, 255';
+    const GRID = 34;       // space between markers (px)
+    const CLEAR = 20;      // empty space kept around the box (px)
+    const NEAR = 120;      // how close (px) the mouse must be to light a marker
+    let W = 0, H = 0, marks = [], t = 0, last = 0, running = false, onScreen = false;
+    const mouse = { x: -9999, y: -9999 };
 
     function build() {
-        layer.innerHTML = '';
-        circles = [];
-        if (!desktop.matches) return;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
         const s = section.getBoundingClientRect();
         const b = box.getBoundingClientRect();
-        const bx = { l: b.left - s.left, t: b.top - s.top, r: b.right - s.left, btm: b.bottom - s.top };
-        const W = s.width;
-        const H = s.height;
-        let tries = 0;
-        while (circles.length < COUNT && tries < 2000) {
-            tries++;
-            const size = 14 + Math.random() * 26;
-            const half = size / 2 + 6;
-            const x = half + Math.random() * (W - half * 2);
-            const y = half + Math.random() * (H - half * 2);
-            // skip spots that would touch the box
-            if (x > bx.l - half && x < bx.r + half && y > bx.t - half && y < bx.btm + half) continue;
-            // skip spots that overlap another circle
-            if (circles.some(c => Math.hypot(c.x - x, c.y - y) < (c.size + size) / 2 + 10)) continue;
-            const el = document.createElement('span');
-            el.className = 'bwm-circle';
-            el.style.cssText = 'left:' + x.toFixed(1) + 'px;top:' + y.toFixed(1) + 'px;width:' + size.toFixed(1) + 'px;height:' + size.toFixed(1) + 'px';
-            el.style.setProperty('--d', (3 + Math.random() * 3).toFixed(1) + 's');
-            el.style.setProperty('--w', (-Math.random() * 6).toFixed(1) + 's');
-            layer.appendChild(el);
-            circles.push({ el: el, x: x, y: y, size: size });
+        W = s.width; H = s.height;
+        canvas.width = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const bx = { l: b.left - s.left - CLEAR, t: b.top - s.top - CLEAR, r: b.right - s.left + CLEAR, btm: b.bottom - s.top + CLEAR };
+        marks = [];
+        for (let y = GRID / 2; y < H; y += GRID) {
+            for (let x = GRID / 2; x < W; x += GRID) {
+                if (x > bx.l && x < bx.r && y > bx.t && y < bx.btm) continue;   // keep the box clear
+                marks.push({ x: x, y: y, twinkle: Math.random() < 0.12, phase: Math.random() * 10 });
+            }
         }
     }
 
-    section.addEventListener('mousemove', (e) => {
-        if (!circles.length) return;
-        const s = section.getBoundingClientRect();
-        const mx = e.clientX - s.left;
-        const my = e.clientY - s.top;
-        circles.forEach(c => {
-            c.el.classList.toggle('is-gone', Math.hypot(mx - c.x, my - c.y) < NEAR);
+    function draw() {
+        ctx.clearRect(0, 0, W, H);
+        ctx.lineWidth = 1.2;
+        marks.forEach(m => {
+            const near = Math.max(0, 1 - Math.hypot(m.x - mouse.x, m.y - mouse.y) / NEAR);
+            const tw = m.twinkle ? 0.5 + 0.5 * Math.sin(t * 2 + m.phase) : 0;
+            const a = Math.min(1, 0.16 + 0.5 * tw + 0.75 * near);
+            const size = 3.5 + 2.5 * near;
+            ctx.save();
+            ctx.translate(m.x, m.y);
+            ctx.rotate(near * Math.PI / 4);
+            ctx.strokeStyle = 'rgba(' + COLOR + ', ' + a.toFixed(3) + ')';
+            ctx.beginPath();
+            ctx.moveTo(-size, 0); ctx.lineTo(size, 0);
+            ctx.moveTo(0, -size); ctx.lineTo(0, size);
+            ctx.stroke();
+            ctx.restore();
         });
+    }
+
+    function loop(now) {
+        if (!running) return;
+        t += Math.max(0, Math.min(0.05, (now - last) / 1000));
+        last = now;
+        draw();
+        requestAnimationFrame(loop);
+    }
+
+    function update() {
+        if (!desktop.matches) { running = false; return; }
+        const go = onScreen && !document.hidden && !reduceMotion.matches;
+        if (go && !running) {
+            running = true;
+            last = performance.now();
+            requestAnimationFrame(loop);
+        } else if (!go) {
+            running = false;
+            draw();   // still picture
+        }
+    }
+
+    function refresh() {
+        if (!desktop.matches) {
+            running = false;
+            canvas.width = 0;
+            canvas.height = 0;
+            return;
+        }
+        build();
+        draw();
+        update();
+    }
+
+    section.addEventListener('mousemove', (e) => {
+        if (!desktop.matches) return;
+        const s = section.getBoundingClientRect();
+        mouse.x = e.clientX - s.left;
+        mouse.y = e.clientY - s.top;
+        if (!running) draw();
     });
     section.addEventListener('mouseleave', () => {
-        circles.forEach(c => c.el.classList.remove('is-gone'));
+        mouse.x = mouse.y = -9999;
+        if (!running && desktop.matches) draw();
     });
 
+    if ('IntersectionObserver' in window) {
+        new IntersectionObserver((entries) => {
+            onScreen = entries[0].isIntersecting;
+            update();
+        }).observe(section);
+    } else {
+        onScreen = true;
+    }
+    document.addEventListener('visibilitychange', update);
     let timer;
     window.addEventListener('resize', () => {
         clearTimeout(timer);
-        timer = setTimeout(build, 250);
+        timer = setTimeout(refresh, 200);
     });
-    desktop.addEventListener('change', build);
-    window.addEventListener('load', build);
-    build();
+    window.addEventListener('load', refresh);
+    desktop.addEventListener('change', refresh);
+    refresh();
 })();
 
 // ===== Essential Pricing Card Flip (desktop and mobile) =====
