@@ -761,21 +761,67 @@ filterButtons.forEach(button => {
     });
 });
 
-// ===== Hero Canvas Node Network Effect =====
+// ===== Hero background effects: shared helpers =====
+// The hero has two background effects (the node network and the flowing
+// lines) and a Nodes / Lines switch. Each effect registers itself here so
+// the switch can turn it on and off.
+const flechaHeroFx = {};
+
+// Mouse or finger position inside the hero, shared by both effects.
+// Desktop: follows the mouse. Phones: follows a finger while it touches the
+// hero (scrolling still works normally; the page is never held in place).
+// onMove(x, y) gets canvas-relative coordinates, or (null, null) when released.
+function flechaHeroPointer(hero, canvas, onMove) {
+    let lastTouch = 0;
+    function at(clientX, clientY) {
+        const r = canvas.getBoundingClientRect();
+        onMove(clientX - r.left, clientY - r.top);
+    }
+    hero.addEventListener('mousemove', (e) => {
+        if (Date.now() - lastTouch < 800) return;   // ignore the fake mouse events phones send after a tap
+        at(e.clientX, e.clientY);
+    });
+    hero.addEventListener('mouseleave', () => onMove(null, null));
+    function touch(e) {
+        lastTouch = Date.now();
+        const t = e.touches[0];
+        if (t) at(t.clientX, t.clientY);
+    }
+    function release(e) {
+        lastTouch = Date.now();
+        if (!e.touches.length) onMove(null, null);
+    }
+    hero.addEventListener('touchstart', touch, { passive: true });
+    hero.addEventListener('touchmove', touch, { passive: true });
+    hero.addEventListener('touchend', release, { passive: true });
+    hero.addEventListener('touchcancel', release, { passive: true });
+}
+
+// ===== Hero Canvas Node Network Effect (desktop and mobile, when "Nodes" is selected) =====
+// Floating nodes joined by lines. Nodes move away from the mouse (desktop) or
+// from a finger on the screen (phones). Only runs while "Nodes" is selected
+// and the hero is on screen.
 (function() {
     const heroCanvas = document.getElementById('heroCanvas');
-    if (!heroCanvas) return;
+    const hero = heroCanvas ? heroCanvas.closest('.hero') : null;   // home page hero only
+    if (!heroCanvas || !hero) return;
 
     const ctx = heroCanvas.getContext('2d');
     let particles = [];
     let mouse = { x: null, y: null, radius: 150 };
-    let animationFrameId = null;
-    let hasInteracted = false; // tracks whether the user has already tapped/moved a node
+    let rafId = null;
+    let hasInteracted = false; // tracks whether the user has already touched the nodes
+    let active = false, running = false, onScreen = true;
+    let sizeW = 0, sizeH = 0;
 
-    function resizeCanvas() {
-        heroCanvas.width = heroCanvas.offsetWidth;
-        heroCanvas.height = heroCanvas.offsetHeight;
-        ctx.clearRect(0, 0, heroCanvas.width, heroCanvas.height);
+    function resizeCanvas(force) {
+        const w = heroCanvas.offsetWidth, h = heroCanvas.offsetHeight;
+        if (!w || !h) return;
+        if (!force && w === sizeW && h === sizeH) return;   // phones fire "resize" when the address bar slides; skip those
+        sizeW = w; sizeH = h;
+        heroCanvas.width = w;
+        heroCanvas.height = h;
+        ctx.clearRect(0, 0, w, h);
         initParticles();
     }
 
@@ -876,90 +922,42 @@ filterButtons.forEach(button => {
             }
         }
     }
-	// This is specifically for desktop
-    heroCanvas.addEventListener('mousemove', (e) => {   
-        if (window.innerWidth <= 768) return;
-        const rect = heroCanvas.getBoundingClientRect();
-        mouse.x = e.clientX - rect.left;
-        mouse.y = e.clientY - rect.top;
-    });
-    heroCanvas.addEventListener('mouseleave', () => {
-        if (window.innerWidth <= 768) return;
-        mouse.x = null;
-        mouse.y = null;
-    });
 
-    // Tap-based scatter for touch devices: a tap briefly scatters nearby
-    // nodes, then automatically settles back on its own after a short
-    // delay. Deliberately NOT hooked into touchmove, so normal page
-    // scrolling over the hero canvas is never intercepted.
-    let touchScatterTimeout = null;
-    const TOUCH_SCATTER_DURATION = 400; // ms
-
-    heroCanvas.addEventListener('touchstart', (e) => {
-        hasInteracted = true;
-        const rect = heroCanvas.getBoundingClientRect();
-        const touch = e.touches[0];
-        mouse.x = touch.clientX - rect.left;
-        mouse.y = touch.clientY - rect.top;
-
-        if (touchScatterTimeout) clearTimeout(touchScatterTimeout);
-        touchScatterTimeout = setTimeout(() => {
-            mouse.x = null;
-            mouse.y = null;
-            touchScatterTimeout = null;
-        }, TOUCH_SCATTER_DURATION);
-    });
-    heroCanvas.addEventListener('touchmove', (e) => {
-        if (window.innerWidth <= 768) return;
-        e.preventDefault();
-        const rect = heroCanvas.getBoundingClientRect();
-        const touch = e.touches[0];
-        mouse.x = touch.clientX - rect.left;
-        mouse.y = touch.clientY - rect.top;
-    });
-    heroCanvas.addEventListener('touchend', () => {
-        // Intentionally left as a no-op on mobile: the scatter settles back
-        // on its own via the timeout above, not on finger-lift, so a quick
-        // tap still produces a visible little burst rather than snapping
-        // back instantly. Desktop never fires this (no touch events there).
+    // Mouse (desktop) or finger (phones): nodes move away from it
+    flechaHeroPointer(hero, heroCanvas, (x, y) => {
+        if (x !== null) hasInteracted = true;
+        mouse.x = x;
+        mouse.y = y;
     });
 
     // ===== Idle auto-demo scatter =====
     // If the user hasn't touched a node within a few seconds of load, gently
     // scatter the cluster near the center on its own — a one-time passive
-    // demo of the tap-to-scatter behavior, no text or instructions needed.
-    // Runs once per browser session, and only on mobile.
+    // demo, no text or instructions needed. Runs once per browser session,
+    // only on phones, and only while "Nodes" is selected.
     const DEMO_DELAY = 3500;    // ms after load before the demo fires
     const DEMO_DURATION = 500;  // ms the scatter holds before settling back
     if (window.innerWidth <= 768 && !sessionStorage.getItem('flechaHeroDemoPlayed')) {
         setTimeout(() => {
-            if (hasInteracted) return; // user already found it on their own
+            if (hasInteracted || !active) return;
             sessionStorage.setItem('flechaHeroDemoPlayed', '1');
             mouse.x = heroCanvas.width / 2;
             mouse.y = heroCanvas.height / 2;
             setTimeout(() => {
+                if (hasInteracted) return;
                 mouse.x = null;
                 mouse.y = null;
             }, DEMO_DURATION);
         }, DEMO_DELAY);
     }
 
-    resizeCanvas();
-
-    let resizeTimeout;
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(resizeCanvas, 250);
-    });
-
     let lastFrameTime = 0;
     const targetFPS = window.innerWidth <= 768 ? 30 : 60;
     const frameInterval = 1000 / targetFPS;
 
     function animateParticles(currentTime) {
-        animationFrameId = requestAnimationFrame(animateParticles);
-        if (heroCanvas.offsetParent === null) return; // hidden on desktop: the flowing lines run there instead
+        if (!running) return;
+        rafId = requestAnimationFrame(animateParticles);
         const deltaTime = currentTime - lastFrameTime;
         if (deltaTime < frameInterval) return;
         lastFrameTime = currentTime - (deltaTime % frameInterval);
@@ -976,14 +974,40 @@ filterButtons.forEach(button => {
         });
     }
 
-    animateParticles(0);
-
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            if (animationFrameId) { cancelAnimationFrame(animationFrameId); animationFrameId = null; }
-        } else {
-            if (!animationFrameId) animateParticles(0);
+    // runs only while "Nodes" is selected, the hero is on screen and the tab is showing
+    function update() {
+        const go = active && onScreen && !document.hidden;
+        if (go && !running) {
+            running = true;
+            lastFrameTime = 0;
+            rafId = requestAnimationFrame(animateParticles);
+        } else if (!go && running) {
+            running = false;
+            cancelAnimationFrame(rafId);
         }
+    }
+
+    flechaHeroFx.nodes = {
+        setActive(on) {
+            active = on;
+            if (on) resizeCanvas(true);
+            else { mouse.x = null; mouse.y = null; }
+            update();
+        }
+    };
+
+    if ('IntersectionObserver' in window) {
+        new IntersectionObserver((entries) => {
+            onScreen = entries[0].isIntersecting;
+            update();
+        }).observe(hero);
+    }
+    document.addEventListener('visibilitychange', update);
+
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => { if (active) resizeCanvas(false); }, 250);
     });
 })();
 
@@ -1056,32 +1080,34 @@ document.querySelectorAll('.pricing-feature-toggle').forEach(btn => {
     });
 });
 
-// ===== Hero "Flowing Lines" Background (desktop only, 769px and wider) =====
-// Thin purple and blue lines ripple across the hero and bend around the
-// mouse. Phones never run this: the canvas is hidden there and the node
-// network is used instead. It pauses when the hero is scrolled out of view
-// or the tab is hidden, and shows a still frame for visitors who ask their
-// computer for less motion.
+// ===== Hero "Flowing Lines" Background (desktop and mobile, when "Lines" is selected) =====
+// Thin purple and blue lines ripple across the hero and bend around the mouse
+// (desktop) or a finger on the screen (phones). Only runs while "Lines" is
+// selected and the hero is on screen; shows a still frame for visitors who
+// ask their computer for less motion.
 (function() {
     const canvas = document.getElementById('heroWaves');
     const hero = document.getElementById('home');
     if (!canvas || !hero) return;
 
     const ctx = canvas.getContext('2d');
-    const desktop = window.matchMedia('(min-width: 769px)');
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const LINES = 22;          // how many lines
-    const BEND = 170;          // how far (px) around the mouse the lines bend
     const mouse = { x: null, y: null };
     let w = 0;
     let h = 0;
+    let bend = 170;            // how far (px) around the mouse/finger the lines bend
+    let active = false;
     let running = false;
     let onScreen = true;
 
-    function resize() {
+    function resize(force) {
+        const nw = hero.offsetWidth, nh = hero.offsetHeight;
+        if (!force && nw === w && nh === h) return;   // phones fire "resize" when the address bar slides; skip those
         const dpr = Math.min(2, window.devicePixelRatio || 1);
-        w = hero.offsetWidth;
-        h = hero.offsetHeight;
+        w = nw;
+        h = nh;
+        bend = Math.min(170, w * 0.35);
         canvas.width = Math.round(w * dpr);
         canvas.height = Math.round(h * dpr);
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -1099,7 +1125,7 @@ document.querySelectorAll('.pricing-feature-toggle').forEach(btn => {
 
             const g = ctx.createLinearGradient(0, 0, w, 0);
             g.addColorStop(0, 'rgba(102, 126, 234, 0)');
-			g.addColorStop(0.3, 'rgba(102, 126, 234, ' + (0.35 + 0.4 * strength) + ')');
+            g.addColorStop(0.3, 'rgba(102, 126, 234, ' + (0.35 + 0.4 * strength) + ')');
             g.addColorStop(0.7, 'rgba(212, 165, 255, ' + (0.4 + 0.45 * strength) + ')');
             g.addColorStop(1, 'rgba(212, 165, 255, 0)');
             ctx.strokeStyle = g;
@@ -1115,7 +1141,7 @@ document.querySelectorAll('.pricing-feature-toggle').forEach(btn => {
                     const dx = x - mouse.x;
                     const dy = y - mouse.y;
                     const d = Math.hypot(dx, dy);
-                    if (d < BEND) y += (dy / (d || 1)) * (BEND - d) * 0.35;
+                    if (d < bend) y += (dy / (d || 1)) * (bend - d) * 0.35;
                 }
                 if (x === 0) ctx.moveTo(x, y);
                 else ctx.lineTo(x, y);
@@ -1131,10 +1157,7 @@ document.querySelectorAll('.pricing-feature-toggle').forEach(btn => {
     }
 
     function update() {
-        if (!desktop.matches) {
-            running = false;
-            return;
-        }
+        if (!active) { running = false; return; }
         if (onScreen && !document.hidden && !reduceMotion.matches) {
             if (!running) {
                 running = true;
@@ -1146,15 +1169,21 @@ document.querySelectorAll('.pricing-feature-toggle').forEach(btn => {
         }
     }
 
-    hero.addEventListener('mousemove', (e) => {
-        const r = hero.getBoundingClientRect();
-        mouse.x = e.clientX - r.left;
-        mouse.y = e.clientY - r.top;
+    // Mouse (desktop) or finger (phones): the lines bend around it
+    flechaHeroPointer(hero, canvas, (x, y) => {
+        mouse.x = x;
+        mouse.y = y;
+        if (active && !running && reduceMotion.matches) draw(0);
     });
-    hero.addEventListener('mouseleave', () => {
-        mouse.x = null;
-        mouse.y = null;
-    });
+
+    flechaHeroFx.lines = {
+        setActive(on) {
+            active = on;
+            if (on) { resize(true); draw(performance.now()); }
+            else { mouse.x = null; mouse.y = null; }
+            update();
+        }
+    };
 
     if ('IntersectionObserver' in window) {
         new IntersectionObserver((entries) => {
@@ -1168,78 +1197,66 @@ document.querySelectorAll('.pricing-feature-toggle').forEach(btn => {
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
-            if (desktop.matches) {
-                resize();
+            if (active) {
+                resize(false);
                 draw(performance.now());
             }
         }, 200);
     });
-    desktop.addEventListener('change', () => {
-        if (desktop.matches) resize();
-        update();
-    });
-
-    if (desktop.matches) {
-        resize();
-        draw(0);
-    }
-    update();
 })();
 
-// ===== Intro Section Pulsing Squares (desktop only, 769px and wider) =====
-// Fills the intro section with a grid of squares; about 1 in 8 gently
-// pulse. Phones never build the grid (it is also hidden there by CSS).
+// ===== Hero "Nodes | Lines" Switch (desktop and mobile) =====
+// Lets visitors pick the hero background. Desktop starts on Lines and phones
+// start on Nodes; once a visitor picks one, it is remembered on that browser.
 (function() {
-    const layer = document.getElementById('introTiles');
-    if (!layer) return;
+    const hero = document.getElementById('home');
+    const sw = hero ? hero.querySelector('.hero-fx-switch') : null;
+    if (!hero || !sw) return;
     const desktop = window.matchMedia('(min-width: 769px)');
-    const SIZE = 60; // 52px square + 8px gap
+    const buttons = sw.querySelectorAll('.hero-fx-btn');
+    let saved = null;
+    try { saved = localStorage.getItem('flechaHeroFx'); } catch (e) { /* storage blocked: use the default */ }
 
-    function build() {
-        layer.innerHTML = '';
-        if (!desktop.matches) return;
-        const cols = Math.ceil(layer.offsetWidth / SIZE);
-        const rows = Math.ceil(layer.offsetHeight / SIZE);
-        const frag = document.createDocumentFragment();
-        for (let i = 0; i < cols * rows; i++) {
-            const tile = document.createElement('div');
-            tile.className = 'intro-tile';
-            if (Math.random() < 0.13) {
-                tile.classList.add('is-lit');
-                tile.style.setProperty('--d', (3 + Math.random() * 3).toFixed(1) + 's');
-                tile.style.setProperty('--w', (-Math.random() * 6).toFixed(1) + 's');
-            }
-            frag.appendChild(tile);
-        }
-        layer.appendChild(frag);
+    function current() {
+        if (saved === 'nodes' || saved === 'lines') return saved;
+        return desktop.matches ? 'lines' : 'nodes';
     }
 
-    let timer;
-    window.addEventListener('resize', () => {
-        clearTimeout(timer);
-        timer = setTimeout(build, 250);
-    });
-    desktop.addEventListener('change', build);
-    build();
+    function apply() {
+        const fx = current();
+        hero.dataset.fx = fx;   // CSS shows the matching canvas
+        buttons.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.fx === fx)));
+        if (flechaHeroFx.nodes) flechaHeroFx.nodes.setActive(fx === 'nodes');
+        if (flechaHeroFx.lines) flechaHeroFx.lines.setActive(fx === 'lines');
+    }
+
+    buttons.forEach(b => b.addEventListener('click', () => {
+        saved = b.dataset.fx;
+        try { localStorage.setItem('flechaHeroFx', saved); } catch (e) { /* storage blocked: choice lasts this visit only */ }
+        apply();
+    }));
+    desktop.addEventListener('change', apply);   // the default follows the screen size until the visitor picks one
+    apply();
 })();
 
-// ===== "Before Your Consultation" Plus-Sign Grid (desktop only, 769px and wider) =====
-// A neat grid of tiny + markers fills the space around the box (never inside
-// it). About 1 in 8 gently twinkle, and the ones near the mouse brighten and
-// turn. Phones never run this (the canvas is also hidden there by CSS).
-// Pauses when off screen or when the tab is hidden; visitors who ask for less
-// motion get a still grid that still reacts to the mouse.
-(function() {
-    const canvas = document.getElementById('bwmPlus');
-    const section = document.getElementById('questionnaire');
-    const box = section ? section.querySelector('.before-we-meet-content') : null;
-    if (!canvas || !section || !box) return;
+// ===== Plus-Sign Grid (desktop only, 769px and wider) =====
+// Shared by the "Welcome to Flecha Web Design" intro and "Before Your
+// Consultation". A neat grid of tiny + markers fills the space around the
+// content (never behind it). About 1 in 8 gently twinkle, and the ones near the
+// mouse brighten and turn. Both sections line their markers up to the same
+// page-wide grid, so they read as one continuous pattern.
+// Phones never run this (the canvas is also hidden there by CSS). Pauses when
+// off screen or when the tab is hidden; visitors who ask for less motion get a
+// still grid that still reacts to the mouse.
+//   getHoles(s) returns the areas to keep clear, as rects relative to the section.
+function flechaPlusGrid(section, canvas, getHoles) {
+    if (!section || !canvas) return;
     const ctx = canvas.getContext('2d');
     const desktop = window.matchMedia('(min-width: 769px)');
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const COLOR = '212, 165, 255';
     const GRID = 34;       // space between markers (px)
-    const CLEAR = 20;      // empty space kept around the box (px)
+    const CLEAR = 20;      // empty space kept around the content (px)
     const NEAR = 120;      // how close (px) the mouse must be to light a marker
     let W = 0, H = 0, marks = [], t = 0, last = 0, running = false, onScreen = false;
     const mouse = { x: -9999, y: -9999 };
@@ -1247,16 +1264,18 @@ document.querySelectorAll('.pricing-feature-toggle').forEach(btn => {
     function build() {
         const dpr = Math.min(2, window.devicePixelRatio || 1);
         const s = section.getBoundingClientRect();
-        const b = box.getBoundingClientRect();
         W = s.width; H = s.height;
         canvas.width = Math.round(W * dpr);
         canvas.height = Math.round(H * dpr);
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        const bx = { l: b.left - s.left - CLEAR, t: b.top - s.top - CLEAR, r: b.right - s.left + CLEAR, btm: b.bottom - s.top + CLEAR };
+        const holes = getHoles(s).map(r => ({ l: r.x - CLEAR, t: r.y - CLEAR, r: r.x + r.w + CLEAR, b: r.y + r.h + CLEAR }));
+        // start the rows on the page-wide grid so neighbouring sections line up
+        const pageTop = s.top + window.scrollY;
+        const y0 = ((GRID / 2 - pageTop) % GRID + GRID) % GRID;
         marks = [];
-        for (let y = GRID / 2; y < H; y += GRID) {
+        for (let y = y0; y < H; y += GRID) {
             for (let x = GRID / 2; x < W; x += GRID) {
-                if (x > bx.l && x < bx.r && y > bx.t && y < bx.btm) continue;   // keep the box clear
+                if (holes.some(h => x > h.l && x < h.r && y > h.t && y < h.b)) continue;   // keep content clear
                 marks.push({ x: x, y: y, twinkle: Math.random() < 0.12, phase: Math.random() * 10 });
             }
         }
@@ -1344,6 +1363,40 @@ document.querySelectorAll('.pricing-feature-toggle').forEach(btn => {
     window.addEventListener('load', refresh);
     desktop.addEventListener('change', refresh);
     refresh();
+}
+
+// rect of an element relative to the section
+function flechaRel(r, s) {
+    return { x: r.left - s.left, y: r.top - s.top, w: r.width, h: r.height };
+}
+
+// "Welcome to Flecha Web Design": keep the title words and the paragraph clear
+(function() {
+    const section = document.querySelector('.company-intro');
+    if (!section) return;
+    flechaPlusGrid(section, document.getElementById('introPlus'), function(s) {
+        const holes = [];
+        const title = section.querySelector('.section-title');
+        if (title) {
+            // the title box is full width, so measure just the words
+            const range = document.createRange();
+            range.selectNodeContents(title);
+            holes.push(flechaRel(range.getBoundingClientRect(), s));
+        }
+        const text = section.querySelector('.intro-text');
+        if (text) holes.push(flechaRel(text.getBoundingClientRect(), s));
+        return holes;
+    });
+})();
+
+// "Before Your Consultation": keep the box clear
+(function() {
+    const section = document.getElementById('questionnaire');
+    const box = section ? section.querySelector('.before-we-meet-content') : null;
+    if (!box) return;
+    flechaPlusGrid(section, document.getElementById('bwmPlus'), function(s) {
+        return [flechaRel(box.getBoundingClientRect(), s)];
+    });
 })();
 
 // ===== Essential Pricing Card Flip (desktop and mobile) =====

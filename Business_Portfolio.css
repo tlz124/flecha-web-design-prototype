@@ -3760,9 +3760,11 @@ section::before {
     }
 }
 
-/* ===== Hero "flowing lines" background (desktop only) =====
-   On desktop the flowing-lines canvas replaces the node network.
-   Phones keep the node network exactly as before. */
+/* ===== Hero background: Nodes / Lines switch (desktop and mobile) =====
+   Two effects share the hero: the node network (#heroCanvas) and the
+   flowing lines (.hero-canvas--waves). The script sets data-fx="nodes" or
+   data-fx="lines" on the hero to show one. Before the script runs, desktop
+   shows the lines and phones show the nodes. */
 .hero-canvas--waves {
     display: none;
 }
@@ -3775,6 +3777,83 @@ section::before {
 
     .hero-canvas--waves {
         display: block;
+    }
+}
+
+.hero[data-fx="nodes"] #heroCanvas {
+    display: block;
+}
+
+.hero[data-fx="nodes"] .hero-canvas--waves {
+    display: none;
+}
+
+.hero[data-fx="lines"] #heroCanvas {
+    display: none;
+}
+
+.hero[data-fx="lines"] .hero-canvas--waves {
+    display: block;
+}
+
+/* the two-option switch in the bottom-right corner of the hero */
+.hero-fx-switch {
+    position: absolute;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 2;
+    display: inline-flex;
+    gap: 3px;
+    padding: 3px;
+    background: rgba(10, 10, 10, 0.75);
+    border: 1px solid rgba(212, 165, 255, 0.35);
+    border-radius: 6px;
+    -webkit-backdrop-filter: blur(6px);
+            backdrop-filter: blur(6px);
+}
+
+.hero-fx-btn {
+    -webkit-appearance: none;
+            appearance: none;
+    border: 0;
+    background: transparent;
+    color: var(--text-gray);
+    font: inherit;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 0.55rem 0.9rem;
+    min-height: 32px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.hero-fx-btn:hover {
+    color: var(--purple-light);
+}
+
+.hero-fx-btn[aria-pressed="true"] {
+    background: var(--purple-accent);
+    color: var(--black);
+}
+
+.hero-fx-btn:focus-visible {
+    outline: 2px solid var(--purple-light);
+    outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+    .hero-fx-switch {
+        right: 0.75rem;
+        bottom: 0.75rem;
+    }
+
+    .hero-fx-btn {
+        min-height: 36px;
+        padding: 0.6rem 0.95rem;
     }
 }
 
@@ -3979,69 +4058,16 @@ section::before {
     }
 }
 
-/* ===== Intro section: pulsing square grid (desktop only) ===== */
-.intro-tiles {
-    display: none;
-}
-@media (min-width: 769px) {
-    .company-intro {
-        overflow: hidden;
-    }
-    .company-intro .container {
-        position: relative;
-        z-index: 1;
-    }
-    .intro-tiles {
-        display: grid;
-        position: absolute;
-        inset: 0;
-        z-index: 0;
-        pointer-events: none;
-        grid-template-columns: repeat(auto-fill, 52px);
-        grid-auto-rows: 52px;
-        gap: 8px;
-        padding: 8px;
-        justify-content: center;
-        /* keeps the middle clear so the text stays easy to read */
-        -webkit-mask-image: radial-gradient(ellipse 42% 62% at 50% 50%, transparent 55%, #000 100%);
-                mask-image: radial-gradient(ellipse 42% 62% at 50% 50%, transparent 55%, #000 100%);
-    }
-    .intro-tile {
-        border: 1px solid rgba(212, 165, 255, 0.18);
-        border-radius: 4px;
-    }
-    .intro-tile.is-lit {
-        border-color: rgba(212, 165, 255, 0.4);
-    }
-}
-@media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
-    .intro-tile.is-lit {
-        animation: intro-tile-pulse var(--d, 4s) ease-in-out var(--w, 0s) infinite;
-    }
-}
-@keyframes intro-tile-pulse {
-    0%, 100% {
-        background: transparent;
-        border-color: rgba(212, 165, 255, 0.18);
-        box-shadow: none;
-    }
-    50% {
-        background: rgba(212, 165, 255, 0.2);
-        border-color: rgba(212, 165, 255, 0.75);
-        box-shadow: 0 0 16px rgba(212, 165, 255, 0.4);
-    }
-}
-
-/* ===== "Before Your Consultation": plus-sign grid around the box (desktop only) =====
-   A neat grid of tiny + markers in the space outside the box. A few twinkle,
-   and the ones near the mouse brighten and turn. Drawn on a canvas by
-   Business_Portfolio.js. Phones never show it. */
-.bwm-plus {
+/* ===== Plus-sign grid: "Welcome" intro + "Before Your Consultation" (desktop only) =====
+   A neat grid of tiny + markers in the space around the text / box. A few
+   twinkle, and the ones near the mouse brighten and turn. Drawn on a canvas
+   by Business_Portfolio.js. Phones never show it. */
+.plus-grid {
     display: none;
 }
 
 @media (min-width: 769px) {
-    .bwm-plus {
+    .plus-grid {
         display: block;
         position: absolute;
         top: 0;
@@ -4052,6 +4078,11 @@ section::before {
         pointer-events: none;
     }
 
+    .company-intro {
+        overflow: hidden;
+    }
+
+    .company-intro .container,
     .before-we-meet .container {
         position: relative;
         z-index: 1;

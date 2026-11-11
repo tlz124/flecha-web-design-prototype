@@ -123,11 +123,17 @@
             <h2 class="hero-title">Moving Your Vision Forward</h2>
             <p class="hero-subtitle">Web design for businesses, schools, and nonprofits that points you in the right direction</p>
         </div>
+        <!-- Background effect switch (desktop and mobile) -->
+        <div class="hero-fx-switch" role="group" aria-label="Background effect">
+            <button type="button" class="hero-fx-btn" data-fx="nodes" aria-pressed="false">Nodes</button>
+            <button type="button" class="hero-fx-btn" data-fx="lines" aria-pressed="false">Lines</button>
+        </div>
     </section>
 
     <!-- Company Description Section -->
     <section class="company-intro">
-        <div class="intro-tiles" id="introTiles" aria-hidden="true"></div>
+        <!-- Plus-sign grid around the text (desktop only, never behind the text) -->
+        <canvas class="plus-grid" id="introPlus" aria-hidden="true"></canvas>
         <div class="container">
             <h2 class="section-title">Welcome to Flecha Web Design</h2>
             <p class="intro-text">We create purposeful, user-friendly websites for businesses, schools, and nonprofits. Our name, "Flecha" (Spanish for "arrow"), represents our mission: to point your business or organization in the right direction and help you move forward in the digital world.</p>
@@ -139,7 +145,7 @@
     <!-- Before We Meet Banner -->
     <section class="before-we-meet" id="questionnaire">
         <!-- Plus-sign grid around the box (desktop only, never inside the box) -->
-        <canvas class="bwm-plus" id="bwmPlus" aria-hidden="true"></canvas>
+        <canvas class="plus-grid" id="bwmPlus" aria-hidden="true"></canvas>
         <div class="container">
             <div class="before-we-meet-content">
                 <div class="before-we-meet-text">
