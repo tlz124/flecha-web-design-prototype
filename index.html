@@ -480,7 +480,7 @@
         <div class="container">
             <h2 class="section-title">Investment</h2>
             <p class="section-subtitle">Simple, transparent pricing — no surprises</p>
-            <p class="pricing-swipe-hint">← Swipe to explore plans →</p>
+            <p class="pricing-swipe-hint" id="pricingSwipeHint">← Swipe to explore plans →</p>
 
             <!-- E-Commerce Toggle -->
             <div class="pricing-toggle-wrap">
@@ -490,6 +490,14 @@
                 <button class="pricing-toggle-btn pricing-toggle-btn--right" id="ecomBtn">
                     E-Commerce
                 </button>
+            </div>
+
+            <!-- Pay Once / Monthly switch (Non E-Commerce only, for now) -->
+            <div class="pricing-billing-wrap" id="billingWrap">
+                <div class="pricing-billing" role="group" aria-label="How you pay">
+                    <button type="button" class="pricing-billing-btn active" id="payOnceBtn" aria-pressed="true">Pay Once</button>
+                    <button type="button" class="pricing-billing-btn" id="monthlyBtn" aria-pressed="false">Monthly <span class="pricing-new">New</span></button>
+                </div>
             </div>
 
             <div class="pricing-content-wrap">
@@ -691,6 +699,33 @@
             </div>
 
             <!-- E-Commerce Pricing -->
+            <!-- Non E-Commerce, Monthly: Website as a Service (edit prices here) -->
+            <div class="pricing-grid pricing-grid--monthly" id="nonEcomMonthly" style="display:none;">
+                <div class="pricing-card pricing-card--monthly">
+                    <div class="pricing-header">
+                        <h3 class="pricing-name">Essential</h3>
+                        <div class="pricing-amount">
+                            <span class="pricing-total">$99<span class="pricing-per">/mo</span></span>
+                            <span class="pricing-label">Website as a Service</span>
+                            <span class="pricing-setup">+ $250 one-time setup</span>
+                        </div>
+                    </div>
+                    <div class="pricing-body">
+                        <ul class="pricing-features">
+                            <li>✓ Everything in the Essential site</li>
+                            <li class="pricing-feature--added">✓ Hosting, domain &amp; SSL included</li>
+                            <li class="pricing-feature--added">✓ Up to 2 content updates / month</li>
+                            <li class="pricing-feature--added">✓ Security updates &amp; backups</li>
+                            <li class="pricing-feature--added">✓ Uptime monitoring</li>
+                        </ul>
+                        <a href="#contact" class="pricing-cta">
+                            Request Consultation <span class="arrow-icon">→</span>
+                        </a>
+                        <p class="pricing-monthly-terms">12-month minimum, then month to month. Own your site anytime with a buyout.</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="pricing-grid" id="ecomPricing" style="display:none;">
 
                 <!-- E-Com Tier 1 (flips over to show the price breakdown) -->
@@ -884,10 +919,14 @@
 
             </div>
 
-            <p class="pricing-note">
+            <p class="pricing-note" id="payOnceNote">
                 All tiers include a 50% deposit at project start with the
                 remaining balance due on delivery. Optional maintenance &amp;
                 support plans available for all tiers.
+            </p>
+            <p class="pricing-note" id="monthlyNote" style="display:none;">
+                Monthly plans: the setup fee is due at sign-up, then billing is
+                monthly. Cancel any time after the first 12 months.
             </p>
 			<p class="pricing-note" style="font-size:1.05rem; font-style:normal;">Nonprofit or school? Ask about our nonprofit rate.</p>
             </div>

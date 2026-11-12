@@ -1070,6 +1070,43 @@ if (ecomBtn && nonEcomBtn) {
     });
 }
 
+// ===== Pricing: Pay Once / Monthly switch (desktop and mobile) =====
+// "Monthly" shows the Website-as-a-Service cards instead of the one-time
+// cards. For now only Non E-Commerce has a monthly card (Essential), so the
+// switch is hidden while E-Commerce is selected.
+(function() {
+    const wrap = document.getElementById('billingWrap');
+    const onceBtn = document.getElementById('payOnceBtn');
+    const monthlyBtn = document.getElementById('monthlyBtn');
+    const monthlyGrid = document.getElementById('nonEcomMonthly');
+    if (!wrap || !onceBtn || !monthlyBtn || !monthlyGrid) return;
+    const onceNote = document.getElementById('payOnceNote');
+    const monthlyNote = document.getElementById('monthlyNote');
+    const swipeHint = document.getElementById('pricingSwipeHint');
+    let monthly = false;
+    let ecom = false;
+
+    function apply() {
+        const showMonthly = monthly && !ecom;
+        wrap.style.display = ecom ? 'none' : '';
+        if (nonEcomPricing) nonEcomPricing.style.display = ecom || showMonthly ? 'none' : '';
+        monthlyGrid.style.display = showMonthly ? '' : 'none';
+        if (onceNote) onceNote.style.display = showMonthly ? 'none' : '';
+        if (monthlyNote) monthlyNote.style.display = showMonthly ? '' : 'none';
+        if (swipeHint) swipeHint.style.visibility = showMonthly ? 'hidden' : '';   // only one card, nothing to swipe
+        onceBtn.classList.toggle('active', !monthly);
+        monthlyBtn.classList.toggle('active', monthly);
+        onceBtn.setAttribute('aria-pressed', String(!monthly));
+        monthlyBtn.setAttribute('aria-pressed', String(monthly));
+    }
+
+    onceBtn.addEventListener('click', () => { monthly = false; apply(); });
+    monthlyBtn.addEventListener('click', () => { monthly = true; apply(); });
+    if (ecomBtn) ecomBtn.addEventListener('click', () => { ecom = true; apply(); });
+    if (nonEcomBtn) nonEcomBtn.addEventListener('click', () => { ecom = false; apply(); });
+    apply();
+})();
+
 // ===== Nested Pricing Feature Toggles =====
 document.querySelectorAll('.pricing-feature-toggle').forEach(btn => {
     btn.addEventListener('click', () => {
