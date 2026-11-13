@@ -4738,9 +4738,9 @@ section::before {
     color: #6ee7a8;
 }
 
-/* one card, centered */
+/* monthly cards, centered side by side */
 .pricing-grid--monthly {
-    grid-template-columns: minmax(0, 400px);
+    grid-template-columns: repeat(2, minmax(0, 400px));
     justify-content: center;
 }
 
@@ -4777,7 +4777,8 @@ section::before {
 
 @media (max-width: 968px) {
     .pricing-grid--monthly {
-        justify-content: center;
+        justify-content: flex-start;   /* older browsers: never cut off the first card */
+        justify-content: safe center;  /* centered when both fit, swipeable when they don't */
     }
 }
 
