@@ -4738,10 +4738,20 @@ section::before {
     color: #6ee7a8;
 }
 
-/* monthly cards, centered side by side */
+/* monthly cards: three across, same as the Pay Once cards */
 .pricing-grid--monthly {
-    grid-template-columns: repeat(2, minmax(0, 400px));
-    justify-content: center;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* small "From" before the Custom monthly price */
+.pricing-from {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-gray);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-right: 4px;
+    vertical-align: middle;
 }
 
 .pricing-per {
@@ -4779,6 +4789,14 @@ section::before {
     .pricing-grid--monthly {
         justify-content: flex-start;   /* older browsers: never cut off the first card */
         justify-content: safe center;  /* centered when both fit, swipeable when they don't */
+    }
+
+    /* narrow cards: "From" sits neatly on its own line above the price */
+    .pricing-from {
+        display: block;
+        line-height: 1.2;
+        margin: 0 0 0.15rem;
+        font-size: 0.85rem;
     }
 }
 
