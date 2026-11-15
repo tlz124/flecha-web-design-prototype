@@ -4743,6 +4743,12 @@ section::before {
     grid-template-columns: repeat(3, 1fr);
 }
 
+/* only one monthly card (E-Commerce for now): centered */
+.pricing-grid--monthly.pricing-grid--single {
+    grid-template-columns: minmax(0, 400px);
+    justify-content: center;
+}
+
 /* small "From" before the Custom monthly price */
 .pricing-from {
     font-size: 1rem;

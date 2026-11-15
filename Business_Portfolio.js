@@ -1072,26 +1072,32 @@ if (ecomBtn && nonEcomBtn) {
 
 // ===== Pricing: Pay Once / Monthly switch (desktop and mobile) =====
 // "Monthly" shows the Website-as-a-Service cards instead of the one-time
-// cards. For now only Non E-Commerce has monthly cards (Essential,
-// Essential Plus and Custom), so the switch is hidden while E-Commerce is selected.
+// cards, under both Non E-Commerce and E-Commerce. The choice stays when the
+// visitor switches between the two. E-Commerce has one monthly card for now
+// (E-Com Essential), so the swipe hint is hidden there.
 (function() {
     const wrap = document.getElementById('billingWrap');
     const onceBtn = document.getElementById('payOnceBtn');
     const monthlyBtn = document.getElementById('monthlyBtn');
     const monthlyGrid = document.getElementById('nonEcomMonthly');
     if (!wrap || !onceBtn || !monthlyBtn || !monthlyGrid) return;
+    const ecomMonthlyGrid = document.getElementById('ecomMonthly');
     const onceNote = document.getElementById('payOnceNote');
     const monthlyNote = document.getElementById('monthlyNote');
+    const swipeHint = document.getElementById('pricingSwipeHint');
     let monthly = false;
     let ecom = false;
 
+    const show = (el, on) => { if (el) el.style.display = on ? '' : 'none'; };
+
     function apply() {
-        const showMonthly = monthly && !ecom;
-        wrap.style.display = ecom ? 'none' : '';
-        if (nonEcomPricing) nonEcomPricing.style.display = ecom || showMonthly ? 'none' : '';
-        monthlyGrid.style.display = showMonthly ? '' : 'none';
-        if (onceNote) onceNote.style.display = showMonthly ? 'none' : '';
-        if (monthlyNote) monthlyNote.style.display = showMonthly ? '' : 'none';
+        show(nonEcomPricing, !ecom && !monthly);
+        show(monthlyGrid, !ecom && monthly);
+        show(ecomPricing, ecom && !monthly);
+        show(ecomMonthlyGrid, ecom && monthly);
+        show(onceNote, !monthly);
+        show(monthlyNote, monthly);
+        if (swipeHint) swipeHint.style.visibility = ecom && monthly ? 'hidden' : '';   // one card, nothing to swipe
         onceBtn.classList.toggle('active', !monthly);
         monthlyBtn.classList.toggle('active', monthly);
         onceBtn.setAttribute('aria-pressed', String(!monthly));
