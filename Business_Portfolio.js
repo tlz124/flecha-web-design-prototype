@@ -1073,8 +1073,8 @@ if (ecomBtn && nonEcomBtn) {
 // ===== Pricing: Pay Once / Monthly switch (desktop and mobile) =====
 // "Monthly" shows the Website-as-a-Service cards instead of the one-time
 // cards, under both Non E-Commerce and E-Commerce. The choice stays when the
-// visitor switches between the two. E-Commerce has one monthly card for now
-// (E-Com Essential), so the swipe hint is hidden there.
+// visitor switches between the two. E-Commerce has two monthly cards for now
+// (E-Com Essential and E-Com Plus).
 (function() {
     const wrap = document.getElementById('billingWrap');
     const onceBtn = document.getElementById('payOnceBtn');
@@ -1084,7 +1084,6 @@ if (ecomBtn && nonEcomBtn) {
     const ecomMonthlyGrid = document.getElementById('ecomMonthly');
     const onceNote = document.getElementById('payOnceNote');
     const monthlyNote = document.getElementById('monthlyNote');
-    const swipeHint = document.getElementById('pricingSwipeHint');
     let monthly = false;
     let ecom = false;
 
@@ -1097,7 +1096,6 @@ if (ecomBtn && nonEcomBtn) {
         show(ecomMonthlyGrid, ecom && monthly);
         show(onceNote, !monthly);
         show(monthlyNote, monthly);
-        if (swipeHint) swipeHint.style.visibility = ecom && monthly ? 'hidden' : '';   // one card, nothing to swipe
         onceBtn.classList.toggle('active', !monthly);
         monthlyBtn.classList.toggle('active', monthly);
         onceBtn.setAttribute('aria-pressed', String(!monthly));
