@@ -1073,8 +1073,8 @@ if (ecomBtn && nonEcomBtn) {
 // ===== Pricing: Pay Once / Monthly switch (desktop and mobile) =====
 // "Monthly" shows the Website-as-a-Service cards instead of the one-time
 // cards, under both Non E-Commerce and E-Commerce. The choice stays when the
-// visitor switches between the two. E-Commerce has two monthly cards for now
-// (E-Com Essential and E-Com Plus).
+// visitor switches between the two. Both have three monthly cards
+// (Essential, Plus and Custom).
 (function() {
     const wrap = document.getElementById('billingWrap');
     const onceBtn = document.getElementById('payOnceBtn');

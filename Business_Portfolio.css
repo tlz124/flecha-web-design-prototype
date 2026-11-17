@@ -4743,15 +4743,6 @@ section::before {
     grid-template-columns: repeat(3, 1fr);
 }
 
-/* two monthly cards (E-Commerce for now): centered side by side on desktop
-   (phones and tablets keep the swipe row) */
-@media (min-width: 969px) {
-    .pricing-grid--monthly.pricing-grid--two {
-        grid-template-columns: repeat(2, minmax(0, 400px));
-        justify-content: center;
-    }
-}
-
 /* small "From" before the Custom monthly price */
 .pricing-from {
     font-size: 1rem;
