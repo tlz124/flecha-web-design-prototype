@@ -762,9 +762,9 @@ filterButtons.forEach(button => {
 });
 
 // ===== Hero background effects: shared helpers =====
-// The hero has two background effects (the node network and the flowing
-// lines) and a Nodes / Lines switch. Each effect registers itself here so
-// the switch can turn it on and off.
+// The hero has three background effects (the node network, the flowing
+// lines and the warp stars) and a Nodes / Lines / Warp switch. Each effect
+// registers itself here so the switch can turn it on and off.
 const flechaHeroFx = {};
 
 // Mouse or finger position inside the hero, shared by both effects.
@@ -1244,7 +1244,133 @@ document.querySelectorAll('.pricing-feature-toggle').forEach(btn => {
     });
 })();
 
-// ===== Hero "Nodes | Lines" Switch (desktop and mobile) =====
+// ===== Hero "Warp" Background (desktop and mobile, when "Warp" is selected) =====
+// Purple and blue stars stream toward the viewer, like a jump to light speed.
+// The mouse (desktop) or a finger on the screen (phones) steers the direction.
+// Phones draw about half as many stars. Only runs while "Warp" is selected
+// and the hero is on screen; shows a still frame for visitors who ask their
+// computer for less motion. Clears fully every frame, so it never leaves trails.
+(function() {
+    const canvas = document.getElementById('heroWarp');
+    const hero = document.getElementById('home');
+    if (!canvas || !hero) return;
+
+    const ctx = canvas.getContext('2d');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const SPEED = 0.006;       // how fast the stars fly toward you
+    const BLUE = [102, 126, 234], PURPLE = [212, 165, 255];
+    let w = 0, h = 0, stars = [];
+    let cx = 0, cy = 0;        // where the stars stream out from (eases toward the pointer)
+    const pointer = { x: null, y: null };
+    let active = false, running = false, onScreen = true, last = 0;
+
+    function newStar(anyDepth) {
+        return { x: (Math.random() - 0.5) * 2, y: (Math.random() - 0.5) * 2, z: anyDepth ? Math.random() : 1, k: Math.random() };
+    }
+
+    function resize(force) {
+        const nw = hero.offsetWidth, nh = hero.offsetHeight;
+        if (!nw || !nh) return;
+        if (!force && nw === w && nh === h) return;   // phones fire "resize" when the address bar slides; skip those
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        w = nw; h = nh;
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const count = w <= 768 ? 350 : 700;
+        stars = Array.from({ length: count }, () => newStar(true));
+        cx = w / 2; cy = h / 2;
+    }
+
+    function draw(step) {
+        const tx = pointer.x !== null ? pointer.x : w / 2;
+        const ty = pointer.y !== null ? pointer.y : h / 2;
+        cx += (tx - cx) * Math.min(1, 0.05 * step);
+        cy += (ty - cy) * Math.min(1, 0.05 * step);
+        ctx.clearRect(0, 0, w, h);
+        const scale = Math.max(w, h) * 0.15;
+        for (let i = 0; i < stars.length; i++) {
+            const s = stars[i];
+            const pz = s.z;
+            s.z -= SPEED * step;
+            if (s.z <= 0.02) { stars[i] = newStar(false); continue; }
+            const x1 = cx + s.x / pz * scale, y1 = cy + s.y / pz * scale;
+            const x2 = cx + s.x / s.z * scale, y2 = cy + s.y / s.z * scale;
+            if (x2 < -50 || x2 > w + 50 || y2 < -50 || y2 > h + 50) { stars[i] = newStar(false); continue; }
+            const c = BLUE.map((v, j) => Math.round(v + (PURPLE[j] - v) * s.k));
+            ctx.strokeStyle = 'rgba(' + c[0] + ', ' + c[1] + ', ' + c[2] + ', ' + Math.min(1, (1 - s.z) * 1.2).toFixed(3) + ')';
+            ctx.lineWidth = 0.6 + (1 - s.z) * 1.8;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+        }
+    }
+
+    // a still picture: let the stars spread out first so it isn't empty
+    function stillFrame() {
+        for (let i = 0; i < 40; i++) draw(1);
+    }
+
+    function loop(now) {
+        if (!running) return;
+        const step = Math.min(3, Math.max(0, (now - last) / (1000 / 60)));   // 1 = one frame at 60fps
+        last = now;
+        draw(step);
+        requestAnimationFrame(loop);
+    }
+
+    function update() {
+        if (!active) { running = false; return; }
+        if (onScreen && !document.hidden && !reduceMotion.matches) {
+            if (!running) {
+                running = true;
+                last = performance.now();
+                requestAnimationFrame(loop);
+            }
+        } else {
+            running = false;
+        }
+    }
+
+    // Mouse (desktop) or finger (phones): steers where the stars come from
+    flechaHeroPointer(hero, canvas, (x, y) => {
+        pointer.x = x;
+        pointer.y = y;
+        if (active && !running && reduceMotion.matches) { cx = x !== null ? x : w / 2; cy = y !== null ? y : h / 2; draw(0); }
+    });
+
+    flechaHeroFx.warp = {
+        setActive(on) {
+            active = on;
+            if (on) { resize(true); stillFrame(); }
+            else { pointer.x = null; pointer.y = null; }
+            update();
+        }
+    };
+
+    if ('IntersectionObserver' in window) {
+        new IntersectionObserver((entries) => {
+            onScreen = entries[0].isIntersecting;
+            update();
+        }).observe(hero);
+    }
+    document.addEventListener('visibilitychange', update);
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            if (active) {
+                const before = w;
+                resize(false);
+                if (w !== before && !running) stillFrame();
+            }
+        }, 200);
+    });
+})();
+
+// ===== Hero "Nodes | Lines | Warp" Switch (desktop and mobile) =====
 // Lets visitors pick the hero background. Desktop starts on Lines and phones
 // start on Nodes; once a visitor picks one, it is remembered on that browser.
 (function() {
@@ -1257,7 +1383,7 @@ document.querySelectorAll('.pricing-feature-toggle').forEach(btn => {
     try { saved = localStorage.getItem('flechaHeroFx'); } catch (e) { /* storage blocked: use the default */ }
 
     function current() {
-        if (saved === 'nodes' || saved === 'lines') return saved;
+        if (saved === 'nodes' || saved === 'lines' || saved === 'warp') return saved;
         return desktop.matches ? 'lines' : 'nodes';
     }
 
@@ -1267,6 +1393,7 @@ document.querySelectorAll('.pricing-feature-toggle').forEach(btn => {
         buttons.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.fx === fx)));
         if (flechaHeroFx.nodes) flechaHeroFx.nodes.setActive(fx === 'nodes');
         if (flechaHeroFx.lines) flechaHeroFx.lines.setActive(fx === 'lines');
+        if (flechaHeroFx.warp) flechaHeroFx.warp.setActive(fx === 'warp');
     }
 
     buttons.forEach(b => b.addEventListener('click', () => {

@@ -3796,7 +3796,21 @@ section::before {
     display: block;
 }
 
-/* the two-option switch in the bottom-right corner of the hero */
+/* Third effect: Warp (stars streaming toward the viewer) */
+.hero-canvas--warp {
+    display: none;
+}
+
+.hero[data-fx="warp"] #heroCanvas,
+.hero[data-fx="warp"] .hero-canvas--waves {
+    display: none;
+}
+
+.hero[data-fx="warp"] .hero-canvas--warp {
+    display: block;
+}
+
+/* the Nodes | Lines | Warp switch in the bottom-right corner of the hero */
 .hero-fx-switch {
     position: absolute;
     right: 1.25rem;
@@ -3853,7 +3867,7 @@ section::before {
 
     .hero-fx-btn {
         min-height: 36px;
-        padding: 0.6rem 0.95rem;
+        padding: 0.6rem 0.8rem;
     }
 }
 
