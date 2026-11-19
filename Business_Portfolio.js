@@ -1536,22 +1536,211 @@ function flechaRel(r, s) {
     return { x: r.left - s.left, y: r.top - s.top, w: r.width, h: r.height };
 }
 
-// "Welcome to Flecha Web Design": keep the title words and the paragraph clear
+// ===== "Welcome to Flecha Web Design" Portal (desktop and mobile) =====
+// The first time the section scrolls into view, two doors with the Flecha
+// arrow split down the middle glow at the seam and swing open. Behind them a
+// purple portal sends small previews of the portfolio sites drifting out
+// toward the visitor. The mouse (desktop) gently shifts the portal.
+// Phones get fewer, smaller cards at 30 frames a second. The doors open once
+// per visit (later page loads start open). Pauses when off screen or when the
+// tab is hidden; visitors who ask for less motion get the doors already open
+// and a still picture.
 (function() {
     const section = document.querySelector('.company-intro');
-    if (!section) return;
-    flechaPlusGrid(section, document.getElementById('introPlus'), function(s) {
-        const holes = [];
-        const title = section.querySelector('.section-title');
-        if (title) {
-            // the title box is full width, so measure just the words
-            const range = document.createRange();
-            range.selectNodeContents(title);
-            holes.push(flechaRel(range.getBoundingClientRect(), s));
+    const canvas = document.getElementById('introPortal');
+    if (!section || !canvas) return;
+    const ctx = canvas.getContext('2d');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const PURPLE = [212, 165, 255], BLUE = [102, 126, 234];
+    const COLORS = [[232, 143, 180], [240, 163, 94], [126, 214, 154], [111, 195, 224], [201, 179, 126], [180, 140, 240], [143, 176, 240], [224, 194, 111]];
+    const SITES = (typeof projects !== 'undefined' ? projects : []).map((p, i) => ({ name: p.title, color: COLORS[i % COLORS.length] }));
+    if (!SITES.length) SITES.push({ name: 'Flecha Web Design', color: PURPLE });
+    const rgba = (c, a) => 'rgba(' + c[0] + ', ' + c[1] + ', ' + c[2] + ', ' + Math.max(0, Math.min(1, a)).toFixed(3) + ')';
+    const ease = (x) => x <= 0 ? 0 : x >= 1 ? 1 : 1 - Math.pow(1 - x, 3);
+
+    let w = 0, h = 0, phone = false;
+    let cards = [], spawnIn = 0, next = 0;
+    let since = -1;            // seconds since the doors started opening (-1 = still closed)
+    let running = false, onScreen = false, last = 0, frameGap = 0;
+    const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
+
+    function size() {
+        const r = section.getBoundingClientRect();
+        if (!r.width || !r.height) return;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        w = r.width; h = r.height;
+        phone = window.innerWidth <= 768;
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function box(x, y, bw, bh, r) {
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(x, y, bw, bh, r);
+        else ctx.rect(x, y, bw, bh);
+    }
+
+    // one small "website preview" card
+    function drawCard(x, y, s, a, site) {
+        const cw = 170 * s, ch = 110 * s, r = 6 * s;
+        ctx.save();
+        ctx.globalAlpha = a;
+        ctx.translate(x - cw / 2, y - ch / 2);
+        ctx.fillStyle = '#15121b';
+        ctx.strokeStyle = 'rgba(212, 165, 255, 0.55)';
+        ctx.lineWidth = 1;
+        box(0, 0, cw, ch, r); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = rgba(site.color, 0.9);
+        ctx.fillRect(0, 0, cw, ch * 0.13);
+        ctx.fillStyle = rgba(site.color, 0.28);
+        ctx.fillRect(cw * 0.07, ch * 0.22, cw * 0.86, ch * 0.34);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+        ctx.font = '700 ' + Math.max(6, 11 * s).toFixed(1) + 'px "Segoe UI", -apple-system, Roboto, Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(site.name, cw / 2, ch * 0.39, cw * 0.82);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+        ctx.fillRect(cw * 0.07, ch * 0.66, cw * 0.6, ch * 0.06);
+        ctx.fillRect(cw * 0.07, ch * 0.78, cw * 0.42, ch * 0.06);
+        ctx.restore();
+    }
+
+    function draw(dt) {
+        ctx.clearRect(0, 0, w, h);
+        const open = ease((since - 0.9) / 1.4);
+        if (open <= 0) return;
+        mouse.x += (mouse.tx - mouse.x) * Math.min(1, dt * 4);
+        mouse.y += (mouse.ty - mouse.y) * Math.min(1, dt * 4);
+        const cx = w / 2 + mouse.x * 40, cy = h / 2 + mouse.y * 25;
+
+        // the portal glow and ring
+        const pr = Math.min(w, h) * (phone ? 0.36 : 0.42) * open;
+        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, pr * 1.25);
+        g.addColorStop(0, rgba(PURPLE, 0.22 * open));
+        g.addColorStop(0.6, rgba(BLUE, 0.1 * open));
+        g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = g;
+        ctx.fillRect(cx - pr * 1.3, cy - pr * 1.3, pr * 2.6, pr * 2.6);
+        for (let i = 0; i < 3; i++) {
+            ctx.strokeStyle = rgba(PURPLE, (0.5 - i * 0.15) * open);
+            ctx.lineWidth = 2 + i * 4;
+            ctx.beginPath();
+            ctx.ellipse(cx, cy, pr * 1.15, pr * 0.92, 0, 0, Math.PI * 2);
+            ctx.stroke();
         }
-        const text = section.querySelector('.intro-text');
-        if (text) holes.push(flechaRel(text.getBoundingClientRect(), s));
-        return holes;
+
+        // portfolio cards drifting out
+        if (open > 0.3) {
+            spawnIn -= dt;
+            if (spawnIn <= 0) {
+                spawnIn = phone ? 1.2 : 0.75;
+                cards.push({ p: 0, ang: Math.random() * Math.PI * 2, site: SITES[next++ % SITES.length] });
+            }
+        }
+        const reach = Math.max(w, h) * 0.62;
+        const base = phone ? 0.6 : 1;
+        cards = cards.filter(c => c.p < 1);
+        for (const c of cards) {
+            c.p += dt / 7;
+            const d = Math.pow(c.p, 1.5) * reach;
+            const x = cx + Math.cos(c.ang) * d * 1.25;
+            const y = cy + Math.sin(c.ang) * d * 0.8;
+            const s = (0.18 + c.p * 1.15) * base;
+            const a = Math.min(1, c.p * 5) * (1 - Math.max(0, (c.p - 0.82) / 0.18));
+            drawCard(x, y, s, a * open, c.site);
+        }
+    }
+
+    // a still picture for visitors who ask for less motion
+    function stillFrame() {
+        since = 10;
+        cards = [];
+        for (let i = 0; i < 9; i++) cards.push({ p: 0.12 + i * 0.09, ang: i * 2.4, site: SITES[i % SITES.length] });
+        spawnIn = 999;
+        draw(0);
+    }
+
+    function loop(now) {
+        if (!running) return;
+        requestAnimationFrame(loop);
+        const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
+        frameGap += dt;
+        last = now;
+        if (phone && frameGap < 1 / 30) return;   // phones: 30 frames a second
+        const step = frameGap;
+        frameGap = 0;
+        if (since >= 0) since += step;
+        draw(Math.min(0.1, step));
+    }
+
+    function update() {
+        const go = onScreen && !document.hidden && !reduceMotion.matches && since >= 0;
+        if (go && !running) {
+            running = true;
+            last = performance.now();
+            frameGap = 0;
+            requestAnimationFrame(loop);
+        } else if (!go) {
+            running = false;
+        }
+    }
+
+    function openDoors(instant) {
+        if (since >= 0) return;
+        since = 0;
+        try { sessionStorage.setItem('flechaPortalOpened', '1'); } catch (e) { /* storage blocked: fine */ }
+        if (instant) {
+            section.classList.add('portal-open', 'portal-done');
+            since = 2.5;
+        } else {
+            section.classList.add('portal-cracking');
+            setTimeout(() => section.classList.add('portal-open'), 450);
+            setTimeout(() => section.classList.add('portal-done'), 2600);   // doors removed once off screen-space
+        }
+        update();
+    }
+
+    section.addEventListener('mousemove', (e) => {
+        const r = section.getBoundingClientRect();
+        mouse.tx = (e.clientX - r.left) / r.width - 0.5;
+        mouse.ty = (e.clientY - r.top) / r.height - 0.5;
+    });
+    section.addEventListener('mouseleave', () => { mouse.tx = 0; mouse.ty = 0; });
+
+    size();
+    let seen = false;
+    try { seen = sessionStorage.getItem('flechaPortalOpened') === '1'; } catch (e) { /* storage blocked */ }
+
+    if (reduceMotion.matches || !('IntersectionObserver' in window)) {
+        section.classList.add('portal-open', 'portal-done');
+        stillFrame();
+        if (!reduceMotion.matches) { onScreen = true; update(); }
+    } else {
+        section.classList.add('portal-ready');   // the doors appear only now that the script is running
+        if (seen) openDoors(true);
+        // open once half the section has scrolled above the lower 40% of the screen
+        // (so it plays while the visitor is looking at it, not while they're still on the hero)
+        const opener = new IntersectionObserver((entries) => {
+            if (entries[0].intersectionRatio >= 0.5) { openDoors(false); opener.disconnect(); }
+        }, { rootMargin: '0px 0px -40% 0px', threshold: [0.5] });
+        opener.observe(section);
+    }
+    if ('IntersectionObserver' in window) {
+        new IntersectionObserver((entries) => {
+            onScreen = entries[0].isIntersecting;
+            update();
+        }).observe(section);
+    }
+    document.addEventListener('visibilitychange', update);
+
+    let timer;
+    window.addEventListener('resize', () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            size();
+            if (!running) { if (reduceMotion.matches) stillFrame(); else draw(0); }
+        }, 200);
     });
 })();
 
