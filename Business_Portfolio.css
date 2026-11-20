@@ -4954,3 +4954,277 @@ section::before {
         transition: none;
     }
 }
+
+/* ===== Portal room (desktop only, 769px and wider) =====
+   On desktop the Welcome doors stay closed with an Enter button. Clicking it
+   opens the doors and steps into a full-screen 3D gallery room (built by
+   Business_Portfolio.js with three.js). Phones never see these buttons or the
+   room; their Welcome section works exactly as before. */
+.intro-enter,
+.intro-reenter {
+    display: none;
+}
+
+.portal-room {
+    display: none;
+}
+
+@media (min-width: 769px) {
+    .intro-enter,
+    .intro-reenter {
+        align-items: center;
+        gap: 0.6rem;
+        font: inherit;
+        font-size: 0.85rem;
+        font-weight: 800;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .intro-enter {
+        position: absolute;
+        z-index: 4;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, 70px);
+        padding: 0.85rem 1.6rem;
+        color: var(--black);
+        background: var(--purple-accent);
+        border: 0;
+        box-shadow: 0 0 18px rgba(212, 165, 255, 0.45);
+        animation: introEnterPulse 2.2s ease-in-out infinite;
+    }
+
+    .intro-enter:hover {
+        background: var(--purple-light);
+        transform: translate(-50%, 66px);
+    }
+
+    .intro-enter:focus-visible,
+    .intro-reenter:focus-visible {
+        outline: 2px solid var(--text-white);
+        outline-offset: 3px;
+    }
+
+    .company-intro.portal-ready:not(.portal-cracking):not(.portal-open) .intro-enter {
+        display: inline-flex;
+    }
+
+    .intro-reenter {
+        margin-top: 1.75rem;
+        padding: 0.7rem 1.3rem;
+        color: var(--purple-accent);
+        background: transparent;
+        border: 1px solid rgba(212, 165, 255, 0.55);
+    }
+
+    .intro-reenter:hover {
+        background: rgba(212, 165, 255, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .company-intro.portal-open .intro-reenter {
+        display: inline-flex;
+    }
+
+    /* the full-screen room */
+    .portal-room {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 20000;
+        background: #000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.6s ease;
+    }
+
+    .portal-room.is-on {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .portal-room canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        cursor: grab;
+    }
+
+    .portal-room canvas.is-dragging { cursor: grabbing; }
+    .portal-room canvas.is-pointing { cursor: pointer; }
+
+    .portal-room-brand {
+        position: absolute;
+        top: 18px;
+        left: 20px;
+        font-weight: 900;
+        letter-spacing: 4px;
+        font-size: 0.9rem;
+        color: var(--text-white);
+        pointer-events: none;
+    }
+
+    .portal-room-brand span { color: var(--purple-accent); }
+
+    .portal-room-exit {
+        position: absolute;
+        top: 14px;
+        right: 16px;
+        font: inherit;
+        font-size: 0.8rem;
+        font-weight: 800;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--purple-accent);
+        background: rgba(10, 10, 10, 0.7);
+        border: 1px solid rgba(212, 165, 255, 0.55);
+        border-radius: 4px;
+        padding: 0.6rem 1.1rem;
+        cursor: pointer;
+    }
+
+    .portal-room-exit:hover { background: rgba(212, 165, 255, 0.12); }
+    .portal-room-exit:focus-visible { outline: 2px solid var(--text-white); outline-offset: 3px; }
+
+    .portal-room-hint {
+        position: absolute;
+        left: 50%;
+        bottom: 18px;
+        transform: translateX(-50%);
+        background: rgba(10, 10, 10, 0.8);
+        border: 1px solid var(--border-gray);
+        border-radius: 999px;
+        padding: 0.5rem 1.1rem;
+        font-size: 0.8rem;
+        color: var(--text-gray);
+        white-space: nowrap;
+        pointer-events: none;
+    }
+
+    .portal-room-hint kbd {
+        font-family: inherit;
+        color: var(--text-white);
+        border: 1px solid #555;
+        border-bottom-width: 2px;
+        border-radius: 4px;
+        padding: 0 5px;
+        font-size: 0.75rem;
+    }
+
+    .portal-room-tip {
+        position: absolute;
+        pointer-events: none;
+        background: rgba(10, 10, 10, 0.9);
+        border: 1px solid rgba(212, 165, 255, 0.5);
+        color: var(--text-white);
+        font-size: 0.78rem;
+        padding: 4px 10px;
+        border-radius: 4px;
+        transform: translate(14px, 14px);
+        white-space: nowrap;
+    }
+
+    .portal-room-panel {
+        position: absolute;
+        top: 50%;
+        right: 24px;
+        width: 360px;
+        max-width: calc(100% - 48px);
+        background: rgba(18, 15, 24, 0.95);
+        border: 1px solid rgba(212, 165, 255, 0.45);
+        border-radius: 6px;
+        padding: 1.4rem 1.4rem 1.25rem;
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.6), 0 0 24px rgba(212, 165, 255, 0.15);
+        opacity: 0;
+        transform: translate(20px, -50%);
+        pointer-events: none;
+        transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .portal-room-panel.is-on {
+        opacity: 1;
+        transform: translate(0, -50%);
+        pointer-events: auto;
+    }
+
+    .portal-room-panel .prp-kicker {
+        font-size: 0.7rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--purple-accent);
+        font-weight: 700;
+    }
+
+    .portal-room-panel h4 {
+        margin: 0.35rem 0 0.25rem;
+        font-size: 1.35rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--text-white);
+    }
+
+    .portal-room-panel .prp-price { font-size: 1.8rem; font-weight: 900; color: var(--text-white); }
+    .portal-room-panel .prp-sub { color: var(--text-gray); font-size: 0.85rem; }
+    .portal-room-panel p { margin: 0.5rem 0 0; color: var(--text-light); font-size: 0.9rem; line-height: 1.6; }
+    .portal-room-panel ul { margin: 0.6rem 0 0; padding-left: 1.1rem; color: var(--text-light); font-size: 0.88rem; line-height: 1.7; }
+    .portal-room-panel .prp-actions { display: flex; gap: 0.6rem; margin-top: 1rem; flex-wrap: wrap; }
+
+    .portal-room-panel .prp-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font: inherit;
+        font-size: 0.8rem;
+        font-weight: 800;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--black);
+        background: var(--purple-accent);
+        border: 0;
+        border-radius: 4px;
+        padding: 0.7rem 1.1rem;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .portal-room-panel .prp-btn:hover { background: var(--purple-light); }
+
+    .portal-room-panel .prp-close {
+        position: absolute;
+        top: 6px;
+        right: 10px;
+        background: none;
+        border: 0;
+        color: var(--text-gray);
+        font-size: 1.4rem;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .portal-room-panel .prp-close:hover { color: var(--text-white); }
+
+    .portal-room-note {
+        position: absolute;
+        left: 50%;
+        top: 45%;
+        transform: translate(-50%, -50%);
+        max-width: 420px;
+        text-align: center;
+        color: var(--text-light);
+        font-size: 1rem;
+    }
+}
+
+@keyframes introEnterPulse {
+    50% { box-shadow: 0 0 30px rgba(212, 165, 255, 0.8); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .intro-enter { animation: none; }
+    .portal-room,
+    .portal-room-panel { transition: none; }
+}

@@ -1536,11 +1536,395 @@ function flechaRel(r, s) {
     return { x: r.left - s.left, y: r.top - s.top, w: r.width, h: r.height };
 }
 
+// ===== Portal Room: a 3D gallery behind the Welcome doors (desktop only) =====
+// Opened by the Enter button in "Welcome to Flecha Web Design". A full-screen
+// dark purple room built with three.js (loaded at the bottom of index.html):
+//   - portfolio sites hang on the side walls; click one to open the live site
+//   - three glowing pedestals (Essential, Plus, Custom) show the pricing
+//   - a Contact doorway at the far end jumps to the consultation form
+// Drag to look, click the floor or use W A S D / arrow keys to walk, and the
+// Exit button or Esc returns to the page right where the visitor was.
+// Nothing is built until the first click, and it only draws while open.
+function flechaPortalRoom() {
+    if (flechaPortalRoom.api) return flechaPortalRoom.api;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    // ---- the overlay ----
+    const room = document.createElement('div');
+    room.className = 'portal-room';
+    room.setAttribute('role', 'dialog');
+    room.setAttribute('aria-modal', 'true');
+    room.setAttribute('aria-label', 'Flecha portal room');
+    room.innerHTML =
+        '<div class="portal-room-brand">FLECHA <span>WEB DESIGN</span></div>' +
+        '<button type="button" class="portal-room-exit">Exit ✕</button>' +
+        '<div class="portal-room-hint"><kbd>Drag</kbd> look &nbsp;·&nbsp; <kbd>W A S D</kbd> or click the floor to walk &nbsp;·&nbsp; click things to explore &nbsp;·&nbsp; <kbd>Esc</kbd> exit</div>' +
+        '<div class="portal-room-tip" hidden></div>' +
+        '<div class="portal-room-panel"><button type="button" class="prp-close" aria-label="Close">×</button><div class="prp-body"></div></div>';
+    document.body.appendChild(room);
+    const exitBtn = room.querySelector('.portal-room-exit');
+    const tip = room.querySelector('.portal-room-tip');
+    const panel = room.querySelector('.portal-room-panel');
+    const panelBody = room.querySelector('.prp-body');
+    let returnFocus = null;
+
+    const esc = (t) => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    function showPanel(html) { panelBody.innerHTML = html; panel.classList.add('is-on'); }
+    function hidePanel() { panel.classList.remove('is-on'); }
+
+    function scrollToId(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - 80, behavior: 'smooth' });
+    }
+
+    let scene3d = null;   // built on first open
+
+    function open() {
+        returnFocus = document.activeElement;
+        room.classList.add('is-on');
+        document.body.style.overflow = 'hidden';
+        if (!scene3d) {
+            try { scene3d = build(); }
+            catch (e) {
+                scene3d = { start() {}, stop() {} };
+                room.insertAdjacentHTML('beforeend', '<p class="portal-room-note">The 3D room couldn\'t start on this browser. Press Exit to go back to the site.</p>');
+            }
+        }
+        scene3d.start();
+        exitBtn.focus({ preventScroll: true });
+    }
+
+    function close(thenScrollTo) {
+        room.classList.remove('is-on');
+        document.body.style.overflow = 'auto';
+        hidePanel();
+        if (scene3d) scene3d.stop();
+        if (thenScrollTo) scrollToId(thenScrollTo);
+        else {
+            const back = returnFocus && returnFocus.offsetParent ? returnFocus : document.getElementById('introReenter');
+            if (back && back.focus) back.focus({ preventScroll: true });
+        }
+    }
+
+    exitBtn.addEventListener('click', () => close());
+    room.querySelector('.prp-close').addEventListener('click', hidePanel);
+    panelBody.addEventListener('click', (e) => {
+        const go = e.target.closest('[data-go]');
+        if (go) close(go.dataset.go);
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape' || !room.classList.contains('is-on')) return;
+        if (panel.classList.contains('is-on')) hidePanel(); else close();
+    });
+
+    // ---- the 3D scene ----
+    function build() {
+        if (typeof THREE === 'undefined') throw new Error('three.js not loaded');
+        const COLORS = ['#e88fb4', '#f0a35e', '#7ed69a', '#6fc3e0', '#b48cf0', '#c9b37e', '#8fb0f0', '#e0c26f'];
+        const SITES = (typeof projects !== 'undefined' ? projects : []).slice(0, 8).map((p, i) => ({
+            name: p.title, cat: p.category, desc: p.description, link: p.liveLink, color: COLORS[i % COLORS.length]
+        }));
+        const TIERS = [
+            { name: 'Essential', price: '$1,000', sub: 'or $99/mo', feats: ['Mobile responsive design', 'Photo gallery', 'Contact form', 'Hours, location & Google Maps', 'Social media links'] },
+            { name: 'Essential Plus', price: '$3,000', sub: 'or $249/mo', feats: ['Everything in Essential', 'Product catalog with pricing', 'Delivery area section', 'Testimonials section', 'Expanded navigation'] },
+            { name: 'Custom', price: '$5,000+', sub: 'or from $449/mo', feats: ['Everything in Essential Plus', 'Complex functionality', 'Custom quote based on scope', 'Priority support', 'Extended launch support'] }
+        ];
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        if ('outputColorSpace' in renderer) renderer.outputColorSpace = THREE.SRGBColorSpace;
+        const cvs = renderer.domElement;
+        room.insertBefore(cvs, room.firstChild);
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x050407);
+        scene.fog = new THREE.Fog(0x050407, 14, 40);
+        const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 100);
+
+        const W = 20, D = 30, H = 6;            // room size (width, depth, height)
+        const PURPLE = 0xd4a5ff, BLUE = 0x667eea;
+
+        const LIGHT = Math.PI;   // three.js r155+ light units (same look as the classic lighting)
+        scene.add(new THREE.AmbientLight(0x6a5a8a, 0.3 * LIGHT));
+        [[PURPLE, 1.3, 0, 5, 2], [BLUE, 1.0, 0, 4, -10], [PURPLE, 0.7, 0, 4, 12]].forEach(([c, i, x, y, z]) => {
+            const l = new THREE.PointLight(c, i * 1.4, 26, 0); l.position.set(x, y, z); scene.add(l);
+        });
+
+        const shell = new THREE.Mesh(new THREE.BoxGeometry(W, H, D), new THREE.MeshStandardMaterial({ color: 0x07060a, roughness: 0.9, metalness: 0.1, side: THREE.BackSide }));
+        shell.position.y = H / 2; scene.add(shell);
+        const edges = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(W, H, D)), new THREE.LineBasicMaterial({ color: PURPLE, transparent: true, opacity: 0.75 }));
+        edges.position.y = H / 2; scene.add(edges);
+
+        const floor = new THREE.Mesh(new THREE.PlaneGeometry(W, D), new THREE.MeshStandardMaterial({ color: 0x050408, roughness: 0.6, metalness: 0.3 }));
+        floor.rotation.x = -Math.PI / 2; floor.userData.floor = true; scene.add(floor);
+        const grid = new THREE.GridHelper(D, 30, PURPLE, 0x3a2f4d);
+        grid.material.transparent = true; grid.material.opacity = 0.35; grid.position.y = 0.01; grid.scale.set(W / D, 1, 1); scene.add(grid);
+
+        // plus signs on the ceiling, like the site's plus grid
+        const plus = [];
+        for (let x = -W / 2 + 1; x < W / 2; x += 2) for (let z = -D / 2 + 1; z < D / 2; z += 2) {
+            plus.push(x - 0.15, H - 0.01, z, x + 0.15, H - 0.01, z, x, H - 0.01, z - 0.15, x, H - 0.01, z + 0.15);
+        }
+        const plusGeo = new THREE.BufferGeometry(); plusGeo.setAttribute('position', new THREE.Float32BufferAttribute(plus, 3));
+        scene.add(new THREE.LineSegments(plusGeo, new THREE.LineBasicMaterial({ color: PURPLE, transparent: true, opacity: 0.4 })));
+
+        const clickables = [];
+        const disposables = [];
+        function tex(w, h, paint) {
+            const c = document.createElement('canvas'); c.width = w; c.height = h;
+            paint(c.getContext('2d'), w, h);
+            const t = new THREE.CanvasTexture(c);
+            if ('colorSpace' in t) t.colorSpace = THREE.SRGBColorSpace;
+            t.anisotropy = 4; disposables.push(t); return t;
+        }
+        const font = (wt, px) => wt + ' ' + px + 'px "Segoe UI", -apple-system, Roboto, Arial, sans-serif';
+
+        // portfolio frames: up to 4 per side wall
+        SITES.forEach((s, i) => {
+            const side = i % 2 === 0 ? -1 : 1, slot = Math.floor(i / 2);
+            const z = 10.5 - slot * 6.2;
+            const t = tex(640, 400, (g, w, h) => {
+                g.fillStyle = '#14111b'; g.fillRect(0, 0, w, h);
+                g.fillStyle = s.color; g.fillRect(0, 0, w, 46);
+                g.fillStyle = 'rgba(255,255,255,.85)'; for (let k = 0; k < 4; k++) g.fillRect(w - 230 + k * 52, 18, 38, 10);
+                const grd = g.createLinearGradient(0, 70, 0, 250); grd.addColorStop(0, s.color + '88'); grd.addColorStop(1, s.color + '22');
+                g.fillStyle = grd; g.fillRect(30, 70, w - 60, 180);
+                g.fillStyle = '#fff'; g.font = font('800', 38); g.textAlign = 'center'; g.fillText(s.name.toUpperCase(), w / 2, 172, w - 90);
+                g.fillStyle = 'rgba(255,255,255,.25)'; g.fillRect(30, 280, 360, 16); g.fillRect(30, 310, 260, 16);
+                g.fillStyle = s.color; g.fillRect(30, 342, 150, 34);
+            });
+            const pic = new THREE.Mesh(new THREE.PlaneGeometry(4, 2.5), new THREE.MeshBasicMaterial({ map: t }));
+            pic.position.set(side * (W / 2 - 0.06), 2.6, z);
+            pic.rotation.y = side < 0 ? Math.PI / 2 : -Math.PI / 2;
+            scene.add(pic);
+            const frame = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(0.08, 2.7, 4.2)), new THREE.LineBasicMaterial({ color: PURPLE }));
+            frame.position.set(side * (W / 2 - 0.08), 2.6, z); scene.add(frame);
+            const plaque = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 0.35), new THREE.MeshBasicMaterial({ map: tex(512, 80, (g, w) => {
+                g.fillStyle = '#0d0b11'; g.fillRect(0, 0, w, 80); g.fillStyle = '#d4a5ff'; g.font = font('700', 30); g.textAlign = 'center'; g.fillText(String(s.cat).toUpperCase(), w / 2, 52, w - 20);
+            }) }));
+            plaque.position.set(side * (W / 2 - 0.06), 1.0, z); plaque.rotation.y = pic.rotation.y; scene.add(plaque);
+            pic.userData = { kind: 'site', data: s, glow: frame, label: 'View ' + s.name };
+            clickables.push(pic);
+        });
+
+        // pricing pedestals
+        const gems = [];
+        TIERS.forEach((t, i) => {
+            const x = (i - 1) * 4.5, z = -5;
+            const base = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.85, 1.1, 32), new THREE.MeshStandardMaterial({ color: 0x17131f, roughness: 0.5, metalness: 0.4 }));
+            base.position.set(x, 0.55, z); scene.add(base);
+            const ring = new THREE.Mesh(new THREE.TorusGeometry(0.72, 0.03, 8, 48), new THREE.MeshBasicMaterial({ color: PURPLE }));
+            ring.rotation.x = Math.PI / 2; ring.position.set(x, 1.11, z); scene.add(ring);
+            const geo = i === 0 ? new THREE.OctahedronGeometry(0.42) : i === 1 ? new THREE.OctahedronGeometry(0.5, 1) : new THREE.IcosahedronGeometry(0.58, 0);
+            const mat = new THREE.MeshStandardMaterial({ color: PURPLE, emissive: i === 1 ? PURPLE : BLUE, emissiveIntensity: 0.55, roughness: 0.25, metalness: 0.2, flatShading: true });
+            const gem = new THREE.Mesh(geo, mat); gem.position.set(x, 2.1, z); scene.add(gem);
+            const glow = new THREE.PointLight(i === 1 ? PURPLE : BLUE, 0.8, 5, 0); glow.position.set(x, 2.1, z); scene.add(glow);
+            const label = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex(512, 160, (g, w) => {
+                g.textAlign = 'center'; g.fillStyle = '#d4a5ff'; g.font = font('800', 40); g.fillText(t.name.toUpperCase(), w / 2, 58);
+                g.fillStyle = '#fff'; g.font = font('900', 54); g.fillText(t.price, w / 2, 124);
+            }), transparent: true }));
+            label.scale.set(2.2, 0.7, 1); label.position.set(x, 3.3, z); scene.add(label);
+            gem.userData = { kind: 'tier', data: t, mat: mat, label: 'See ' + t.name + ' pricing' };
+            base.userData = gem.userData;
+            clickables.push(gem, base); gems.push(gem);
+        });
+
+        // Contact doorway at the far end
+        const door = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 3.9), new THREE.MeshBasicMaterial({ map: tex(512, 768, (g, w, h) => {
+            const grd = g.createRadialGradient(w / 2, h / 2, 20, w / 2, h / 2, h * 0.6);
+            grd.addColorStop(0, '#f0dcff'); grd.addColorStop(0.25, '#b580e6'); grd.addColorStop(0.7, '#3b2a6a'); grd.addColorStop(1, '#0d0b11');
+            g.fillStyle = grd; g.fillRect(0, 0, w, h);
+            g.strokeStyle = 'rgba(255,255,255,.75)'; g.lineWidth = 16; g.lineCap = 'round'; g.lineJoin = 'round';
+            g.beginPath(); g.moveTo(w / 2 - 50, h / 2 - 80); g.lineTo(w / 2 + 40, h / 2); g.lineTo(w / 2 - 50, h / 2 + 80); g.stroke();
+        }) }));
+        door.position.set(0, 1.95, -D / 2 + 0.05); scene.add(door);
+        const doorFrame = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(2.9, 4.2, 0.1)), new THREE.LineBasicMaterial({ color: PURPLE }));
+        doorFrame.position.set(0, 2.1, -D / 2 + 0.06); scene.add(doorFrame);
+        const sign = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 0.6), new THREE.MeshBasicMaterial({ map: tex(680, 120, (g, w) => {
+            g.fillStyle = '#0d0b11'; g.fillRect(0, 0, w, 120); g.fillStyle = '#fff'; g.font = font('900', 64); g.textAlign = 'center'; g.fillText('CONTACT US', w / 2, 84);
+        }) }));
+        sign.position.set(0, 4.7, -D / 2 + 0.05); scene.add(sign);
+        door.userData = { kind: 'contact', glow: doorFrame, label: 'Book a consultation' };
+        clickables.push(door);
+
+        // tagline on the entrance wall
+        const back = new THREE.Mesh(new THREE.PlaneGeometry(12, 1.6), new THREE.MeshBasicMaterial({ map: tex(1200, 160, (g, w) => {
+            g.fillStyle = '#0a0810'; g.fillRect(0, 0, w, 160); g.fillStyle = '#fff'; g.font = font('900', 72); g.textAlign = 'center'; g.fillText('MOVING YOUR VISION FORWARD', w / 2, 104);
+        }) }));
+        back.position.set(0, 3.6, D / 2 - 0.05); back.rotation.y = Math.PI; scene.add(back);
+
+        // floating dust
+        const dp = [];
+        for (let i = 0; i < 260; i++) dp.push((Math.random() - 0.5) * W, Math.random() * H, (Math.random() - 0.5) * D);
+        const dustGeo = new THREE.BufferGeometry(); dustGeo.setAttribute('position', new THREE.Float32BufferAttribute(dp, 3));
+        const dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({ color: PURPLE, size: 0.05, transparent: true, opacity: 0.7 }));
+        scene.add(dust);
+
+        // walk-to marker
+        const marker = new THREE.Mesh(new THREE.RingGeometry(0.25, 0.32, 32), new THREE.MeshBasicMaterial({ color: PURPLE, transparent: true, opacity: 0 }));
+        marker.rotation.x = -Math.PI / 2; marker.position.y = 0.02; scene.add(marker);
+
+        // ---- controls ----
+        const START = { x: 0, z: 12.5, yaw: 0, pitch: -0.05 };
+        const me = { x: 0, z: 0, yaw: 0, pitch: 0, tx: null, tz: null };
+        const keys = {};
+        const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+        let hover = null, down = null, dragging = false, running = false, last = 0, intro = 0;
+
+        function pick(ev) {
+            const r = cvs.getBoundingClientRect();
+            ndc.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
+            ray.setFromCamera(ndc, camera);
+            return ray.intersectObjects(clickables.concat([floor]), false)[0] || null;
+        }
+        function glow(obj, on) {
+            const u = obj.userData;
+            if (u.glow) u.glow.material.color.set(on ? 0xffffff : PURPLE);
+            if (u.mat) u.mat.emissiveIntensity = on ? 1.1 : 0.55;
+        }
+        function setHover(obj, ev) {
+            if (hover && hover !== obj) glow(hover, false);
+            hover = obj;
+            if (obj) {
+                glow(obj, true);
+                tip.hidden = false; tip.textContent = obj.userData.label;
+                tip.style.left = ev.clientX + 'px'; tip.style.top = ev.clientY + 'px';
+                cvs.classList.add('is-pointing');
+            } else {
+                tip.hidden = true; cvs.classList.remove('is-pointing');
+            }
+        }
+
+        cvs.addEventListener('pointerdown', (e) => { down = { x: e.clientX, y: e.clientY, yaw: me.yaw, pitch: me.pitch }; dragging = false; cvs.setPointerCapture(e.pointerId); });
+        cvs.addEventListener('pointermove', (e) => {
+            if (down) {
+                const dx = e.clientX - down.x, dy = e.clientY - down.y;
+                if (!dragging && Math.hypot(dx, dy) > 5) { dragging = true; cvs.classList.add('is-dragging'); setHover(null); }
+                if (dragging) { me.yaw = down.yaw + dx * 0.004; me.pitch = Math.max(-0.9, Math.min(0.7, down.pitch + dy * 0.003)); }
+                return;
+            }
+            const h = pick(e);
+            setHover(h && !h.object.userData.floor ? h.object : null, e);
+        });
+        cvs.addEventListener('pointerup', (e) => {
+            const wasDrag = dragging;
+            down = null; dragging = false; cvs.classList.remove('is-dragging');
+            if (wasDrag) return;
+            const h = pick(e);
+            if (!h) return;
+            const u = h.object.userData;
+            if (u.floor) {
+                me.tx = Math.max(-W / 2 + 1, Math.min(W / 2 - 1, h.point.x));
+                me.tz = Math.max(-D / 2 + 1, Math.min(D / 2 - 1, h.point.z));
+                marker.position.x = me.tx; marker.position.z = me.tz; marker.material.opacity = 1;
+                hidePanel();
+            } else if (u.kind === 'site') {
+                const s = u.data;
+                showPanel('<div class="prp-kicker">' + esc(s.cat) + '</div><h4>' + esc(s.name) + '</h4><p>' + esc(s.desc) + '</p>' +
+                    '<div class="prp-actions"><a class="prp-btn" href="' + esc(s.link) + '" target="_blank" rel="noopener noreferrer">Open live site ↗</a></div>');
+            } else if (u.kind === 'tier') {
+                const t = u.data;
+                showPanel('<div class="prp-kicker">Investment</div><h4>' + esc(t.name) + '</h4><div class="prp-price">' + esc(t.price) + '</div><div class="prp-sub">' + esc(t.sub) + '</div>' +
+                    '<ul>' + t.feats.map(f => '<li>' + esc(f) + '</li>').join('') + '</ul>' +
+                    '<div class="prp-actions"><button type="button" class="prp-btn" data-go="pricing">See all pricing</button></div>');
+            } else if (u.kind === 'contact') {
+                showPanel('<div class="prp-kicker">Contact</div><h4>Book a consultation</h4><p>Tell us about your project and pick a time that works for you.</p>' +
+                    '<div class="prp-actions"><button type="button" class="prp-btn" data-go="contact">Go to the form</button></div>');
+            }
+        });
+        cvs.addEventListener('pointerleave', () => { if (!down) setHover(null); });
+
+        window.addEventListener('keydown', (e) => {
+            if (!running) return;
+            const k = e.key.toLowerCase();
+            if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(k)) { keys[k] = true; e.preventDefault(); }
+        });
+        window.addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
+        window.addEventListener('blur', () => { for (const k in keys) keys[k] = false; });
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        });
+
+        function blocked(x, z) {   // keep out of the pedestals
+            if (Math.abs(z + 5) < 1.3) for (let i = 0; i < 3; i++) if (Math.abs(x - (i - 1) * 4.5) < 1.3) return true;
+            return false;
+        }
+
+        function frame(now) {
+            if (!running) return;
+            requestAnimationFrame(frame);
+            const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
+            last = now;
+            const f = (keys.w || keys.arrowup ? 1 : 0) - (keys.s || keys.arrowdown ? 1 : 0);
+            const s = (keys.d || keys.arrowright ? 1 : 0) - (keys.a || keys.arrowleft ? 1 : 0);
+            let nx = me.x, nz = me.z;
+            if (f || s) {
+                me.tx = null; marker.material.opacity = 0;
+                const sp = 5 * dt;
+                nx += (-Math.sin(me.yaw) * f + Math.cos(me.yaw) * s) * sp;
+                nz += (-Math.cos(me.yaw) * f - Math.sin(me.yaw) * s) * sp;
+            } else if (me.tx !== null) {
+                const dx = me.tx - me.x, dz = me.tz - me.z, d = Math.hypot(dx, dz);
+                if (d < 0.08) { me.tx = null; marker.material.opacity = 0; }
+                else { const sp = Math.min(d, 5 * dt); nx += dx / d * sp; nz += dz / d * sp; }
+            }
+            nx = Math.max(-W / 2 + 0.8, Math.min(W / 2 - 0.8, nx));
+            nz = Math.max(-D / 2 + 0.8, Math.min(D / 2 - 0.8, nz));
+            if (!blocked(nx, nz)) { me.x = nx; me.z = nz; } else { me.tx = null; marker.material.opacity = 0; }
+
+            intro = Math.min(1, intro + dt / 1.6);   // glide in through the doorway
+            const k = reduceMotion.matches ? 1 : 1 - Math.pow(1 - intro, 3);
+            const bob = (f || s || me.tx !== null) && !reduceMotion.matches ? Math.sin(now / 140) * 0.03 : 0;
+            camera.position.set(me.x, 1.7 + bob, me.z + (1 - k) * 2.5);
+            camera.rotation.order = 'YXZ';
+            camera.rotation.y = me.yaw;
+            camera.rotation.x = me.pitch;
+
+            const t = now / 1000;
+            if (!reduceMotion.matches) {
+                gems.forEach((g, i) => { g.rotation.y = t * 0.6 + i; g.rotation.x = Math.sin(t * 0.5 + i) * 0.2; g.position.y = 2.1 + Math.sin(t * 1.4 + i) * 0.12; });
+                dust.rotation.y = t * 0.01;
+            }
+            if (marker.material.opacity > 0) { const p = 1 + Math.sin(t * 6) * 0.1; marker.scale.set(p, p, p); }
+            renderer.render(scene, camera);
+        }
+
+        return {
+            start() {
+                Object.assign(me, START, { tx: null, tz: null });
+                marker.material.opacity = 0;
+                intro = 0;
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                running = true;
+                last = performance.now();
+                requestAnimationFrame(frame);
+            },
+            stop() {
+                running = false;
+                for (const k in keys) keys[k] = false;
+                if (hover) setHover(null);
+            }
+        };
+    }
+
+    flechaPortalRoom.api = { open, close };
+    return flechaPortalRoom.api;
+}
+
 // ===== "Welcome to Flecha Web Design" Portal (desktop and mobile) =====
 // The first time the section scrolls into view, two doors with the Flecha
 // arrow split down the middle glow at the seam and swing open. Behind them a
 // purple portal sends small previews of the portfolio sites drifting out
 // toward the visitor. The mouse (desktop) gently shifts the portal.
+// Phones: the doors open by themselves when the section scrolls into view.
+// Desktop: the doors stay closed with an Enter button; clicking it opens them
+// and steps into the 3D Portal Room (see flechaPortalRoom above).
 // Phones get fewer, smaller cards at 30 frames a second. The doors open once
 // per visit (later page loads start open). Pauses when off screen or when the
 // tab is hidden; visitors who ask for less motion get the doors already open
@@ -1551,6 +1935,7 @@ function flechaRel(r, s) {
     if (!section || !canvas) return;
     const ctx = canvas.getContext('2d');
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const desktop = window.matchMedia('(min-width: 769px)');
     const PURPLE = [212, 165, 255], BLUE = [102, 126, 234];
     const COLORS = [[232, 143, 180], [240, 163, 94], [126, 214, 154], [111, 195, 224], [201, 179, 126], [180, 140, 240], [143, 176, 240], [224, 194, 111]];
     const SITES = (typeof projects !== 'undefined' ? projects : []).map((p, i) => ({ name: p.title, color: COLORS[i % COLORS.length] }));
@@ -1721,11 +2106,23 @@ function flechaRel(r, s) {
         if (seen) openDoors(true);
         // open once half the section has scrolled above the lower 40% of the screen
         // (so it plays while the visitor is looking at it, not while they're still on the hero)
+        // (phones only: on desktop the visitor opens the doors with the Enter button)
         const opener = new IntersectionObserver((entries) => {
-            if (entries[0].intersectionRatio >= 0.5) { openDoors(false); opener.disconnect(); }
+            if (entries[0].intersectionRatio >= 0.5 && !desktop.matches) { openDoors(false); opener.disconnect(); }
         }, { rootMargin: '0px 0px -40% 0px', threshold: [0.5] });
         opener.observe(section);
+        // if the window shrinks to phone size while the doors are still closed, just open them
+        desktop.addEventListener('change', () => { if (!desktop.matches) openDoors(true); });
     }
+
+    // Desktop: Enter opens the doors, then steps into the 3D room
+    const enterBtn = document.getElementById('introEnter');
+    const reenterBtn = document.getElementById('introReenter');
+    if (enterBtn) enterBtn.addEventListener('click', () => {
+        openDoors(false);
+        setTimeout(() => flechaPortalRoom().open(), reduceMotion.matches ? 0 : 1500);
+    });
+    if (reenterBtn) reenterBtn.addEventListener('click', () => flechaPortalRoom().open());
     if ('IntersectionObserver' in window) {
         new IntersectionObserver((entries) => {
             onScreen = entries[0].isIntersecting;
