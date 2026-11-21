@@ -1536,15 +1536,19 @@ function flechaRel(r, s) {
     return { x: r.left - s.left, y: r.top - s.top, w: r.width, h: r.height };
 }
 
-// ===== Portal Room: a 3D gallery behind the Welcome doors (desktop only) =====
+// ===== Portal World: a 3D space behind the Welcome doors (desktop only) =====
 // Opened by the Enter button in "Welcome to Flecha Web Design". A full-screen
-// dark purple room built with three.js (loaded at the bottom of index.html):
-//   - portfolio sites hang on the side walls; click one to open the live site
-//   - three glowing pedestals (Essential, Plus, Custom) show the pricing
-//   - a Contact doorway at the far end jumps to the consultation form
-// Drag to look, click the floor or use W A S D / arrow keys to walk, and the
-// Exit button or Esc returns to the page right where the visitor was.
-// Nothing is built until the first click, and it only draws while open.
+// open night space built with three.js (loaded at the bottom of index.html),
+// with no walls or ceiling. Glowing paths lined with glow dots lead from the
+// starting platform to:
+//   - Our Work: the portfolio sites on stands; click one to open the live site
+//   - Pricing: a raised plaza with three glowing pedestals (Essential, Plus, Custom)
+//   - Contact: a glowing doorway that jumps to the consultation form
+// Drag to look, W A S D / arrow keys to walk, Space to jump, or click a sign
+// or a spot on the path to walk there. Visitors can only walk on the paths;
+// the ground follows the ramps up and down. Exit or Esc returns to the page
+// right where the visitor was. Nothing is built until the first click, and it
+// only draws while open.
 function flechaPortalRoom() {
     if (flechaPortalRoom.api) return flechaPortalRoom.api;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -1554,11 +1558,11 @@ function flechaPortalRoom() {
     room.className = 'portal-room';
     room.setAttribute('role', 'dialog');
     room.setAttribute('aria-modal', 'true');
-    room.setAttribute('aria-label', 'Flecha portal room');
+    room.setAttribute('aria-label', 'Flecha portal world');
     room.innerHTML =
         '<div class="portal-room-brand">FLECHA <span>WEB DESIGN</span></div>' +
         '<button type="button" class="portal-room-exit">Exit ✕</button>' +
-        '<div class="portal-room-hint"><kbd>Drag</kbd> look &nbsp;·&nbsp; <kbd>W A S D</kbd> or click the floor to walk &nbsp;·&nbsp; click things to explore &nbsp;·&nbsp; <kbd>Esc</kbd> exit</div>' +
+        '<div class="portal-room-hint"><kbd>Drag</kbd> look &nbsp;·&nbsp; <kbd>W A S D</kbd> walk &nbsp;·&nbsp; <kbd>Space</kbd> jump &nbsp;·&nbsp; click a sign or the path to travel &nbsp;·&nbsp; <kbd>Esc</kbd> exit</div>' +
         '<div class="portal-room-tip" hidden></div>' +
         '<div class="portal-room-panel"><button type="button" class="prp-close" aria-label="Close">×</button><div class="prp-body"></div></div>';
     document.body.appendChild(room);
@@ -1618,7 +1622,14 @@ function flechaPortalRoom() {
         if (panel.classList.contains('is-on')) hidePanel(); else close();
     });
 
-    // ---- the 3D scene ----
+    // ---- the 3D world ----
+    // An open night space (no walls or ceiling). Glowing paths branch out from
+    // a round starting platform ("the hub") to each destination:
+    //   - Our Work: a winding path lined with the portfolio sites on stands
+    //   - Pricing: a ramp up to a raised plaza with the three pedestals
+    //   - Contact: a path down to a platform with the glowing doorway
+    // Visitors can only walk on the paths and platforms. The ground follows the
+    // ramps up and down, and Space jumps.
     function build() {
         if (typeof THREE === 'undefined') throw new Error('three.js not loaded');
         const COLORS = ['#e88fb4', '#f0a35e', '#7ed69a', '#6fc3e0', '#b48cf0', '#c9b37e', '#8fb0f0', '#e0c26f'];
@@ -1640,51 +1651,199 @@ function flechaPortalRoom() {
 
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x050407);
-        scene.fog = new THREE.Fog(0x050407, 14, 40);
-        const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 100);
+        scene.fog = new THREE.Fog(0x07050c, 28, 75);
+        const camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.2, 200);
 
-        const W = 20, D = 30, H = 6;            // room size (width, depth, height)
         const PURPLE = 0xd4a5ff, BLUE = 0x667eea;
-
-        const LIGHT = Math.PI;   // three.js r155+ light units (same look as the classic lighting)
-        scene.add(new THREE.AmbientLight(0x6a5a8a, 0.3 * LIGHT));
-        [[PURPLE, 1.3, 0, 5, 2], [BLUE, 1.0, 0, 4, -10], [PURPLE, 0.7, 0, 4, 12]].forEach(([c, i, x, y, z]) => {
-            const l = new THREE.PointLight(c, i * 1.4, 26, 0); l.position.set(x, y, z); scene.add(l);
-        });
-
-        const shell = new THREE.Mesh(new THREE.BoxGeometry(W, H, D), new THREE.MeshStandardMaterial({ color: 0x07060a, roughness: 0.9, metalness: 0.1, side: THREE.BackSide }));
-        shell.position.y = H / 2; scene.add(shell);
-        const edges = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(W, H, D)), new THREE.LineBasicMaterial({ color: PURPLE, transparent: true, opacity: 0.75 }));
-        edges.position.y = H / 2; scene.add(edges);
-
-        const floor = new THREE.Mesh(new THREE.PlaneGeometry(W, D), new THREE.MeshStandardMaterial({ color: 0x050408, roughness: 0.6, metalness: 0.3 }));
-        floor.rotation.x = -Math.PI / 2; floor.userData.floor = true; scene.add(floor);
-        const grid = new THREE.GridHelper(D, 30, PURPLE, 0x3a2f4d);
-        grid.material.transparent = true; grid.material.opacity = 0.35; grid.position.y = 0.01; grid.scale.set(W / D, 1, 1); scene.add(grid);
-
-        // plus signs on the ceiling, like the site's plus grid
-        const plus = [];
-        for (let x = -W / 2 + 1; x < W / 2; x += 2) for (let z = -D / 2 + 1; z < D / 2; z += 2) {
-            plus.push(x - 0.15, H - 0.01, z, x + 0.15, H - 0.01, z, x, H - 0.01, z - 0.15, x, H - 0.01, z + 0.15);
-        }
-        const plusGeo = new THREE.BufferGeometry(); plusGeo.setAttribute('position', new THREE.Float32BufferAttribute(plus, 3));
-        scene.add(new THREE.LineSegments(plusGeo, new THREE.LineBasicMaterial({ color: PURPLE, transparent: true, opacity: 0.4 })));
-
-        const clickables = [];
-        const disposables = [];
+        const V = (x, y, z) => new THREE.Vector3(x, y, z);
+        const font = (wt, px) => wt + ' ' + px + 'px "Segoe UI", -apple-system, Roboto, Arial, sans-serif';
         function tex(w, h, paint) {
             const c = document.createElement('canvas'); c.width = w; c.height = h;
             paint(c.getContext('2d'), w, h);
             const t = new THREE.CanvasTexture(c);
             if ('colorSpace' in t) t.colorSpace = THREE.SRGBColorSpace;
-            t.anisotropy = 4; disposables.push(t); return t;
+            t.anisotropy = 4; return t;
         }
-        const font = (wt, px) => wt + ' ' + px + 'px "Segoe UI", -apple-system, Roboto, Arial, sans-serif';
 
-        // portfolio frames: up to 4 per side wall
+        // ---- lights ----
+        scene.add(new THREE.AmbientLight(0x6a5a8a, 0.55 * Math.PI));
+        [[PURPLE, 1.4, 0, 4, 0], [BLUE, 1.2, 0, 6, -18], [PURPLE, 1.0, 18, 3, -12], [BLUE, 1.0, -17, 4, -10]].forEach(([c, i, x, y, z]) => {
+            const l = new THREE.PointLight(c, i, 26, 0); l.position.set(x, y, z); scene.add(l);
+        });
+
+        // ---- sky: dark gradient with a purple horizon glow, stars, and a faint grid far below ----
+        const sky = new THREE.Mesh(new THREE.SphereGeometry(150, 32, 16), new THREE.MeshBasicMaterial({ side: THREE.BackSide, fog: false, map: tex(8, 256, (g, w, h) => {
+            const grd = g.createLinearGradient(0, 0, 0, h);
+            grd.addColorStop(0, '#030205'); grd.addColorStop(0.4, '#0b0714'); grd.addColorStop(0.5, '#2a1b45'); grd.addColorStop(0.56, '#0d0918'); grd.addColorStop(1, '#020103');
+            g.fillStyle = grd; g.fillRect(0, 0, w, h);
+        }) }));
+        scene.add(sky);
+        const starPos = [];
+        for (let i = 0; i < 1100; i++) {
+            const th = Math.random() * Math.PI * 2, ph = Math.acos(Math.random() * 1.15 - 0.15), r = 120;
+            starPos.push(r * Math.sin(ph) * Math.cos(th), r * Math.cos(ph), r * Math.sin(ph) * Math.sin(th));
+        }
+        const starGeo = new THREE.BufferGeometry(); starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
+        const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xe8ccff, size: 0.45, fog: false, transparent: true, opacity: 0.8 }));
+        scene.add(stars);
+        const deep = new THREE.GridHelper(220, 70, 0x3a2f4d, 0x241c33);
+        deep.material.transparent = true; deep.material.opacity = 0.25; deep.position.y = -14; scene.add(deep);
+
+        // ---- the walkable layout ----
+        // Platforms (round) and paths (polylines from the hub center outward).
+        // Each path runs: hub center -> hub edge -> ... -> destination edge -> destination center.
+        const HUB = { c: V(0, 0, 0), r: 3.6 };
+        const PLAZA = { c: V(0, 2.2, -19), r: 4.8 };
+        const CONTACT = { c: V(18, -1.2, -12), r: 3.2 };
+        const LOOKOUT = { c: V(-18, 0.9, -22), r: 3 };
+        const PLATFORMS = [HUB, PLAZA, CONTACT, LOOKOUT];
+        const HALF = 1.5;   // half the path width
+        const PATHS = [
+            { name: 'Our Work', dest: LOOKOUT, pts: [V(0, 0, 0), V(-3.6, 0, 0.3), V(-9, 0, 1.6), V(-14, 0.9, -1.8), V(-17, 0.9, -8), V(-18.4, 0.9, -14.5), V(-18, 0.9, -19), V(-18, 0.9, -22)] },
+            { name: 'Pricing', dest: PLAZA, pts: [V(0, 0, 0), V(0, 0, -3.6), V(0, 2.2, -14.2), V(0, 2.2, -19)] },
+            { name: 'Contact', dest: CONTACT, pts: [V(0, 0, 0), V(3.6, 0, -0.4), V(9, 0, -1.4), V(13.8, -1.2, -6), V(16.1, -1.2, -9.4), V(18, -1.2, -12)] }
+        ];
+        // drawn segments: everything except the bits inside the hub and the destination platform
+        PATHS.forEach(p => {
+            p.len = [0];
+            for (let i = 1; i < p.pts.length; i++) p.len.push(p.len[i - 1] + p.pts[i].distanceTo(p.pts[i - 1]));
+            p.total = p.len[p.len.length - 1];
+        });
+
+        function insidePlatform(x, z) {
+            for (const P of PLATFORMS) if (Math.hypot(x - P.c.x, z - P.c.z) <= P.r) return P;
+            return null;
+        }
+        // nearest point on the path network: { path, s (distance along it), d (sideways distance), y }
+        function project(x, z) {
+            let best = null;
+            for (const p of PATHS) {
+                for (let i = 1; i < p.pts.length; i++) {
+                    const a = p.pts[i - 1], b = p.pts[i];
+                    const abx = b.x - a.x, abz = b.z - a.z, L2 = abx * abx + abz * abz;
+                    const t = L2 ? Math.max(0, Math.min(1, ((x - a.x) * abx + (z - a.z) * abz) / L2)) : 0;
+                    const px = a.x + abx * t, pz = a.z + abz * t;
+                    const d = Math.hypot(x - px, z - pz);
+                    const s = p.len[i - 1] + (p.len[i] - p.len[i - 1]) * t;
+                    if (!best || d < best.d - 1e-6 || (Math.abs(d - best.d) < 1e-6 && s < best.s)) best = { path: p, s: s, d: d, y: a.y + (b.y - a.y) * t };
+                }
+            }
+            return best;
+        }
+        // ground height at a spot, or null if it's off the paths (the void)
+        function groundAt(x, z) {
+            const P = insidePlatform(x, z);
+            if (P) return P.c.y;
+            const pr = project(x, z);
+            return pr && pr.d <= HALF ? pr.y : null;
+        }
+        function pointAt(p, s) {
+            s = Math.max(0, Math.min(p.total, s));
+            for (let i = 1; i < p.pts.length; i++) {
+                if (s <= p.len[i] || i === p.pts.length - 1) {
+                    const seg = p.len[i] - p.len[i - 1], t = seg ? (s - p.len[i - 1]) / seg : 0;
+                    return p.pts[i - 1].clone().lerp(p.pts[i], Math.max(0, Math.min(1, t)));
+                }
+            }
+            return p.pts[0].clone();
+        }
+
+        // ---- draw the platforms and paths ----
+        const walkMeshes = [];
+        const surfMat = new THREE.MeshStandardMaterial({ color: 0x120e1c, roughness: 0.7, metalness: 0.25, side: THREE.DoubleSide });
+        const edgeMat = new THREE.LineBasicMaterial({ color: PURPLE, transparent: true, opacity: 0.55 });
+        const dotPos = [];
+        PLATFORMS.forEach(P => {
+            const disc = new THREE.Mesh(new THREE.CircleGeometry(P.r, 48), surfMat);
+            disc.rotation.x = -Math.PI / 2; disc.position.copy(P.c); disc.position.y += 0.002;
+            disc.userData.walk = true; scene.add(disc); walkMeshes.push(disc);
+            const rim = new THREE.Mesh(new THREE.CylinderGeometry(P.r, P.r * 0.94, 0.35, 48, 1, true), new THREE.MeshStandardMaterial({ color: 0x0c0913, roughness: 0.8, side: THREE.DoubleSide }));
+            rim.position.set(P.c.x, P.c.y - 0.175, P.c.z); scene.add(rim);
+            const ring = new THREE.Mesh(new THREE.TorusGeometry(P.r, 0.035, 6, 64), new THREE.MeshBasicMaterial({ color: PURPLE }));
+            ring.rotation.x = Math.PI / 2; ring.position.copy(P.c); scene.add(ring);
+            const n = Math.round(P.r * 2 * Math.PI / 0.9);
+            for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2; dotPos.push(P.c.x + Math.cos(a) * (P.r - 0.25), P.c.y + 0.06, P.c.z + Math.sin(a) * (P.r - 0.25)); }
+        });
+        PATHS.forEach(p => {
+            const first = 1, last = p.pts.length - 2;   // drawn from the hub edge to the destination edge
+            for (let i = first + 1; i <= last; i++) {
+                const a = p.pts[i - 1], b = p.pts[i];
+                const dir = V(b.x - a.x, 0, b.z - a.z).normalize();
+                const nrm = V(-dir.z, 0, dir.x).multiplyScalar(HALF);
+                const g = new THREE.BufferGeometry();
+                const q = [a.clone().add(nrm), a.clone().sub(nrm), b.clone().add(nrm), b.clone().sub(nrm)];
+                g.setAttribute('position', new THREE.Float32BufferAttribute([q[0].x, q[0].y, q[0].z, q[1].x, q[1].y, q[1].z, q[2].x, q[2].y, q[2].z, q[3].x, q[3].y, q[3].z], 3));
+                g.setIndex([0, 2, 1, 2, 3, 1]); g.computeVertexNormals();   // wound so the surface faces up
+                const ribbon = new THREE.Mesh(g, surfMat); ribbon.userData.walk = true; scene.add(ribbon); walkMeshes.push(ribbon);
+                const lift = V(0, 0.02, 0);   // edge lines sit just above the surface so they never flicker
+                const eg = new THREE.BufferGeometry().setFromPoints([q[0].clone().add(lift), q[2].clone().add(lift), q[1].clone().add(lift), q[3].clone().add(lift)]);
+                scene.add(new THREE.LineSegments(eg, edgeMat));
+                // underside so the path has some thickness
+                const under = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: 0x07050b, side: THREE.DoubleSide }));
+                under.position.y = -0.18; scene.add(under);
+                // glow dots along both edges
+                const L = a.distanceTo(b), n = Math.max(2, Math.round(L / 0.9));
+                for (let k = 0; k <= n; k++) {
+                    const pt = a.clone().lerp(b, k / n);
+                    const side = nrm.clone().multiplyScalar((HALF - 0.2) / HALF);
+                    dotPos.push(pt.x + side.x, pt.y + 0.06, pt.z + side.z, pt.x - side.x, pt.y + 0.06, pt.z - side.z);
+                }
+                // round joint where two drawn segments meet
+                if (i < last) {
+                    const j = new THREE.Mesh(new THREE.CircleGeometry(HALF, 24), surfMat);
+                    j.rotation.x = -Math.PI / 2; j.position.copy(b); j.position.y += 0.001; j.userData.walk = true; scene.add(j); walkMeshes.push(j);
+                }
+            }
+        });
+        const glowTex = tex(64, 64, (g, w) => {
+            const grd = g.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
+            grd.addColorStop(0, 'rgba(255,255,255,1)'); grd.addColorStop(0.25, 'rgba(232,204,255,.9)'); grd.addColorStop(0.6, 'rgba(180,128,230,.25)'); grd.addColorStop(1, 'rgba(180,128,230,0)');
+            g.fillStyle = grd; g.fillRect(0, 0, w, w);
+        });
+        const dotGeo = new THREE.BufferGeometry(); dotGeo.setAttribute('position', new THREE.Float32BufferAttribute(dotPos, 3));
+        const dotMat = new THREE.PointsMaterial({ map: glowTex, size: 0.42, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: PURPLE });
+        scene.add(new THREE.Points(dotGeo, dotMat));
+        // a few brighter dots that travel along each path, leading the way
+        const RUNNERS = [];
+        PATHS.forEach(p => { p.runFrom = HUB.r; p.runTo = p.total - p.dest.r; for (let k = 0; k < 3; k++) RUNNERS.push({ p: p, s: p.runFrom + (p.runTo - p.runFrom) * k / 3 }); });
+        const runGeo = new THREE.BufferGeometry(); runGeo.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(RUNNERS.length * 3), 3));
+        scene.add(new THREE.Points(runGeo, new THREE.PointsMaterial({ map: glowTex, size: 0.6, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, color: 0xffffff })));
+
+        const clickables = [];
+
+        // ---- hub signs: click one to walk there ----
+        PATHS.forEach((p, i) => {
+            const entry = pointAt(p, HUB.r - 0.4), dir = pointAt(p, HUB.r + 2).sub(entry).setY(0).normalize();
+            const at = entry.clone().add(V(dir.z, 0, -dir.x).multiplyScalar(HALF + 0.35));   // beside the path entrance, not in the way
+            const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 0.62), new THREE.MeshBasicMaterial({ transparent: true, map: tex(512, 144, (g, w, h) => {
+                g.fillStyle = 'rgba(13,11,17,.92)'; g.fillRect(0, 0, w, h);
+                g.strokeStyle = '#d4a5ff'; g.lineWidth = 4; g.strokeRect(2, 2, w - 4, h - 4);
+                g.fillStyle = '#fff'; g.font = font('900', 56); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(p.name.toUpperCase() + '  ›', w / 2, h / 2 + 2);
+            }) }));
+            sign.position.set(at.x + dir.x * 0.2, at.y + 2.7, at.z + dir.z * 0.2);
+            sign.lookAt(sign.position.x - dir.x, sign.position.y, sign.position.z - dir.z);   // face back toward the hub
+            scene.add(sign);
+            const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 2.4, 8), new THREE.MeshBasicMaterial({ color: PURPLE }));
+            pole.position.set(sign.position.x, at.y + 1.2, sign.position.z); scene.add(pole);
+            sign.userData = { kind: 'goto', path: p, label: 'Walk to ' + p.name, glowMesh: sign };
+            clickables.push(sign);
+        });
+
+        // ---- Our Work: portfolio screens on stands along the winding path ----
+        const work = PATHS[0];
         SITES.forEach((s, i) => {
-            const side = i % 2 === 0 ? -1 : 1, slot = Math.floor(i / 2);
-            const z = 10.5 - slot * 6.2;
+            const sAlong = 6.5 + i * ((work.total - 10.5) / Math.max(1, SITES.length - 1));
+            const at = pointAt(work, sAlong), ahead = pointAt(work, sAlong + 0.5);
+            const dir = V(ahead.x - at.x, 0, ahead.z - at.z).normalize();
+            const side = i % 2 === 0 ? 1 : -1;
+            const nrm = V(-dir.z, 0, dir.x).multiplyScalar(side * (HALF + 1.2));
+            const pos = at.clone().add(nrm);
+            const stand = new THREE.Group();
+            stand.position.set(pos.x, at.y, pos.z);
+            // face the path, turned a little toward people walking out from the hub
+            const look = at.clone().sub(dir.clone().multiplyScalar(1.5));
+            stand.lookAt(look.x, at.y, look.z);
+            scene.add(stand);
             const t = tex(640, 400, (g, w, h) => {
                 g.fillStyle = '#14111b'; g.fillRect(0, 0, w, h);
                 g.fillStyle = s.color; g.fillRect(0, 0, w, 46);
@@ -1695,94 +1854,138 @@ function flechaPortalRoom() {
                 g.fillStyle = 'rgba(255,255,255,.25)'; g.fillRect(30, 280, 360, 16); g.fillRect(30, 310, 260, 16);
                 g.fillStyle = s.color; g.fillRect(30, 342, 150, 34);
             });
-            const pic = new THREE.Mesh(new THREE.PlaneGeometry(4, 2.5), new THREE.MeshBasicMaterial({ map: t }));
-            pic.position.set(side * (W / 2 - 0.06), 2.6, z);
-            pic.rotation.y = side < 0 ? Math.PI / 2 : -Math.PI / 2;
-            scene.add(pic);
-            const frame = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(0.08, 2.7, 4.2)), new THREE.LineBasicMaterial({ color: PURPLE }));
-            frame.position.set(side * (W / 2 - 0.08), 2.6, z); scene.add(frame);
-            const plaque = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 0.35), new THREE.MeshBasicMaterial({ map: tex(512, 80, (g, w) => {
+            const pic = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 2), new THREE.MeshBasicMaterial({ map: t, side: THREE.DoubleSide }));
+            pic.position.y = 2.4; stand.add(pic);
+            const frame = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(3.35, 2.15, 0.06)), new THREE.LineBasicMaterial({ color: PURPLE }));
+            frame.position.y = 2.4; stand.add(frame);
+            const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.4, 8), new THREE.MeshStandardMaterial({ color: 0x2a2236, metalness: 0.5, roughness: 0.4 }));
+            pole.position.y = 0.7; stand.add(pole);
+            const foot = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.45, 0.08, 20), new THREE.MeshBasicMaterial({ color: PURPLE }));
+            foot.position.y = 0.04; stand.add(foot);
+            const plaque = new THREE.Mesh(new THREE.PlaneGeometry(1.9, 0.3), new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, map: tex(512, 80, (g, w) => {
                 g.fillStyle = '#0d0b11'; g.fillRect(0, 0, w, 80); g.fillStyle = '#d4a5ff'; g.font = font('700', 30); g.textAlign = 'center'; g.fillText(String(s.cat).toUpperCase(), w / 2, 52, w - 20);
             }) }));
-            plaque.position.set(side * (W / 2 - 0.06), 1.0, z); plaque.rotation.y = pic.rotation.y; scene.add(plaque);
+            plaque.position.y = 1.1; stand.add(plaque);
             pic.userData = { kind: 'site', data: s, glow: frame, label: 'View ' + s.name };
             clickables.push(pic);
         });
 
-        // pricing pedestals
+        // ---- Pricing plaza ----
         const gems = [];
         TIERS.forEach((t, i) => {
-            const x = (i - 1) * 4.5, z = -5;
-            const base = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.85, 1.1, 32), new THREE.MeshStandardMaterial({ color: 0x17131f, roughness: 0.5, metalness: 0.4 }));
-            base.position.set(x, 0.55, z); scene.add(base);
-            const ring = new THREE.Mesh(new THREE.TorusGeometry(0.72, 0.03, 8, 48), new THREE.MeshBasicMaterial({ color: PURPLE }));
-            ring.rotation.x = Math.PI / 2; ring.position.set(x, 1.11, z); scene.add(ring);
-            const geo = i === 0 ? new THREE.OctahedronGeometry(0.42) : i === 1 ? new THREE.OctahedronGeometry(0.5, 1) : new THREE.IcosahedronGeometry(0.58, 0);
+            const x = PLAZA.c.x + (i - 1) * 2.9, z = PLAZA.c.z - 1, y = PLAZA.c.y;
+            const base = new THREE.Mesh(new THREE.CylinderGeometry(0.6, 0.75, 1.1, 32), new THREE.MeshStandardMaterial({ color: 0x17131f, roughness: 0.5, metalness: 0.4 }));
+            base.position.set(x, y + 0.55, z); scene.add(base);
+            const ring = new THREE.Mesh(new THREE.TorusGeometry(0.62, 0.03, 8, 48), new THREE.MeshBasicMaterial({ color: PURPLE }));
+            ring.rotation.x = Math.PI / 2; ring.position.set(x, y + 1.11, z); scene.add(ring);
+            const geo = i === 0 ? new THREE.OctahedronGeometry(0.4) : i === 1 ? new THREE.OctahedronGeometry(0.48, 1) : new THREE.IcosahedronGeometry(0.55, 0);
             const mat = new THREE.MeshStandardMaterial({ color: PURPLE, emissive: i === 1 ? PURPLE : BLUE, emissiveIntensity: 0.55, roughness: 0.25, metalness: 0.2, flatShading: true });
-            const gem = new THREE.Mesh(geo, mat); gem.position.set(x, 2.1, z); scene.add(gem);
-            const glow = new THREE.PointLight(i === 1 ? PURPLE : BLUE, 0.8, 5, 0); glow.position.set(x, 2.1, z); scene.add(glow);
-            const label = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex(512, 160, (g, w) => {
+            const gem = new THREE.Mesh(geo, mat); gem.position.set(x, y + 2, z); gem.userData.baseY = y + 2; scene.add(gem);
+            const label = new THREE.Sprite(new THREE.SpriteMaterial({ transparent: true, map: tex(512, 160, (g, w) => {
                 g.textAlign = 'center'; g.fillStyle = '#d4a5ff'; g.font = font('800', 40); g.fillText(t.name.toUpperCase(), w / 2, 58);
                 g.fillStyle = '#fff'; g.font = font('900', 54); g.fillText(t.price, w / 2, 124);
-            }), transparent: true }));
-            label.scale.set(2.2, 0.7, 1); label.position.set(x, 3.3, z); scene.add(label);
-            gem.userData = { kind: 'tier', data: t, mat: mat, label: 'See ' + t.name + ' pricing' };
+            }) }));
+            label.scale.set(2, 0.64, 1); label.position.set(x, y + 3.15, z); scene.add(label);
+            gem.userData = Object.assign(gem.userData, { kind: 'tier', data: t, mat: mat, label: 'See ' + t.name + ' pricing' });
             base.userData = gem.userData;
             clickables.push(gem, base); gems.push(gem);
         });
 
-        // Contact doorway at the far end
-        const door = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 3.9), new THREE.MeshBasicMaterial({ map: tex(512, 768, (g, w, h) => {
+        // ---- Contact doorway (stands on its own platform, facing back up the path) ----
+        const cPath = PATHS[2];
+        const cIn = cPath.pts[cPath.pts.length - 2], cDir = V(CONTACT.c.x - cIn.x, 0, CONTACT.c.z - cIn.z).normalize();
+        const doorGroup = new THREE.Group();
+        doorGroup.position.set(CONTACT.c.x + cDir.x * 1.6, CONTACT.c.y, CONTACT.c.z + cDir.z * 1.6);
+        doorGroup.lookAt(cIn.x, CONTACT.c.y, cIn.z);
+        scene.add(doorGroup);
+        const door = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 3.3), new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, map: tex(512, 768, (g, w, h) => {
             const grd = g.createRadialGradient(w / 2, h / 2, 20, w / 2, h / 2, h * 0.6);
             grd.addColorStop(0, '#f0dcff'); grd.addColorStop(0.25, '#b580e6'); grd.addColorStop(0.7, '#3b2a6a'); grd.addColorStop(1, '#0d0b11');
             g.fillStyle = grd; g.fillRect(0, 0, w, h);
             g.strokeStyle = 'rgba(255,255,255,.75)'; g.lineWidth = 16; g.lineCap = 'round'; g.lineJoin = 'round';
             g.beginPath(); g.moveTo(w / 2 - 50, h / 2 - 80); g.lineTo(w / 2 + 40, h / 2); g.lineTo(w / 2 - 50, h / 2 + 80); g.stroke();
         }) }));
-        door.position.set(0, 1.95, -D / 2 + 0.05); scene.add(door);
-        const doorFrame = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(2.9, 4.2, 0.1)), new THREE.LineBasicMaterial({ color: PURPLE }));
-        doorFrame.position.set(0, 2.1, -D / 2 + 0.06); scene.add(doorFrame);
-        const sign = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 0.6), new THREE.MeshBasicMaterial({ map: tex(680, 120, (g, w) => {
-            g.fillStyle = '#0d0b11'; g.fillRect(0, 0, w, 120); g.fillStyle = '#fff'; g.font = font('900', 64); g.textAlign = 'center'; g.fillText('CONTACT US', w / 2, 84);
+        door.position.y = 1.65; doorGroup.add(door);
+        const doorFrame = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(2.5, 3.6, 0.12)), new THREE.LineBasicMaterial({ color: PURPLE }));
+        doorFrame.position.y = 1.8; doorGroup.add(doorFrame);
+        const sign = new THREE.Mesh(new THREE.PlaneGeometry(3, 0.55), new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, map: tex(680, 124, (g, w) => {
+            g.fillStyle = '#0d0b11'; g.fillRect(0, 0, w, 124); g.fillStyle = '#fff'; g.font = font('900', 64); g.textAlign = 'center'; g.fillText('CONTACT US', w / 2, 86);
         }) }));
-        sign.position.set(0, 4.7, -D / 2 + 0.05); scene.add(sign);
+        sign.position.y = 4.05; doorGroup.add(sign);
+        const doorLight = new THREE.PointLight(PURPLE, 1.2, 8, 0); doorLight.position.set(0, 1.8, 1); doorGroup.add(doorLight);
         door.userData = { kind: 'contact', glow: doorFrame, label: 'Book a consultation' };
         clickables.push(door);
 
-        // tagline on the entrance wall
-        const back = new THREE.Mesh(new THREE.PlaneGeometry(12, 1.6), new THREE.MeshBasicMaterial({ map: tex(1200, 160, (g, w) => {
-            g.fillStyle = '#0a0810'; g.fillRect(0, 0, w, 160); g.fillStyle = '#fff'; g.font = font('900', 72); g.textAlign = 'center'; g.fillText('MOVING YOUR VISION FORWARD', w / 2, 104);
+        // tagline floating behind the starting spot
+        const tagline = new THREE.Mesh(new THREE.PlaneGeometry(14, 1.8), new THREE.MeshBasicMaterial({ transparent: true, fog: false, map: tex(1400, 180, (g, w) => {
+            g.fillStyle = '#fff'; g.font = font('900', 84); g.textAlign = 'center'; g.fillText('MOVING YOUR VISION FORWARD', w / 2, 120);
         }) }));
-        back.position.set(0, 3.6, D / 2 - 0.05); back.rotation.y = Math.PI; scene.add(back);
-
-        // floating dust
-        const dp = [];
-        for (let i = 0; i < 260; i++) dp.push((Math.random() - 0.5) * W, Math.random() * H, (Math.random() - 0.5) * D);
-        const dustGeo = new THREE.BufferGeometry(); dustGeo.setAttribute('position', new THREE.Float32BufferAttribute(dp, 3));
-        const dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({ color: PURPLE, size: 0.05, transparent: true, opacity: 0.7 }));
-        scene.add(dust);
+        tagline.position.set(0, 4.2, 14); tagline.rotation.y = Math.PI; scene.add(tagline);
 
         // walk-to marker
         const marker = new THREE.Mesh(new THREE.RingGeometry(0.25, 0.32, 32), new THREE.MeshBasicMaterial({ color: PURPLE, transparent: true, opacity: 0 }));
-        marker.rotation.x = -Math.PI / 2; marker.position.y = 0.02; scene.add(marker);
+        marker.rotation.x = -Math.PI / 2; scene.add(marker);
 
-        // ---- controls ----
-        const START = { x: 0, z: 12.5, yaw: 0, pitch: -0.05 };
-        const me = { x: 0, z: 0, yaw: 0, pitch: 0, tx: null, tz: null };
+        // ---- movement ----
+        const EYE = 1.7, SPEED = 5, JUMP = 5.2, GRAVITY = 15;
+        const START = { x: 0, z: 2.2, yaw: 0, pitch: -0.08 };
+        const me = { x: 0, z: 0, yaw: 0, pitch: 0, jump: 0, vy: 0, route: [] };
         const keys = {};
         const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
-        let hover = null, down = null, dragging = false, running = false, last = 0, intro = 0;
+        let hover = null, down = null, dragging = false, running = false, last = 0, intro = 0, groundY = 0;
+
+        // walkable = on a path or platform, and not inside a pedestal
+        const OBSTACLES = gems.map(gm => ({ x: gm.position.x, z: gm.position.z, r: 0.95 }));
+        function walkable(x, z) {
+            if (groundAt(x, z) === null) return false;
+            for (const o of OBSTACLES) if (Math.hypot(x - o.x, z - o.z) < o.r) return false;
+            return true;
+        }
+        // move toward (nx, nz) but never off the paths: slide along the edge if blocked
+        function tryMove(nx, nz) {
+            if (walkable(nx, nz)) { me.x = nx; me.z = nz; return true; }
+            if (walkable(nx, me.z)) { me.x = nx; return true; }
+            if (walkable(me.x, nz)) { me.z = nz; return true; }
+            return false;
+        }
+
+        // route along the paths to a spot: back toward the hub on this path, then out along the other
+        function routeTo(tx, tz) {
+            const from = project(me.x, me.z), to = project(tx, tz);
+            const pts = [];
+            const along = (p, s0, s1) => {   // the path's corner points between s0 and s1, in order
+                const out = [];
+                if (s1 > s0) { for (let i = 0; i < p.pts.length; i++) if (p.len[i] > s0 && p.len[i] < s1) out.push(p.pts[i]); }
+                else { for (let i = p.pts.length - 1; i >= 0; i--) if (p.len[i] < s0 && p.len[i] > s1) out.push(p.pts[i]); }
+                return out;
+            };
+            const onPlatform = insidePlatform(me.x, me.z), targetPlatform = insidePlatform(tx, tz);
+            if (onPlatform && onPlatform === targetPlatform) {
+                pts.push(V(tx, 0, tz));
+            } else if (from.path === to.path) {
+                along(from.path, from.s, to.s).forEach(q => pts.push(q));
+                pts.push(V(tx, 0, tz));
+            } else {
+                along(from.path, from.s, 0).forEach(q => pts.push(q));
+                pts.push(HUB.c.clone());
+                along(to.path, 0, to.s).forEach(q => pts.push(q));
+                pts.push(V(tx, 0, tz));
+            }
+            me.route = pts.map(q => ({ x: q.x, z: q.z }));
+            marker.position.set(tx, (groundAt(tx, tz) || 0) + 0.04, tz); marker.material.opacity = 1;
+        }
 
         function pick(ev) {
             const r = cvs.getBoundingClientRect();
             ndc.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
             ray.setFromCamera(ndc, camera);
-            return ray.intersectObjects(clickables.concat([floor]), false)[0] || null;
+            return ray.intersectObjects(clickables.concat(walkMeshes), false)[0] || null;
         }
         function glow(obj, on) {
             const u = obj.userData;
             if (u.glow) u.glow.material.color.set(on ? 0xffffff : PURPLE);
             if (u.mat) u.mat.emissiveIntensity = on ? 1.1 : 0.55;
+            if (u.glowMesh) u.glowMesh.scale.setScalar(on ? 1.08 : 1);
         }
         function setHover(obj, ev) {
             if (hover && hover !== obj) glow(hover, false);
@@ -1802,11 +2005,11 @@ function flechaPortalRoom() {
             if (down) {
                 const dx = e.clientX - down.x, dy = e.clientY - down.y;
                 if (!dragging && Math.hypot(dx, dy) > 5) { dragging = true; cvs.classList.add('is-dragging'); setHover(null); }
-                if (dragging) { me.yaw = down.yaw + dx * 0.004; me.pitch = Math.max(-0.9, Math.min(0.7, down.pitch + dy * 0.003)); }
+                if (dragging) { me.yaw = down.yaw + dx * 0.004; me.pitch = Math.max(-1.1, Math.min(0.9, down.pitch + dy * 0.003)); }
                 return;
             }
             const h = pick(e);
-            setHover(h && !h.object.userData.floor ? h.object : null, e);
+            setHover(h && !h.object.userData.walk ? h.object : null, e);
         });
         cvs.addEventListener('pointerup', (e) => {
             const wasDrag = dragging;
@@ -1815,10 +2018,12 @@ function flechaPortalRoom() {
             const h = pick(e);
             if (!h) return;
             const u = h.object.userData;
-            if (u.floor) {
-                me.tx = Math.max(-W / 2 + 1, Math.min(W / 2 - 1, h.point.x));
-                me.tz = Math.max(-D / 2 + 1, Math.min(D / 2 - 1, h.point.z));
-                marker.position.x = me.tx; marker.position.z = me.tz; marker.material.opacity = 1;
+            if (u.walk) {
+                if (groundAt(h.point.x, h.point.z) !== null) routeTo(h.point.x, h.point.z);
+                hidePanel();
+            } else if (u.kind === 'goto') {
+                const end = pointAt(u.path, u.path.total - u.path.dest.r + 1);
+                routeTo(end.x, end.z);
                 hidePanel();
             } else if (u.kind === 'site') {
                 const s = u.data;
@@ -1836,10 +2041,14 @@ function flechaPortalRoom() {
         });
         cvs.addEventListener('pointerleave', () => { if (!down) setHover(null); });
 
+        const MOVE_KEYS = ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '];
         window.addEventListener('keydown', (e) => {
             if (!running) return;
             const k = e.key.toLowerCase();
-            if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(k)) { keys[k] = true; e.preventDefault(); }
+            if (!MOVE_KEYS.includes(k)) return;
+            e.preventDefault();
+            if (k === ' ') { if (me.jump <= 0.001 && me.vy === 0) me.vy = JUMP; return; }
+            keys[k] = true;
         });
         window.addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
         window.addEventListener('blur', () => { for (const k in keys) keys[k] = false; });
@@ -1849,11 +2058,6 @@ function flechaPortalRoom() {
             camera.updateProjectionMatrix();
         });
 
-        function blocked(x, z) {   // keep out of the pedestals
-            if (Math.abs(z + 5) < 1.3) for (let i = 0; i < 3; i++) if (Math.abs(x - (i - 1) * 4.5) < 1.3) return true;
-            return false;
-        }
-
         function frame(now) {
             if (!running) return;
             requestAnimationFrame(frame);
@@ -1861,33 +2065,52 @@ function flechaPortalRoom() {
             last = now;
             const f = (keys.w || keys.arrowup ? 1 : 0) - (keys.s || keys.arrowdown ? 1 : 0);
             const s = (keys.d || keys.arrowright ? 1 : 0) - (keys.a || keys.arrowleft ? 1 : 0);
-            let nx = me.x, nz = me.z;
+            let moving = false;
             if (f || s) {
-                me.tx = null; marker.material.opacity = 0;
-                const sp = 5 * dt;
-                nx += (-Math.sin(me.yaw) * f + Math.cos(me.yaw) * s) * sp;
-                nz += (-Math.cos(me.yaw) * f - Math.sin(me.yaw) * s) * sp;
-            } else if (me.tx !== null) {
-                const dx = me.tx - me.x, dz = me.tz - me.z, d = Math.hypot(dx, dz);
-                if (d < 0.08) { me.tx = null; marker.material.opacity = 0; }
-                else { const sp = Math.min(d, 5 * dt); nx += dx / d * sp; nz += dz / d * sp; }
+                me.route = []; marker.material.opacity = 0;
+                const sp = SPEED * dt;
+                moving = tryMove(me.x + (-Math.sin(me.yaw) * f + Math.cos(me.yaw) * s) * sp, me.z + (-Math.cos(me.yaw) * f - Math.sin(me.yaw) * s) * sp);
+            } else if (me.route.length) {
+                const wp = me.route[0], dx = wp.x - me.x, dz = wp.z - me.z, d = Math.hypot(dx, dz);
+                if (d < 0.08) { me.route.shift(); if (!me.route.length) marker.material.opacity = 0; }
+                else {
+                    const sp = Math.min(d, SPEED * dt);
+                    moving = tryMove(me.x + dx / d * sp, me.z + dz / d * sp);
+                    if (!moving) { me.route = []; marker.material.opacity = 0; }
+                    // turn gently to face where we're going
+                    let want = Math.atan2(-dx, -dz), diff = ((want - me.yaw + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+                    me.yaw += diff * Math.min(1, dt * 3);
+                }
             }
-            nx = Math.max(-W / 2 + 0.8, Math.min(W / 2 - 0.8, nx));
-            nz = Math.max(-D / 2 + 0.8, Math.min(D / 2 - 0.8, nz));
-            if (!blocked(nx, nz)) { me.x = nx; me.z = nz; } else { me.tx = null; marker.material.opacity = 0; }
+            // ground follows the ramps; Space jumps
+            const g = groundAt(me.x, me.z);
+            if (g !== null) groundY += (g - groundY) * Math.min(1, dt * 12);
+            if (me.vy !== 0 || me.jump > 0) {
+                me.vy -= GRAVITY * dt;
+                me.jump += me.vy * dt;
+                if (me.jump <= 0) { me.jump = 0; me.vy = 0; }
+            }
 
-            intro = Math.min(1, intro + dt / 1.6);   // glide in through the doorway
+            intro = Math.min(1, intro + dt / 1.6);   // glide in from the doorway
             const k = reduceMotion.matches ? 1 : 1 - Math.pow(1 - intro, 3);
-            const bob = (f || s || me.tx !== null) && !reduceMotion.matches ? Math.sin(now / 140) * 0.03 : 0;
-            camera.position.set(me.x, 1.7 + bob, me.z + (1 - k) * 2.5);
+            const bob = moving && me.jump === 0 && !reduceMotion.matches ? Math.sin(now / 140) * 0.03 : 0;
+            camera.position.set(me.x, groundY + EYE + me.jump + bob, me.z + (1 - k) * 3);
             camera.rotation.order = 'YXZ';
             camera.rotation.y = me.yaw;
             camera.rotation.x = me.pitch;
 
             const t = now / 1000;
             if (!reduceMotion.matches) {
-                gems.forEach((g, i) => { g.rotation.y = t * 0.6 + i; g.rotation.x = Math.sin(t * 0.5 + i) * 0.2; g.position.y = 2.1 + Math.sin(t * 1.4 + i) * 0.12; });
-                dust.rotation.y = t * 0.01;
+                gems.forEach((gm, i) => { gm.rotation.y = t * 0.6 + i; gm.rotation.x = Math.sin(t * 0.5 + i) * 0.2; gm.position.y = gm.userData.baseY + Math.sin(t * 1.4 + i) * 0.12; });
+                dotMat.opacity = 0.75 + Math.sin(t * 2) * 0.2;
+                const arr = runGeo.attributes.position.array;
+                RUNNERS.forEach((r, i) => {
+                    r.s += dt * 2.2; if (r.s > r.p.runTo) r.s = r.p.runFrom;   // run from the hub out to the destination
+                    const pt = pointAt(r.p, r.s);
+                    arr[i * 3] = pt.x; arr[i * 3 + 1] = pt.y + 0.12; arr[i * 3 + 2] = pt.z;
+                });
+                runGeo.attributes.position.needsUpdate = true;
+                stars.rotation.y = t * 0.004;
             }
             if (marker.material.opacity > 0) { const p = 1 + Math.sin(t * 6) * 0.1; marker.scale.set(p, p, p); }
             renderer.render(scene, camera);
@@ -1895,7 +2118,8 @@ function flechaPortalRoom() {
 
         return {
             start() {
-                Object.assign(me, START, { tx: null, tz: null });
+                Object.assign(me, START, { route: [], jump: 0, vy: 0 });
+                groundY = groundAt(me.x, me.z) || 0;
                 marker.material.opacity = 0;
                 intro = 0;
                 renderer.setSize(window.innerWidth, window.innerHeight);
