@@ -4955,6 +4955,16 @@ section::before {
     }
 }
 
+/* Desktop: no portal ring or drifting website cards behind the doors, just the
+   text on the plus-sign grid (like "Before Your Consultation"). Phones keep
+   the portal and cards as before. */
+@media (min-width: 769px) {
+    .company-intro .intro-portal,
+    .company-intro .container::after {
+        display: none;
+    }
+}
+
 /* ===== Portal room (desktop only, 769px and wider) =====
    On desktop the Welcome doors stay closed with an Enter button. Clicking it
    opens the doors and steps into a full-screen 3D gallery room (built by
