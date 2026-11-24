@@ -1529,6 +1529,7 @@ function flechaPlusGrid(section, canvas, getHoles) {
     window.addEventListener('load', refresh);
     desktop.addEventListener('change', refresh);
     refresh();
+    return { refresh: refresh };
 }
 
 // rect of an element relative to the section
@@ -1536,13 +1537,16 @@ function flechaRel(r, s) {
     return { x: r.left - s.left, y: r.top - s.top, w: r.width, h: r.height };
 }
 
-// ===== Portal Room: a 3D gallery behind the Welcome doors (desktop only) =====
-// Opened by the Enter button in "Welcome to Flecha Web Design". A full-screen
-// dark purple room built with three.js (loaded at the bottom of index.html):
-//   - portfolio sites hang on the side walls; click one to open the live site
-//   - a pricing stage: Pay Once on the raised top row, Monthly on the row in
-//     front, and a sign above that switches Non-E-Commerce / E-Commerce
-//   - a Contact doorway on the back wall jumps to the consultation form
+// ===== Portal Rooms: a 3D gallery behind the Welcome doors (desktop only) =====
+// Opened by the Enter button in "Welcome to Flecha Web Design". Two full-screen
+// dark purple rooms built with three.js (loaded at the bottom of index.html),
+// one thing at a time:
+//   Room 1, Our Work: the portfolio sites hang on the side walls (click one to
+//     open the live site). A glowing "Pricing" doorway on the far wall leads on.
+//   Room 2, Pricing: the pricing stage (Pay Once on the raised top row, Monthly
+//     in front, and a sign that switches Non-E-Commerce / E-Commerce), the
+//     Contact doorway, and an "Our Work" doorway back to Room 1.
+// Click a doorway or walk into it to change rooms (a quick fade between them).
 // Drag to look, click the floor or use W A S D / arrow keys to walk, and the
 // Exit button or Esc returns to the page right where the visitor was.
 // Nothing is built until the first click, and it only draws while open.
@@ -1559,7 +1563,8 @@ function flechaPortalRoom() {
     room.innerHTML =
         '<div class="portal-room-brand">FLECHA <span>WEB DESIGN</span></div>' +
         '<button type="button" class="portal-room-exit">Exit ✕</button>' +
-        '<div class="portal-room-hint"><kbd>Drag</kbd> look &nbsp;·&nbsp; <kbd>W A S D</kbd> or click the floor to walk &nbsp;·&nbsp; click things to explore &nbsp;·&nbsp; <kbd>Esc</kbd> exit</div>' +
+        '<div class="portal-room-hint"><kbd>Drag</kbd> look &nbsp;·&nbsp; <kbd>W A S D</kbd> or click the floor to walk &nbsp;·&nbsp; click things to explore &nbsp;·&nbsp; doorways change rooms &nbsp;·&nbsp; <kbd>Esc</kbd> exit</div>' +
+        '<div class="portal-room-where" style="position:absolute;top:44px;left:20px;color:#d4a5ff;font-size:0.72rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;pointer-events:none;"></div>' +
         '<div class="portal-room-tip" hidden></div>' +
         '<div class="portal-room-panel"><button type="button" class="prp-close" aria-label="Close">×</button><div class="prp-body"></div></div>';
     document.body.appendChild(room);
@@ -1707,7 +1712,11 @@ function flechaPortalRoom() {
         const plusGeo = new THREE.BufferGeometry(); plusGeo.setAttribute('position', new THREE.Float32BufferAttribute(plus, 3));
         scene.add(new THREE.LineSegments(plusGeo, new THREE.LineBasicMaterial({ color: PURPLE, transparent: true, opacity: 0.4 })));
 
-        const clickables = [];
+        // the two rooms share the walls, floor and ceiling; only one room's contents show at a time
+        const workRoom = new THREE.Group(), priceRoom = new THREE.Group();
+        scene.add(workRoom, priceRoom);
+        const roomClick = { work: [], pricing: [] };   // what can be clicked in each room
+        let current = 'work';
         const disposables = [];
         function tex(w, h, paint) {
             const c = document.createElement('canvas'); c.width = w; c.height = h;
@@ -1735,15 +1744,15 @@ function flechaPortalRoom() {
             const pic = new THREE.Mesh(new THREE.PlaneGeometry(4, 2.5), new THREE.MeshBasicMaterial({ map: t }));
             pic.position.set(side * (W / 2 - 0.06), 2.6, z);
             pic.rotation.y = side < 0 ? Math.PI / 2 : -Math.PI / 2;
-            scene.add(pic);
+            workRoom.add(pic);
             const frame = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(0.08, 2.7, 4.2)), new THREE.LineBasicMaterial({ color: PURPLE }));
-            frame.position.set(side * (W / 2 - 0.08), 2.6, z); scene.add(frame);
+            frame.position.set(side * (W / 2 - 0.08), 2.6, z); workRoom.add(frame);
             const plaque = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 0.35), new THREE.MeshBasicMaterial({ map: tex(512, 80, (g, w) => {
                 g.fillStyle = '#0d0b11'; g.fillRect(0, 0, w, 80); g.fillStyle = '#d4a5ff'; g.font = font('700', 30); g.textAlign = 'center'; g.fillText(String(s.cat).toUpperCase(), w / 2, 52, w - 20);
             }) }));
-            plaque.position.set(side * (W / 2 - 0.06), 1.0, z); plaque.rotation.y = pic.rotation.y; scene.add(plaque);
+            plaque.position.set(side * (W / 2 - 0.06), 1.0, z); plaque.rotation.y = pic.rotation.y; workRoom.add(plaque);
             pic.userData = { kind: 'site', data: s, glow: frame, label: 'View ' + s.name };
-            clickables.push(pic);
+            roomClick.work.push(pic);
         });
 
         // ---- pricing stage ----
@@ -1757,10 +1766,10 @@ function flechaPortalRoom() {
         ];
         const SPACING = 3.6;
         const stage = new THREE.Mesh(new THREE.BoxGeometry(STAGE.w, STAGE.h, STAGE.d), new THREE.MeshStandardMaterial({ color: 0x100d17, roughness: 0.7, metalness: 0.3 }));
-        stage.position.set(0, STAGE.h / 2, STAGE.z); scene.add(stage);
+        stage.position.set(0, STAGE.h / 2, STAGE.z); priceRoom.add(stage);
         const stageEdges = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(STAGE.w, STAGE.h, STAGE.d)), new THREE.LineBasicMaterial({ color: PURPLE, transparent: true, opacity: 0.8 }));
-        stageEdges.position.copy(stage.position); scene.add(stageEdges);
-        const stageLight = new THREE.PointLight(PURPLE, 1.2, 12, 0); stageLight.position.set(0, 4.6, -5); scene.add(stageLight);
+        stageEdges.position.copy(stage.position); priceRoom.add(stageEdges);
+        const stageLight = new THREE.PointLight(PURPLE, 1.2, 12, 0); stageLight.position.set(0, 4.6, -5); priceRoom.add(stageLight);
 
         // a canvas texture that can be repainted when the pricing type changes
         function liveTex(w, h) {
@@ -1777,19 +1786,19 @@ function flechaPortalRoom() {
             for (let i = 0; i < 3; i++) {
                 const x = (i - 1) * SPACING, z = row.z, y0 = row.floor;
                 const base = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.75, 0.8, 32), new THREE.MeshStandardMaterial({ color: 0x17131f, roughness: 0.5, metalness: 0.4 }));
-                base.position.set(x, y0 + 0.4, z); scene.add(base);
+                base.position.set(x, y0 + 0.4, z); priceRoom.add(base);
                 const ring = new THREE.Mesh(new THREE.TorusGeometry(0.64, 0.03, 8, 48), new THREE.MeshBasicMaterial({ color: PURPLE }));
-                ring.rotation.x = Math.PI / 2; ring.position.set(x, y0 + 0.81, z); scene.add(ring);
+                ring.rotation.x = Math.PI / 2; ring.position.set(x, y0 + 0.81, z); priceRoom.add(ring);
                 const geo = i === 0 ? new THREE.OctahedronGeometry(0.4) : i === 1 ? new THREE.OctahedronGeometry(0.46, 1) : new THREE.IcosahedronGeometry(0.52, 0);
                 const glowColor = row.key === 'monthly' ? BLUE : PURPLE;
                 const mat = new THREE.MeshStandardMaterial({ color: PURPLE, emissive: i === 1 ? PURPLE : glowColor, emissiveIntensity: 0.55, roughness: 0.25, metalness: 0.2, flatShading: true });
-                const gem = new THREE.Mesh(geo, mat); gem.position.set(x, y0 + 1.5, z); gem.userData.baseY = y0 + 1.5; scene.add(gem);
+                const gem = new THREE.Mesh(geo, mat); gem.position.set(x, y0 + 1.5, z); gem.userData.baseY = y0 + 1.5; priceRoom.add(gem);
                 const lt = liveTex(512, 160);
                 const label = new THREE.Sprite(new THREE.SpriteMaterial({ map: lt.tex, transparent: true }));
-                label.scale.set(2.1, 0.66, 1); label.position.set(x, y0 + 2.35, z); scene.add(label);
+                label.scale.set(2.1, 0.66, 1); label.position.set(x, y0 + 2.35, z); priceRoom.add(label);
                 gem.userData = Object.assign(gem.userData, { kind: 'tier', mat: mat });
                 base.userData = gem.userData;
-                clickables.push(gem, base); gems.push(gem);
+                roomClick.pricing.push(gem, base); gems.push(gem);
                 slots.push({ row: row, i: i, gem: gem, paint: lt.paint });
             }
             // row name at the left end of each row
@@ -1798,15 +1807,15 @@ function flechaPortalRoom() {
                 g.strokeStyle = '#d4a5ff'; g.lineWidth = 4; g.strokeRect(2, 2, w - 4, h - 4);
                 g.fillStyle = '#d4a5ff'; g.font = font('900', 46); g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(row.label, w / 2, h / 2 + 2);
             }) }));
-            rowSign.scale.set(1.6, 0.4, 1); rowSign.position.set(-SPACING - 2.3, row.floor + 1.5, row.z); scene.add(rowSign);
+            rowSign.scale.set(1.6, 0.4, 1); rowSign.position.set(-SPACING - 2.3, row.floor + 1.5, row.z); priceRoom.add(rowSign);
         });
 
         // switch sign above the stage: NON-E-COMMERCE | E-COMMERCE
         const sw = liveTex(1280, 200);
         const switchSign = new THREE.Mesh(new THREE.PlaneGeometry(6.4, 1.0), new THREE.MeshBasicMaterial({ map: sw.tex, transparent: true }));
-        switchSign.position.set(0, 5.4, STAGE.z - STAGE.d / 2 + 0.05); scene.add(switchSign);
+        switchSign.position.set(0, 5.4, STAGE.z - STAGE.d / 2 + 0.05); priceRoom.add(switchSign);
         switchSign.userData = { kind: 'ptype', label: 'Switch between Non-E-Commerce and E-Commerce' };
-        clickables.push(switchSign);
+        roomClick.pricing.push(switchSign);
 
         function paintPricing() {
             const P = PRICING[priceType];
@@ -1835,30 +1844,47 @@ function flechaPortalRoom() {
         }
         paintPricing();
 
-        // Contact doorway on the back wall, to the right of the pricing stage (so nothing hides it)
+        // ---- doorways ----
+        // A glowing doorway with a sign above it, set into a wall.
+        // wallZ: the wall it sits in; rotY: Math.PI for the entrance wall (faces the back of the room)
+        function doorway(group, x, wallZ, rotY, signText, arrowLeft, userData) {
+            const g = new THREE.Group(); g.position.set(x, 0, wallZ); g.rotation.y = rotY; group.add(g);
+            const door = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 3.9), new THREE.MeshBasicMaterial({ map: tex(512, 768, (c, w, h) => {
+                const grd = c.createRadialGradient(w / 2, h / 2, 20, w / 2, h / 2, h * 0.6);
+                grd.addColorStop(0, '#f0dcff'); grd.addColorStop(0.25, '#b580e6'); grd.addColorStop(0.7, '#3b2a6a'); grd.addColorStop(1, '#0d0b11');
+                c.fillStyle = grd; c.fillRect(0, 0, w, h);
+                c.strokeStyle = 'rgba(255,255,255,.75)'; c.lineWidth = 16; c.lineCap = 'round'; c.lineJoin = 'round';
+                const d = arrowLeft ? -1 : 1;
+                c.beginPath(); c.moveTo(w / 2 - 50 * d, h / 2 - 80); c.lineTo(w / 2 + 40 * d, h / 2); c.lineTo(w / 2 - 50 * d, h / 2 + 80); c.stroke();
+            }) }));
+            door.position.set(0, 1.95, 0.05); g.add(door);
+            const frameLines = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(2.9, 4.2, 0.1)), new THREE.LineBasicMaterial({ color: PURPLE }));
+            frameLines.position.set(0, 2.1, 0.06); g.add(frameLines);
+            const sign = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 0.6), new THREE.MeshBasicMaterial({ map: tex(680, 120, (c, w) => {
+                c.fillStyle = '#0d0b11'; c.fillRect(0, 0, w, 120); c.fillStyle = '#fff'; c.font = font('900', 60); c.textAlign = 'center'; c.fillText(signText, w / 2, 82, w - 30);
+            }) }));
+            sign.position.set(0, 4.7, 0.05); g.add(sign);
+            door.userData = Object.assign({ glow: frameLines }, userData);
+            return door;
+        }
+
+        // Room 1 (Our Work): the doorway on the far wall leads to Pricing
+        const toPricing = doorway(workRoom, 0, -D / 2, 0, 'PRICING  ›', false, { kind: 'room', to: 'pricing', label: 'Go to Pricing' });
+        roomClick.work.push(toPricing);
+
+        // Room 2 (Pricing): Contact doorway on the far wall, to the right of the stage (so nothing hides it)
         const DOOR_X = 7.9;
-        const door = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 3.9), new THREE.MeshBasicMaterial({ map: tex(512, 768, (g, w, h) => {
-            const grd = g.createRadialGradient(w / 2, h / 2, 20, w / 2, h / 2, h * 0.6);
-            grd.addColorStop(0, '#f0dcff'); grd.addColorStop(0.25, '#b580e6'); grd.addColorStop(0.7, '#3b2a6a'); grd.addColorStop(1, '#0d0b11');
-            g.fillStyle = grd; g.fillRect(0, 0, w, h);
-            g.strokeStyle = 'rgba(255,255,255,.75)'; g.lineWidth = 16; g.lineCap = 'round'; g.lineJoin = 'round';
-            g.beginPath(); g.moveTo(w / 2 - 50, h / 2 - 80); g.lineTo(w / 2 + 40, h / 2); g.lineTo(w / 2 - 50, h / 2 + 80); g.stroke();
-        }) }));
-        door.position.set(DOOR_X, 1.95, -D / 2 + 0.05); scene.add(door);
-        const doorFrame = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(2.9, 4.2, 0.1)), new THREE.LineBasicMaterial({ color: PURPLE }));
-        doorFrame.position.set(DOOR_X, 2.1, -D / 2 + 0.06); scene.add(doorFrame);
-        const sign = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 0.6), new THREE.MeshBasicMaterial({ map: tex(680, 120, (g, w) => {
-            g.fillStyle = '#0d0b11'; g.fillRect(0, 0, w, 120); g.fillStyle = '#fff'; g.font = font('900', 64); g.textAlign = 'center'; g.fillText('CONTACT US', w / 2, 84);
-        }) }));
-        sign.position.set(DOOR_X, 4.7, -D / 2 + 0.05); scene.add(sign);
-        door.userData = { kind: 'contact', glow: doorFrame, label: 'Book a consultation' };
-        clickables.push(door);
+        const contactDoor = doorway(priceRoom, DOOR_X, -D / 2, 0, 'CONTACT US', false, { kind: 'contact', label: 'Book a consultation' });
+        roomClick.pricing.push(contactDoor);
+        // ...and a doorway in the entrance wall back to Our Work (behind the visitor on arrival)
+        const toWork = doorway(priceRoom, 0, D / 2, Math.PI, '‹  OUR WORK', true, { kind: 'room', to: 'work', label: 'Back to Our Work' });
+        roomClick.pricing.push(toWork);
 
         // tagline on the entrance wall
         const back = new THREE.Mesh(new THREE.PlaneGeometry(12, 1.6), new THREE.MeshBasicMaterial({ map: tex(1200, 160, (g, w) => {
             g.fillStyle = '#0a0810'; g.fillRect(0, 0, w, 160); g.fillStyle = '#fff'; g.font = font('900', 72); g.textAlign = 'center'; g.fillText('MOVING YOUR VISION FORWARD', w / 2, 104);
         }) }));
-        back.position.set(0, 3.6, D / 2 - 0.05); back.rotation.y = Math.PI; scene.add(back);
+        back.position.set(0, 3.6, D / 2 - 0.05); back.rotation.y = Math.PI; workRoom.add(back);
 
         // floating dust
         const dp = [];
@@ -1882,7 +1908,7 @@ function flechaPortalRoom() {
             const r = cvs.getBoundingClientRect();
             ndc.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
             ray.setFromCamera(ndc, camera);
-            return ray.intersectObjects(clickables.concat([floor]), false)[0] || null;
+            return ray.intersectObjects(roomClick[current].concat([floor]), false)[0] || null;
         }
         function glow(obj, on) {
             const u = obj.userData;
@@ -1929,6 +1955,8 @@ function flechaPortalRoom() {
                 const s = u.data;
                 showPanel('<div class="prp-kicker">' + esc(s.cat) + '</div><h4>' + esc(s.name) + '</h4><p>' + esc(s.desc) + '</p>' +
                     '<div class="prp-actions"><a class="prp-btn" href="' + esc(s.link) + '" target="_blank" rel="noopener noreferrer">Open live site ↗</a></div>');
+            } else if (u.kind === 'room') {
+                goRoom(u.to);
             } else if (u.kind === 'ptype') {
                 // left half = Non-E-Commerce, right half = E-Commerce
                 const want = h.uv && h.uv.x >= 0.5 ? 'ecom' : 'non';
@@ -1958,10 +1986,43 @@ function flechaPortalRoom() {
             camera.updateProjectionMatrix();
         });
 
-        function blocked(x, z) {   // keep out of the stage and the front pedestals
+        function blocked(x, z) {   // pricing room: keep out of the stage and the front pedestals
+            if (current !== 'pricing') return false;
             if (Math.abs(x) < STAGE.w / 2 + 0.5 && Math.abs(z - STAGE.z) < STAGE.d / 2 + 0.5) return true;
             if (Math.abs(z - ROWS[1].z) < 1.2) for (let i = 0; i < 3; i++) if (Math.abs(x - (i - 1) * SPACING) < 1.2) return true;
             return false;
+        }
+
+        // ---- changing rooms: a quick fade to black, swap, fade back in ----
+        const where = room.querySelector('.portal-room-where');
+        const fade = document.createElement('div');
+        fade.style.cssText = 'position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity 0.35s ease;';
+        cvs.after(fade);
+        let switching = false;
+        function setRoom(name) {
+            current = name;
+            workRoom.visible = name === 'work';
+            priceRoom.visible = name === 'pricing';
+            where.textContent = name === 'work' ? 'Room 1 of 2 · Our Work' : 'Room 2 of 2 · Pricing';
+        }
+        function placeIn(name, fromPricing) {
+            if (name === 'work' && fromPricing) Object.assign(me, { x: 0, z: -11.5, yaw: Math.PI, pitch: -0.05 });   // just inside the Pricing doorway, facing back into the room
+            else Object.assign(me, START);
+            me.tx = null; marker.material.opacity = 0;
+        }
+        function goRoom(name) {
+            if (switching || name === current) return;
+            switching = true;
+            hidePanel(); if (hover) setHover(null);
+            for (const k in keys) keys[k] = false;
+            const fromPricing = current === 'pricing';
+            const wait = reduceMotion.matches ? 0 : 350;
+            fade.style.opacity = '1';
+            setTimeout(() => {
+                setRoom(name); placeIn(name, fromPricing); intro = 1;
+                fade.style.opacity = '0';
+                setTimeout(() => { switching = false; }, wait);
+            }, wait);
         }
 
         function frame(now) {
@@ -1985,6 +2046,11 @@ function flechaPortalRoom() {
             nx = Math.max(-W / 2 + 0.8, Math.min(W / 2 - 0.8, nx));
             nz = Math.max(-D / 2 + 0.8, Math.min(D / 2 - 0.8, nz));
             if (!blocked(nx, nz)) { me.x = nx; me.z = nz; } else { me.tx = null; marker.material.opacity = 0; }
+            // walking into a doorway changes rooms
+            if (!switching && Math.abs(me.x) < 1.4) {
+                if (current === 'work' && me.z < -D / 2 + 1.0) goRoom('pricing');
+                else if (current === 'pricing' && me.z > D / 2 - 1.0) goRoom('work');
+            }
 
             intro = Math.min(1, intro + dt / 1.6);   // glide in through the doorway
             const k = reduceMotion.matches ? 1 : 1 - Math.pow(1 - intro, 3);
@@ -2005,6 +2071,8 @@ function flechaPortalRoom() {
 
         return {
             start() {
+                setRoom('work');
+                fade.style.opacity = '0'; switching = false;
                 Object.assign(me, START, { tx: null, tz: null });
                 marker.material.opacity = 0;
                 intro = 0;
@@ -2260,7 +2328,7 @@ function flechaPortalRoom() {
 (function() {
     const section = document.querySelector('.company-intro');
     if (!section) return;
-    flechaPlusGrid(section, document.getElementById('introPlus'), function(s) {
+    const grid = flechaPlusGrid(section, document.getElementById('introPlus'), function(s) {
         const holes = [];
         section.querySelectorAll('.container .section-title, .container .intro-text').forEach(el => holes.push(flechaRel(el.getBoundingClientRect(), s)));
         const btn = document.getElementById('introReenter');
@@ -2272,6 +2340,11 @@ function flechaPortalRoom() {
         }
         return holes;
     });
+    if (!grid) return;
+    // The section gets taller when the doors open and the button appears, so
+    // redraw the grid then (otherwise the + signs end up stretched over the button).
+    new MutationObserver(() => grid.refresh()).observe(section, { attributes: true, attributeFilter: ['class'] });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => grid.refresh());
 })();
 
 // "Before Your Consultation": keep the box clear
